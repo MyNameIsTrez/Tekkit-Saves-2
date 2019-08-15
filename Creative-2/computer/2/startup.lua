@@ -1,5 +1,7 @@
-function startingSettings() -- customisable starting data
-  -- code that needs to be ran at least once for the program to work
+function startingSettings()
+  -- code that needs to be ran at least once for the program to work, where you can also customize the starting data
+  -- in lua, all these variables will still be globally accesible once this function is done
+
   term.clear()
   shuffleSongs = {}
   playlistLength = 0
