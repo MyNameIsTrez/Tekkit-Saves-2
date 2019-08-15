@@ -92,7 +92,6 @@ function getSongTitles() -- gets all the midi titles
 
   for i = 1, #filesInCurDir do
     if filesInCurDir[i] == "startup" or filesInCurDir[i] == "main.lua" or filesInCurDir[i] == "rom" then
-      -- print(filesInCurDir[i])
       table.remove(filesInCurDir, i)
     end
   end
@@ -102,10 +101,6 @@ function getSongTitles() -- gets all the midi titles
   for i = 1, #filesInCurDir do
     midiArrayTitles[i] = {} -- it's necessary to make this a 2D array, as it'll also hold the song lengths for every title
     midiArrayTitles[i][1] = filesInCurDir[i]
-  end
-
-  for i = 1, #midiArrayTitles do
-    print(midiArrayTitles[i][1])
   end
 end
 getSongTitles() -- run the above function upon the startup of this program
