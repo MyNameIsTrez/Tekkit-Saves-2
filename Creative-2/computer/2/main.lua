@@ -112,20 +112,21 @@ getSongTitles() -- run the above function upon the startup of this program
 
 
 
--- function songLengths() -- gets the lengths of the songs
---   for i = 1, #midiArrayTitles do
---     songLength = 0
---     shell.run(midiArrayTitles[i][1])
---     print(midiArrayTitles[i][1])
---     for j = 1, #midiArray do
---       songLength = songLength + midiArray[j][1]
---     end
---     midiArrayTitles[i][2] = songLength -- assigns the length of each song title to the 2D array
---     playlistLength = playlistLength + songLength -- counts the total time length of all the songs together
---     midiArray = nil -- why does it need to set the midiArray to nil???
---   end
--- end
--- songLengths() -- run the above function upon the startup of this program
+function songLengths() -- gets the lengths of the songs
+  for i = 1, #midiArrayTitles do
+    songLength = 0
+    shell.run(midiArrayTitles[i][1])
+    print(midiArrayTitles[i][1])
+    for j = 1, #midiArray do
+      print(midiArray[j][1])
+      songLength = songLength + midiArray[j][1]
+    end
+    midiArrayTitles[i][2] = songLength -- assigns the length of each song title to the 2D array
+    playlistLength = playlistLength + songLength -- counts the total time length of all the songs together
+    midiArray = nil -- why does it need to set the midiArray to nil???
+  end
+end
+songLengths() -- run the above function upon the startup of this program
 
 
 
