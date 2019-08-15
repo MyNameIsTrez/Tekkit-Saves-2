@@ -1,10 +1,9 @@
 function startingSettings()
   -- code that needs to be ran at least once for the program to work, where you can also customize the starting data
   -- in lua, all these variables will still be globally accesible once this function is done
-
-  term.clear()
+  term.clear() -- clear the text on the monitor
   shuffleSongs = {}
-  playlistLength = 0
+  playlistLength = 0 -- this needs to be 0, as it keeps track of the total time length of all the songs together
   termX, termY = term.getSize() -- store the terminal's dimensions in two variables
   gen = 0 -- which note the song is on
 
@@ -25,30 +24,31 @@ startingSettings() -- run the above function upon the startup of this program
 
 
 function drawStartingGraphInfo()
-  term.redirect(m)
+  term.redirect(m) -- redirect the code to be ran on the monitor
 
   for i = 0, 24 do
     -- screen : max x-coordinate ratio is 1:6, 2:16, 3:26, 4:36
     -- screen : max y-coordinate ratio is 1:5, 2:11, 3:18, 4:25
-    m.setCursorPos(1, 25 - i)
+    m.setCursorPos(1, 25 - i) -- set the cursor on the monitor to x, y
     if i <= 9 then
       i = "0"..i
     end
     write(i)
   end
 
-  for i = 1, 25 do
+  for i = 1, 25 do -- make a vertical line to the right of the numbers
     m.setCursorPos(3, i)
     write("|")
   end
-  term.restore()
+
+  term.restore() -- redirect the code back to the terminal
 end
 drawStartingGraphInfo() -- run the above function upon the startup of this program
 
 
 
-function drawSong(instrument, pitch) -- draws the song data on the monitor
-  term.redirect(m)
+function drawSong(instrument, pitch) -- draws the given song data on the monitor
+  term.redirect(m) -- redirect the code to be ran on the monitor
   -- screen : max x-coordinate ratio is 1:6, 2:16, 3:26, 4:36
   -- screen : max y-coordinate ratio is 1:5, 2:11, 3:18, 4:25
 
@@ -64,7 +64,7 @@ function drawSong(instrument, pitch) -- draws the song data on the monitor
   elseif instrument == "harp" then
     write("e")
   end
-  term.restore()
+  term.restore() -- redirect the code back to the terminal
 end
 
 
@@ -99,7 +99,7 @@ function getSongTitles() -- gets all the midi titles
   midiArrayTitles = {}
 
   for i = 1, #filesInCurDir do
-    midiArrayTitles[i] = {}
+    midiArrayTitles[i] = {} -- it's necessary to make this a 2D array, as it'll also hold the song lengths for every title
     midiArrayTitles[i][1] = filesInCurDir[i]
   end
 end
@@ -114,9 +114,9 @@ function songLengths() -- gets the lengths of the songs
     for j = 1, #midiArray do
       songLength = songLength + midiArray[j][1]
     end
-    midiArrayTitles[i][2] = songLength
-    playlistLength = playlistLength + songLength
-    midiArray = nil
+    midiArrayTitles[i][2] = songLength -- assigns the length of each song title to the 2D array
+    playlistLength = playlistLength + songLength -- counts the total time length of all the songs together
+    midiArray = nil -- why does it need to set the midiArray to nil???
   end
 end
 songLengths() -- run the above function upon the startup of this program
