@@ -202,20 +202,65 @@ function readUserInput() -- reading the user input
   if (type(numberUserInput) == "number") and (numberUserInput > 0) and (numberUserInput < (#midiArrayTitles + 1)) then -- checks if the user input is a number that's the index of a song title
     chosenSongNumber = numberUserInput
     page = math.ceil(chosenSongNumber / 10)
-  elseif userInput == "help" then
+  elseif userInput == "help" or userInput =="help 1" then
     term.clear()
-    term.setCursorPos(10, 2)
-    print("Commands and their descriptions:")
+    term.setCursorPos(19, 2)
+    print("Help page 1/2:")
 
-    term.setCursorPos(1, 4)
-    print(" page -> [page number] -- Change the viewed page.")
-    print(" playlist -- Play all the songs in the order of the playlist.")
-    print(" shuffle -- Play all the songs in a random order, doesn't repeat a song.")
-    print(" random -- Play all the songs in a random order, does repeat songs.")
-    print(" playspeed -> [speed] -- Change the speed at which the songs are played at.")
-    print(" randomplayspeed -> [speed] -- Change the speed at which randomly generated songs are played at.")
-    print()
-    print("       [press enter] -- Exit this help menu.")
+    term.setCursorPos(19, 5)
+    print("'help <number>'")
+    term.setCursorPos(12, 6)
+    print("Changes the viewed help page.")
+
+    term.setCursorPos(16, 8)
+    print("'page' -> '<number>'")
+    term.setCursorPos(12, 9)
+    print("Changes the viewed song page.")
+    
+    term.setCursorPos(20, 11)
+    print("'playlist'")
+    term.setCursorPos(4, 12)
+    print("Play all the songs in the order of the pages.")
+
+    -- term.setCursorPos(20, 11)
+    -- print("'shuffle'")
+    -- term.setCursorPos(4, 12)
+    -- print("Play all the songs in a random order, but")
+    -- term.setCursorPos(4, 13)
+    -- print("it can't immediately repeat the same song.")
+    
+    term.setCursorPos(5, 16)
+    print("Press the enter key to exit this help menu!")
+    term.setCursorPos(1, 17)
+    centerUserInput() -- asks a user input so the help menu stays open
+  elseif userInput == "help 2" then
+    term.clear()
+    term.setCursorPos(19, 2)
+    print("Help page 2/2:")
+
+    term.setCursorPos(22, 4)
+    print("'random'")
+    term.setCursorPos(7, 5)
+    print("Play all the songs in a random order,")
+    term.setCursorPos(9, 6)
+    print("but can immediately repeat songs.")
+
+    term.setCursorPos(13, 8)
+    print("'playspeed' -> '<number>'")
+    term.setCursorPos(13, 9)
+    print("Change the speed at which")
+    term.setCursorPos(14, 10)
+    print("the songs are played at.")
+
+    term.setCursorPos(11, 12)
+    print("'randomplayspeed' -> '<speed>'")
+    term.setCursorPos(9, 13)
+    print("Change the speed at which randomly")
+    term.setCursorPos(11, 14)
+    print("generated songs are played at.")
+    
+    term.setCursorPos(5, 16)
+    print("Press the enter key to exit this help menu!")
     term.setCursorPos(1, 17)
     centerUserInput() -- asks a user input so the help menu stays open
   elseif userInput == "page" then
