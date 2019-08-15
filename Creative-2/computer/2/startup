@@ -2,4 +2,4 @@
 -- and VS Code needs the extension name startup.lua to recognize the code as being in LUA,
 -- which is useful for extensions which help me debug the code.
 
-shell.run("startup.lua")
+shell.run("main.lua")
