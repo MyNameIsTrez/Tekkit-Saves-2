@@ -366,12 +366,14 @@ function drawSongTitles()
         clearSongLines()
       end
 
-      term.setCursorPos(1, i - (page * 10 - 10) + 5)
-      print("           "..i..". "..midiArrayTitles[i][1].." ("..(midiArrayTitles[i][2] / 10).."s)")
+      pointerX = 7 -- The x coordinate of the pointer.
 
-      term.setCursorPos(1, i - (page * 10 - 10) + 5)
+      term.setCursorPos(pointerX + 2, i - (page * 10 - 10) + 5)
+      print(i..". "..midiArrayTitles[i][1].." ("..(midiArrayTitles[i][2] / 10).."s)")
+
+      term.setCursorPos(pointerX, i - (page * 10 - 10) + 5)
       if (i == chosenSongNumber) or (i == playlistSongNumber) or (i == shuffleSongNumber) or (i == randomSongNumber) then
-        print("         >")
+        print(">")
       end
     end
   end
