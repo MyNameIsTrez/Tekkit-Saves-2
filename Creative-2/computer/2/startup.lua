@@ -18,7 +18,7 @@ function startingSettings() -- customisable starting data
   randomPlaySpeed = 1 -- the speed at which randomly generated songs are played at (by default 1)
   page = 1 -- the page of the song pages you start at, where you can pick different songs to play (by default 1)
 end
-startingSettings() -- Run the above function upon startup of this program.
+startingSettings() -- run the above function upon the startup of this program
 
 
 
@@ -41,7 +41,7 @@ function drawStartingGraphInfo()
   end
   term.restore()
 end
-drawStartingGraphInfo() -- Run the above function upon startup of this program.
+drawStartingGraphInfo() -- run the above function upon the startup of this program
 
 
 
@@ -101,7 +101,7 @@ function getSongTitles() -- gets all the midi titles
     midiArrayTitles[i][1] = filesInCurDir[i]
   end
 end
-getSongTitles() -- Run the above function upon startup of this program.
+getSongTitles() -- run the above function upon the startup of this program
 
 
 
@@ -117,7 +117,7 @@ function songLengths() -- gets the lengths of the songs
     midiArray = nil
   end
 end
-songLengths() -- Run the above function upon startup of this program.
+songLengths() -- run the above function upon the startup of this program
 
 
 
