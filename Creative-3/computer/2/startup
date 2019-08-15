@@ -1,0 +1,16 @@
+-- Written by MyNameIsTrez
+
+-- Reads the savedData file.
+function readSavedData()
+   file = fs.open("savedData", "r")
+   data = {}
+   print(type(data))
+   data[1] = textutils.unserialize(file)
+   file.close()
+   print(data)
+end
+
+function main()
+   readSavedData()
+end
+main()

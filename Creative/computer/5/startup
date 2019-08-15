@@ -1,0 +1,14 @@
+rednet.open("right")
+sleepTime = 5
+
+function main()
+ while true do
+  term.setCursorPos(1,1)
+  term.clear()
+  senderId, message, protocol = rednet.receive()
+  write(message)
+  sleep(sleepTime)
+ end
+end
+
+main()

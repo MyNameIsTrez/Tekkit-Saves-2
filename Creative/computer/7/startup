@@ -1,0 +1,46 @@
+currentFloor = 0
+floorAnswer = ""
+
+outputSide = "left"
+timeToFloor = 3
+
+function main()
+ while true do
+  bCable = 0
+  
+  term.setCursorPos(1,1)
+  term.clear()
+
+  write("Enter the floor to go to: ")
+  floorAnswer = tonumber(read())
+  
+  if floorAnswer == currentFloor then
+   write("You're already on that floor!")
+   sleep(3)
+   restart()
+  end
+
+  if floorAnswer == 0 then
+   write("Going to floor 0...")
+   bCable = colors.combine(bCable,colors.white)
+   currentFloor = 0
+  elseif floorAnswer == 1 then
+   write("Going to floor 1...")
+   bCable = colors.combine(bCable,colors.orange)
+   currentFloor = 1
+  end
+  
+  for i = 1,5 do
+   rs.setBundledOutput(outputSide,bCable)
+   sleep(0)
+   rs.setBundledOutput(outputSide,0)
+   sleep(1)
+  end  
+ end
+end
+
+function restart()
+ main()
+end
+
+main()

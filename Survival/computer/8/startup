@@ -1,0 +1,94 @@
+-----------------------------------------------------------------------------------------------------------------------------
+-- pastebin get <link> startup                                                                                           --
+-- 1. Place a modem on top of the computer by crouching, this can be changed to any side by changing 'rednet.open("top")'. --
+-- 2. Make sure to change the 'targetComputerID' variable to the ID of the requestingMain computer.                        --
+-- 2. You can change 'outputSide = "left"' to any other direction.                                                         --
+-----------------------------------------------------------------------------------------------------------------------------
+
+rednet.open("top")
+targetComputerID = 0
+outputSide = "back"
+monitorSide = "bottom"
+monitorTextScale = 3
+
+local monitor = peripheral.wrap(monitorSide)
+monitor.setTextScale(monitorTextScale)
+
+itemList = {
+"sign",
+"tnt",
+"furnace",
+"crafting table",
+"sugarcane",
+"paper",
+"wheat",
+"ghast tear",
+"slimeball",
+"feather",
+"leather",
+"bone",
+"flint",
+"clay",
+"torch",
+"bow"
+}
+
+colorList = {
+colors.white, colors.orange, colors.magenta,
+colors.lightBlue, colors.yellow, colors.lime,
+colors.pink, colors.gray, colors.lightGray,
+colors.cyan, colors.purple, colors.blue,
+colors.brown, colors.green, colors.red,
+colors.black
+}
+
+function main()
+ while true do
+  term.clear()
+  term.setCursorPos(1,2)
+  
+  for k = 1, #itemList do
+   print(itemList[k])
+  end
+  
+  monitor.write(tostring(#itemList))
+  
+  bCable = 0
+  color = 0
+  step = 0
+  tempVar = 1
+  
+  senderId, item, protocol = rednet.receive()
+  
+  senderId, stacks, protocol = rednet.receive()
+  stacks = tonumber(stacks)
+  
+  for j = 1, 16 do
+   if item == itemList[j] then
+    color = colorList[j]
+   end
+  end
+  
+  if color == 0 then
+   main()
+  end
+  
+  for i = 1, stacks do   
+   if type(color) ~= "nil" and tempVar == 1 then
+    rednet.send(targetComputerID,"working")
+    tempVar = 0
+   end
+   
+   rs.setBundledOutput(outputSide,colors.combine(0,color))
+   sleep(0.1)
+   rs.setBundledOutput(outputSide,0)
+   sleep(0.3)
+ 
+   step = tostring(i)
+   rednet.send(targetComputerID,step)
+  end
+  rednet.send(targetComputerID,"restart")
+ end
+end
+
+main()

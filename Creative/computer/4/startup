@@ -1,0 +1,19 @@
+outputSide = "back"
+inputSide = "left"
+sleepTimeOn = 0.1
+sleepTimeOff = 0.1
+
+function main()
+ while true do
+  if not rs.getInput(inputSide) then
+   rs.setBundledOutput(outputSide, colors.white)
+   sleep(sleepTimeOn)
+   rs.setBundledOutput(outputSide, 0)
+   sleep(sleepTimeOff)
+  else
+   sleep(1)
+  end
+ end
+end
+
+main()

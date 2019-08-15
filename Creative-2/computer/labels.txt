@@ -1,0 +1,11 @@
+0 SlaveBass2
+1 SlaveSnare2
+2 Master
+3 SlaveBass1
+4 SlaveSnare1
+5 SlaveHat1
+6 SlaveHat2
+7 SlaveBassDrum1
+8 SlaveBassDrum2
+9 SlaveHarp1
+10 SlaveHarp2

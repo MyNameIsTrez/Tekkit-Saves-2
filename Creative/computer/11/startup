@@ -1,0 +1,43 @@
+currentFloor = 0
+floorAnswer = ""
+
+outputSide = "left"
+distance = 5
+
+function main()
+ while true do
+  bCable = 0
+  
+  term.setCursorPos(1,1)
+  term.clear()
+
+  write("Go up or down: ")
+  floorAnswer = string.lower(read())
+
+  write("The amount of floors you want to move: ")
+  floorMoves = tonumber(read())
+
+  if floorAnswer == "down" then
+   write("Going down...")
+   bCable = colors.combine(bCable,colors.white)
+  else
+   write("Going up...")
+   bCable = colors.combine(bCable,colors.orange)
+  end
+  
+  for i = 1, floorMoves do
+   for i = 1,distance do
+    rs.setBundledOutput(outputSide,bCable)
+    sleep(0.1)
+    rs.setBundledOutput(outputSide,0)
+    sleep(1)
+   end
+  end  
+ end
+end
+
+function restart()
+ main()
+end
+
+main()

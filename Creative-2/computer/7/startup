@@ -1,0 +1,17 @@
+computerInstrument = "bassdrum1"
+outputSide = "bottom"
+rednet.open("back")
+
+function main()
+    while true do
+        senderId, msgInstrument, protocol = rednet.receive()
+        if msgInstrument == computerInstrument then
+          senderId, msgColor, protocol = rednet.receive()
+          rs.setBundledOutput(outputSide, colors.combine(0, tonumber(msgColor)))
+          sleep(0.1)
+          rs.setBundledOutput(outputSide, 0)
+        end
+    end
+end
+
+main()

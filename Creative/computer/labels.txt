@@ -1,0 +1,8 @@
+0 RockPaperScissors
+1 RequestingMain
+2 RequestingDrone
+3 Password
+19 requestingDrone
+4 Clock
+20 requestingMain
+8 Elevator

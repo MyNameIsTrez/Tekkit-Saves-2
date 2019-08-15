@@ -1,0 +1,60 @@
+bCable = 0
+
+function main()
+ step = 0
+ while true do
+  term.setCursorPos(1,1)
+  term.clear()
+ 
+  write("Enter an item to request: ")
+  local item = string.lower(read())
+  
+  write("Enter the amount of stacks to request: ")
+  local stacks = tonumber(read())
+   
+  if type(stacks) == "number" then
+   for i = 1, stacks do
+    if item == "stone" then
+     bCable = colors.combine(bCable, colors.white)
+    elseif item == "grass" then
+     bCable = colors.combine(bCable, colors.orange)
+    elseif item == "dirt" then
+     bCable = colors.combine(bCable, colors.magenta)
+    else
+     write("You put in an invalid item.")
+     sleep(3)
+     restart()
+    end
+    
+    rs.setBundledOutput("back",bCable)
+    sleep(0.1)
+    rs.setBundledOutput("back",0)
+    sleep(0.3)
+
+    step = step + 1
+    term.setCursorPos(1,3)
+    if step == 1 then
+     write("Working.  ")
+    elseif step == 2 then
+     write("Working.. ")
+    else
+     write("Working...")
+     step = 0
+    end
+
+    timeLeft = math.ceil((stacks / 10 - i / 10) * 4.5)
+    term.setCursorPos(1,4)
+    write("Time Left: "..timeLeft.." Seconds  ")
+   end
+  else
+   write("You didn't enter the amount of stacks.")
+   sleep(3)
+  end
+ end
+end
+
+function restart()
+ main()
+end
+
+restart()

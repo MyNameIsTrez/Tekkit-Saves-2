@@ -1,0 +1,17 @@
+screenSide = "left"
+m = peripheral.wrap(screenSide)
+m.setTextScale(1)
+term.redirect(m)
+
+mList =
+{
+"1",
+"2",
+"3"
+}
+
+for i = 1,#mList do
+ print(i..": "..mList[i])
+ print()
+end
+term.restore()

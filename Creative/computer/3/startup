@@ -1,0 +1,24 @@
+password = "apple"
+outputSide = "back"
+openTime = 3
+
+function main()
+ while true do
+  term.setCursorPos(1,1)
+  term.clear()
+  answer = ""
+  write("Enter the password to enter: ")
+  answer = string.lower(read())
+  if answer == password then
+   rs.setOutput(outputSide, true)
+   write("The door has opened.")
+   sleep(openTime)
+   rs.setOutput(outputSide, false)
+  else
+   write("You entered the wrong password, try again.")
+   sleep(3)
+  end
+ end
+end
+
+main()

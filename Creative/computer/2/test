@@ -1,0 +1,19 @@
+function main()
+ step = 0
+ while true do
+  step = step + 1
+  
+  term.setCursorPos(1,1)
+  if step == 1 then
+   write(1)
+  elseif step == 2 then
+   write(2)
+  else
+   write(3)
+   step = 0
+  end
+  sleep(1)
+ end
+end
+
+main()

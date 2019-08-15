@@ -1,0 +1,75 @@
+function main()
+ term.setCursorPos(1,1)
+ term.clear()
+
+ round = 0
+ scorePlayer = 0
+ scoreComputer = 0
+
+ print("The time after a round in seconds, lower than 6: ")
+ roundTime = tonumber(read())
+ 
+ if type(roundTime) == "number" and roundTime < 6 then
+ else
+  write("You didn't put in a valid number.")
+  sleep(3)
+  reset()
+ end
+
+ while true do
+  term.setCursorPos(1,1)
+  term.clear()
+  
+  print("Round: "..round.." - Player: "..scorePlayer.." - Computer: "..scoreComputer)
+  
+  print("Choose Rock, Paper, Scissors or R, P, S:")
+  write("Player: ")
+  userAnswer = string.lower(read())
+  computerAnswerInt = tonumber(math.random(0,2))
+  
+  if computerAnswerInt == 0 then
+   computerAnswer = "rock"
+   computerAnswerShort = "r"
+  elseif computerAnswerInt == 1 then
+   computerAnswer = "paper"
+   computerAnswerShort = "p"
+  elseif computerAnswerInt == 2 then
+   computerAnswer = "scissors"
+   computerAnswerShort = "s"
+  end
+  print("Computer: "..computerAnswer)
+
+  if userAnswer == computerAnswer or userAnswer == computerAnswerShort then
+   write("It's a draw!")
+  elseif userAnswer == "rock" or userAnswer == "r" and computerAnswer == "paper" then
+   write("You've lost!")
+   scoreComputer = scoreComputer + 1
+  elseif userAnswer == "rock" or userAnswer == "r" and computerAnswer == "scissors" then
+   write("You've won!")
+   scorePlayer = scorePlayer + 1
+  elseif userAnswer == "paper" or userAnswer == "p" and computerAnswer == "rock" then
+   write("You've won!")
+   scorePlayer = scorePlayer + 1
+  elseif userAnswer == "paper" or userAnswer == "p" and computerAnswer == "scissors" then
+   write("You've lost!")
+   scoreComputer = scoreComputer + 1
+  elseif userAnswer == "scissors" or userAnswer == "s" and computerAnswer == "rock" then
+   write("You've lost!")
+   scoreComputer = scoreComputer + 1
+  elseif userAnswer == "scissors" or userAnswer == "s" and computerAnswer == "paper" then
+   write("You've won!")
+   scorePlayer = scorePlayer + 1
+  else
+   write("You put in something that isn't Rock, Paper, Scissors or R, P, S. Try again.")
+   sleep(3)
+  end
+ round = round + 1
+ sleep(roundTime )
+ end
+end
+
+function reset()
+ main()
+end
+
+main()
