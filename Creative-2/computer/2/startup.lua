@@ -1,24 +1,24 @@
 function startingSettings() -- customisable starting data
-  -- needs to exist at the start
+  -- code that needs to be ran at least once for the program to work
   term.clear()
   shuffleSongs = {}
   playlistLength = 0
-  termX, termY = term.getSize() -- store the terminal dimensions in two variables
+  termX, termY = term.getSize() -- store the terminal's dimensions in two variables
   gen = 0 -- which note the song is on
 
-  screenSide = "right"
-  m = peripheral.wrap(screenSide)
-  m.setTextScale(1) -- 1 by default, 1 to 5
-  w, h = m.getSize() -- store the width and the height of the monitor
+  screenSide = "right" -- which side the monitor is on, relative to the terminal.
+  m = peripheral.wrap(screenSide) -- sets 'm' as being the monitor's variable, using screenSide.
+  m.setTextScale(1) -- 1 by default, from 1 to 5
+  w, h = m.getSize() -- store the width and height of the monitor
   w = w - 5 -- decrease the width by 5, to compensate for GUIs and border wrapping
 
-  rednet.open("back")
-  inputSideRandomSong = "left" -- if you place a lever on this side, you can generate random songs
-  playSpeed = 1 -- the speed of songs by default
-  randomPlaySpeed = 1 -- the speed of randomly generated songs by default
-  page = 1 -- the page you start at by default
+  rednet.open("back") -- open the rednet network connection on the back of the terminal, so a modem can communicate with the terminal
+  inputSideRandomSong = "left" -- if you place a lever on this side, you can activate the random song generator
+  playSpeed = 1 -- the speed at which songs are played at (by default 1)
+  randomPlaySpeed = 1 -- the speed at which randomly generated songs are played at (by default 1)
+  page = 1 -- the page of the song pages you start at, where you can pick different songs to play (by default 1)
 end
-startingSettings()
+startingSettings() -- Run the above function upon startup of this program.
 
 
 
@@ -41,7 +41,7 @@ function drawStartingGraphInfo()
   end
   term.restore()
 end
-drawStartingGraphInfo()
+drawStartingGraphInfo() -- Run the above function upon startup of this program.
 
 
 
@@ -101,7 +101,7 @@ function getSongTitles() -- gets all the midi titles
     midiArrayTitles[i][1] = filesInCurDir[i]
   end
 end
-getSongTitles()
+getSongTitles() -- Run the above function upon startup of this program.
 
 
 
@@ -117,7 +117,7 @@ function songLengths() -- gets the lengths of the songs
     midiArray = nil
   end
 end
-songLengths()
+songLengths() -- Run the above function upon startup of this program.
 
 
 
