@@ -11,13 +11,13 @@ function setup()
   
   monitorW, monitorH = monitor.getSize() -- store the width and height of the monitor
   monitorH = monitorH - 1 -- decrease the monitor height by 1, to compensate for wrapping issues
-  scrollingText = 'jschlatt'
+  scrollingText = 'D I C K  A N D  B A L L S'
   scrollingTextLength = string.len(scrollingText)
   monitorTextScale = 1 -- 1 by default, from 1 to 5
   scrollingTextWidth = scrollingTextLength * monitorTextScale
   scrollingTextHeight = monitorTextScale
   monitor.setTextScale(monitorTextScale) -- sets the monitorTextScale
-  x = 1 -- the monitor cursor x position of the text, always 1 here
+  x = -scrollingTextWidth + 1 -- the monitor cursor x position of the text, always 1 here
   y = 1 -- the monitor cursor y position of the text, always 1 here
 end
 setup() -- run the above function upon the startup of this program
@@ -37,32 +37,27 @@ function drawTerminal()
   print('scrollingTextHeight: '..scrollingTextHeight)
   print('x: '..x)
   print('y: '..y)
-
-  if (scrollingTextWidth > monitorW) then -- draw an error message if the printed text wraps around the monitor
-    outOfBoundsWidth = scrollingTextWidth - monitorW
-    print('Warning! The scrolling text string is '..outOfBoundsLength..' character(s) too long for this monitor!')
-  end
 end
 
 function drawMonitor()
   terminal.redirect(monitor) -- redirect the drawing to the monitor
   monitor.clear() -- clear all the text on the monitor
   monitor.setCursorPos(x, y) -- move the cursor on the monitor
-  print(scrollingText)
+  monitor.write(scrollingText)
   terminal.restore() -- redirect the drawing back to the terminal
 end
 
 function draw()
   drawTerminal()
   drawMonitor()
-  if (x + scrollingTextWidth < monitorW) then
+  if (x < monitorW) then
     x = x + 1
   else
     if (y < monitorH) then
-      x = 1
+      x = -scrollingTextWidth + 1
       y = y + 1
     else
-      x = 1
+      x = -scrollingTextWidth + 1
       y = 1
     end
   end
