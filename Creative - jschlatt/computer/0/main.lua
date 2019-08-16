@@ -11,13 +11,13 @@ function setup()
   
   monitorW, monitorH = monitor.getSize() -- store the width and height of the monitor
   monitorH = monitorH - 1 -- decrease the monitor height by 1, to compensate for wrapping issues
-  scrollingText = 'D I C K  A N D  B A L L S'
+  scrollingText = '-=[ D I C K  A N D  B A L L S ]=-'
   scrollingTextLength = string.len(scrollingText)
-  monitorTextScale = 1 -- 1 by default, from 1 to 5
-  scrollingTextWidth = scrollingTextLength * monitorTextScale
-  scrollingTextHeight = monitorTextScale
-  monitor.setTextScale(monitorTextScale) -- sets the monitorTextScale
-  x = -scrollingTextWidth + 1 -- the monitor cursor x position of the text, always 1 here
+  -- monitorTextScale = 1 -- 1 by default, from 1 to 5
+  -- scrollingTextWidth = scrollingTextLength * monitorTextScale
+  -- scrollingTextHeight = monitorTextScale
+  -- monitor.setTextScale(monitorTextScale) -- sets the monitorTextScale
+  x = monitorW -- the monitor cursor x position of the text, always 1 here
   y = 1 -- the monitor cursor y position of the text, always 1 here
 end
 setup() -- run the above function upon the startup of this program
@@ -32,9 +32,9 @@ function drawTerminal()
   print('monitorW: '..monitorW..', '..'monitorH: '..monitorH)
   print('scrollingText: '..scrollingText)
   print('scrollingTextLength: '..scrollingTextLength)
-  print('monitor text scale: '..monitorTextScale)
-  print('scrollingTextWidth: '..scrollingTextWidth)
-  print('scrollingTextHeight: '..scrollingTextHeight)
+  -- print('monitor text scale: '..monitorTextScale)
+  -- print('scrollingTextWidth: '..scrollingTextWidth)
+  -- print('scrollingTextHeight: '..scrollingTextHeight)
   print('x: '..x)
   print('y: '..y)
 end
@@ -50,14 +50,14 @@ end
 function draw()
   drawTerminal()
   drawMonitor()
-  if (x < monitorW) then
-    x = x + 1
+  if (x > -scrollingTextLength + 1) then
+    x = x - 1
   else
     if (y < monitorH) then
-      x = -scrollingTextWidth + 1
+      x = monitorW
       y = y + 1
     else
-      x = -scrollingTextWidth + 1
+      x = monitorW
       y = 1
     end
   end
