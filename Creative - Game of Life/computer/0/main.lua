@@ -23,12 +23,17 @@ function setup()
     end
   end
 
-  -- x, y coordinates of starting cells
-  cells[6][3].alive = 1
-  cells[4][4].alive = 1
-  cells[6][4].alive = 1
-  cells[5][5].alive = 1
-  cells[6][5].alive = 1
+  -- x, y coordinates of the r_pentomino starting cells
+  -- top 2 cells
+  cells[39][18].alive = 1
+  cells[40][18].alive = 1
+
+  -- middle 2 cells
+  cells[38][19].alive = 1
+  cells[39][19].alive = 1
+
+  -- bottom 1 cell
+  cells[39][20].alive = 1
 end
 setup() -- run the above function upon the startup of this program
 
