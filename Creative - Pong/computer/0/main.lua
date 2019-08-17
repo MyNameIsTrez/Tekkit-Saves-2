@@ -13,18 +13,20 @@ function setup()
   
   ballX = math.ceil(monitorW/2) -- the monitor cursor x position of the text, always 1 here
   ballY = math.ceil(monitorH/2) -- the monitor cursor y position of the text, always 1 here
-  ballXSpeed = 1 -- the horizontal speed of the ball, where 1 is east
-  ballYSpeed = 1 -- the vertical speed of the ball, where 1 is south
+  ballXSpeed = math.random(2, 10) / 10 -- the horizontal speed of the ball, where 1 is east
+  ballYSpeed = math.random(2, 10) / 10 -- the vertical speed of the ball, where 1 is south
   ballSymbol = 'o' -- the symbol used to draw the ball
   
   middleLineSymbol = '|' -- the symbol used to draw the middle line
 
   paddleSymbol = '|' -- the symbol used to draw the paddles
-  pedalSize = 10
+  pedalSize = 5
   pedalTopYLeft = monitorH/2 - pedalSize/2
   pedalTopYRight = monitorH/2 - pedalSize/2
   scoreLeft = 0
   scoreRight = 0
+  ballYInPaddleLeft = false
+  ballYInPaddleRight = false
 end
 setup() -- run the above function upon the startup of this program
 
@@ -41,15 +43,13 @@ function drawTerminal()
   print('ballY: '..ballY)
   print('ballXSpeed: '..ballXSpeed)
   print('ballYSpeed: '..ballYSpeed)
-
-  print('middleLineSymbol: '..middleLineSymbol)
-
-  print('paddleSymbol: '..paddleSymbol)
+  print()
   print('pedalSize: '..pedalSize)
   print('pedalTopYLeft: '..pedalTopYLeft)
   print('pedalTopYRight: '..pedalTopYRight)
-  print('scoreLeft: '..scoreLeft)
-  print('scoreRight: '..scoreRight)
+  print()
+  print('ballYInPaddleLeft: '..tostring(ballYInPaddleLeft))
+  print('ballYInPaddleRight: '..tostring(ballYInPaddleRight))
 end
 
 function drawMonitor()
@@ -90,27 +90,29 @@ function draw()
   drawTerminal()
   drawMonitor()
 
-  yHittingPaddleLeft = ballY > pedalTopYLeft or ballY < pedalTopYLeft + pedalSize
-  yHittingPaddleRight = ballY > pedalTopYRight or ballY < pedalTopYRight + pedalSize
+  ballYInPaddleLeft = ballY > pedalTopYLeft and ballY < pedalTopYLeft + pedalSize
+  ballYInPaddleRight = ballY > pedalTopYRight and ballY < pedalTopYRight + pedalSize
 
-  if (ballX == 1 and yHittingPaddleLeft) then
+  if (ballX < 3 and ballYInPaddleLeft) then
+    -- bounce the ball to the right
     ballXSpeed = -ballXSpeed
-  elseif (ballX == monitorW and yHittingPaddleRight) then
+  elseif (ballX > monitorW - 3 and ballYInPaddleRight) then
+    -- bounce the ball to the left
     ballXSpeed = -ballXSpeed
-  elseif (ballX < 1) then
+  elseif (ballX <= 1) then
     -- give a point to the right player and reset the ball to the middle
     scoreRight = scoreRight + 1
     ballX = math.ceil(monitorW/2) -- the monitor cursor x position of the text, always 1 here
     ballY = math.ceil(monitorH/2) -- the monitor cursor y position of the text, always 1 here
-    ballXSpeed = 1 -- the horizontal speed of the ball, where 1 is east
-    ballYSpeed = 1 -- the vertical speed of the ball, where 1 is south
-  elseif (ballX > monitorW) then
+    ballXSpeed = math.random(2, 10) / 10  -- the horizontal speed of the ball, where 1 is east
+    ballYSpeed = math.random(2, 10) / 10  -- the vertical speed of the ball, where 1 is south
+  elseif (ballX >= monitorW - 1) then
     -- give a point to the left player and reset the ball to the middle
     scoreLeft = scoreLeft + 1
     ballX = math.ceil(monitorW/2) -- the monitor cursor x position of the text, always 1 here
     ballY = math.ceil(monitorH/2) -- the monitor cursor y position of the text, always 1 here
-    ballXSpeed = 1 -- the horizontal speed of the ball, where 1 is east
-    ballYSpeed = 1 -- the vertical speed of the ball, where 1 is south
+    ballXSpeed = math.random(2, 10) / 10  -- the horizontal speed of the ball, where 1 is east
+    ballYSpeed = math.random(2, 10) / 10  -- the vertical speed of the ball, where 1 is south
   end
 
   if (ballY <= 1 or ballY >= monitorH) then
