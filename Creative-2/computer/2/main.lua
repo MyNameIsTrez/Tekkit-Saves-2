@@ -202,19 +202,24 @@ function readUserInput() -- reading the user input
     term.setCursorPos(19, 2)
     print("Help page 1/2:")
 
-    term.setCursorPos(19, 5)
+    term.setCursorPos(19, 4)
     print("'help <number>'")
-    term.setCursorPos(12, 6)
+    term.setCursorPos(12, 5)
     print("Changes the viewed help page.")
 
-    term.setCursorPos(16, 8)
+    term.setCursorPos(22, 7)
+    print("'<number>'")
+    term.setCursorPos(11, 8)
+    print("Select one of the songs to play.")
+
+    term.setCursorPos(16, 10)
     print("'page' -> '<number>'")
-    term.setCursorPos(12, 9)
+    term.setCursorPos(12, 11)
     print("Changes the viewed song page.")
     
-    term.setCursorPos(20, 11)
+    term.setCursorPos(20, 13)
     print("'playlist'")
-    term.setCursorPos(4, 12)
+    term.setCursorPos(4, 14)
     print("Play all the songs in the order of the pages.")
 
     -- term.setCursorPos(20, 11)

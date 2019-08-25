@@ -1,0 +1,78 @@
+-- make sure to always point the front of this turtle south! (f: 0)
+
+tt = {
+  name = '',
+  x = 0,
+  y = 0,
+  z = 0,
+  facing = 0,
+  times_placed = 0,
+  times_broken = 0,
+  nicknames = {
+      ''
+  }
+}
+ 
+function tt:new(name, nicknames)
+  setmetatable({}, tt)
+  self.name = name
+  self.nicknames = nicknames
+  return self
+end
+
+function tt:move_longitudal(dir)
+  if (self.facing == 0) then
+	self.z = self.z + dir
+  elseif (self.facing == 1) then
+	self.x = self.x - dir
+  elseif (self.facing == 2) then
+	self.z = self.z - dir
+  elseif (self.facing == 3) then
+	self.x = self.x + dir
+  end
+end
+
+function tt:forward()
+  tt:move_longitudal(1)
+  turtle.forward()
+end
+
+function tt:back()
+  tt:move_longitudal(-1)
+  turtle.back()
+end
+
+function tt:left()
+  if (self.facing == 0) then
+    self.facing = 3
+  else
+    self.facing = self.facing - 1
+  end
+  turtle.turnLeft()
+end
+
+function tt:right()
+  if (self.facing == 3) then
+    self.facing = 0
+  else
+    self.facing = self.facing + 1
+  end
+  turtle.turnRight()
+end
+
+function tt:print_own_data()
+  term.clear() -- clear the terminal's text
+  term.setCursorPos(1,1) -- set the terminal's cursor to the top-left
+  print('x: '..self.x..', y: '..self.y..', z: '..self.z)
+  print('times_placed: '..self.times_placed..', times_broken: '..self.times_broken)
+end
+
+function tt:place()
+  self.times_placed = self.times_placed + 1
+  turtle.place()
+end
+
+function tt:dig()
+  self.times_broken = self.times_broken + 1
+  turtle.dig()
+end
