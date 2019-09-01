@@ -1,0 +1,19 @@
+outputSide = "top"
+inputSide = "left"
+sleepTimeOn = 0.1
+sleepTimeOff = 0.3
+
+function main()
+ while true do
+  if not rs.getInput(inputSide) then
+   rs.setOutput(outputSide, true)
+   sleep(sleepTimeOn)
+   rs.setOutput(outputSide, false)
+   sleep(sleepTimeOff)
+  else
+   sleep(1)
+  end
+ end
+end
+
+main()
