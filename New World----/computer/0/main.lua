@@ -77,69 +77,40 @@ function enterTwoChars()
 
   left_hex = getHex(left_char)
   right_hex = getHex(right_char)
-  correct_input = left_hex and right_hex
+  correct_inputs = left_hex and right_hex
 
   -- check if the two entered chars are valid
-  if (correct_input) then
+  if (correct_inputs) then
     print('Success!')
     setTwoSegments(left_hex, right_hex)
   else
-    print('You entered an invalid character!')
+    if (left_hex) then
+      print('The first character was invalid, try again!')
+    end
+    if (right_hex) then
+      print('The second character was invalid, try again!')
+    end
     sleep(2)
     main()
   end
 end
 
+function scrollAllChars(segments)
+  while true do
+    for i = 1, #hex do
+      if (i < #hex) then
+        setTwoSegments(hex[i], hex[i+1])
+      else
+        setTwoSegments(hex[i], hex[1])
+      end
+      sleep(0.5)
+    end
+  end
+end
+
 function main()
-  enterTwoChars()
+  -- enterTwoChars()
+  scrollAllChars(2)
 end
 
 main()
-
-
-
-
-
-
-
--- function hexToDecimal(decimal, hex)
---   for key, value in pairs(hex) do
---     decimal[key] = tonumber(value, 16)
---   end
---   return decimal
--- end
-
--- local decimal = {}
--- hexToDecimal(decimal, hex)
-
--- function decimalContains(decimals, left_char, right_char)
---   -- whether decimal contains left_char and right_char
---   local contains_left = nil
---   local contains_right = nil
-
---   -- gets the index of left_char and right_char in decimals
---   for index, subtable in ipairs(decimals) do
---     if subtable[left_char] ~= nil then
---       contains_left = index
---     end
---     if subtable[right_char] ~= nil then
---       contains_right = index
---     end
---   end
-
---   return contains_left ~= nil and contains_right ~= nil 
--- end
-
--- function setLeftSegment(left_char)
---   char = bit.blshift(decimal[left_char], 8)
---   rs.setBundledOutput(bundledOutputSide, char)
--- end
-
--- function scrollAllChars()
---   while true do
---     for key, value in pairs(decimal) do      
---       setLeftSegment(key)
---       sleep(0.5)
---     end
---   end
--- end
