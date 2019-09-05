@@ -84,10 +84,10 @@ function enterTwoChars()
     print('Success!')
     setTwoSegments(left_hex, right_hex)
   else
-    if (left_hex) then
+    if (left_hex == nil) then
       print('The first character was invalid, try again!')
     end
-    if (right_hex) then
+    if (right_hex == nil) then
       print('The second character was invalid, try again!')
     end
     sleep(2)
@@ -95,7 +95,7 @@ function enterTwoChars()
   end
 end
 
-function scrollAllChars(segments)
+function scrollAllChars()
   while true do
     for i = 1, #hex do
       if (i < #hex) then
@@ -110,7 +110,7 @@ end
 
 function main()
   -- enterTwoChars()
-  scrollAllChars(2)
+  scrollAllChars()
 end
 
 main()
