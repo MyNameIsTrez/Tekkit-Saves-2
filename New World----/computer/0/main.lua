@@ -1,5 +1,6 @@
 -- Made by MyNameIsTrez in 2019
-bundledOutputSide = 'back'
+local bundledOutputSides = { 'back', 'right', 'left', 'bottom', 'top', 'front' } 
+local segment_count = 2
 
 local hex = {}
 hex[1] = '3F'
@@ -41,15 +42,9 @@ hex[36] = '5B'
 
 local chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-
-function setTwoSegments(left_hex, right_hex)
-  local left_decimal = tonumber(left_hex, 16)
-  local right_decimal = tonumber(right_hex, 16)
-  
-  shifted_left_char = bit.blshift(left_decimal, 8)
-  combined_chars = shifted_left_char + right_decimal
-
-  rs.setBundledOutput(bundledOutputSide, combined_chars)
+function setSegment(segment_index, hex)
+  local decimal = tonumber(hex, 16)
+  rs.setBundledOutput(bundledOutputSides[segment_index], decimal)
 end
 
 function getHex(char)
@@ -64,53 +59,78 @@ function getHex(char)
   return _hex
 end
 
-function enterTwoChars()
-  -- ready the terminal
-  term.clear()
-  term.setCursorPos(1,1)
-  
-  -- get two chars from the user
-  write('Left char: ')
-  left_char = read()
-  write('Right char: ')
-  right_char = read()
-
-  left_hex = getHex(left_char)
-  right_hex = getHex(right_char)
-  correct_inputs = left_hex and right_hex
-
-  -- check if the two entered chars are valid
-  if (correct_inputs) then
-    print('Success!')
-    setTwoSegments(left_hex, right_hex)
-  else
-    if (left_hex == nil) then
-      print('The first character was invalid, try again!')
-    end
-    if (right_hex == nil) then
-      print('The second character was invalid, try again!')
-    end
-    sleep(2)
-    main()
-  end
-end
-
 function scrollAllChars()
   while true do
+    -- loops for each char
     for i = 1, #hex do
-      if (i < #hex) then
-        setTwoSegments(hex[i], hex[i+1])
-      else
-        setTwoSegments(hex[i], hex[1])
+      -- loops for each segment
+      for segment_index = 1, segment_count do
+        -- gets a hex char based on the looped char and segment
+        local k = i + segment_index - 1
+        local l = k % (#hex + 1)
+        if (l == 0) then -- dit is een slechte oplossing, want ik zie op de map een 0 en 2 gedisplayed
+          l = 1
+        end
+        -- tells a segment which char to display
+        print('l: '..l)
+        print('hex: '..hex[l])
+        setSegment(segment_index, hex[l])
       end
+      print('-----------------')
+      -- sleep before shifting all the chars
       sleep(0.5)
     end
   end
 end
 
 function main()
-  -- enterTwoChars()
+  -- userEnterChars()
   scrollAllChars()
 end
 
 main()
+
+
+
+
+
+-- function setTwoSegments(left_hex, right_hex)
+--   local left_decimal = tonumber(left_hex, 16)
+--   local right_decimal = tonumber(right_hex, 16)
+  
+--   shifted_left_char = bit.blshift(left_decimal, 8)
+--   combined_chars = shifted_left_char + right_decimal
+
+--   rs.setBundledOutput(bundledOutputSide, combined_chars)
+-- end
+
+-- function userEnterChars()
+--   -- ready the terminal
+--   term.clear()
+--   term.setCursorPos(1,1)
+  
+--   -- get two chars from the user
+--   write('Left char: ')
+--   left_char = read()
+--   write('Right char: ')
+--   right_char = read()
+
+--   left_hex = getHex(left_char)
+--   right_hex = getHex(right_char)
+--   correct_inputs = left_hex and right_hex
+
+--   -- check if the two entered chars are valid
+--   if (correct_inputs) then
+--     print('Success!')
+--     setTwoSegments(left_hex, right_hex)
+--   else
+--     if (left_hex == nil) then
+--       print('The first character was invalid, try again!')
+--     end
+--     if (right_hex == nil) then
+--       print('The second character was invalid, try again!')
+--     end
+--     sleep(2)
+--     main()
+--   end
+-- end
