@@ -42,6 +42,8 @@ hex['X'] = '76'
 hex['Y'] = '6E'
 hex['Z'] = '5B'
 
+local chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
 function hexToDecimal(decimal, hex)
   for key, value in pairs(hex) do
     decimal[key] = tonumber(value, 16)
@@ -52,8 +54,35 @@ end
 local decimal = {}
 hexToDecimal(decimal, hex)
 
-function decimalContains(decimal, key)
-  return decimal[key] ~= nil
+function decimalContains(decimals, left_char, right_char)
+  -- return decimal[char] ~= nil
+  -- whether decimal contains left_char and right_char
+  local contains_left = nil
+  local contains_right = nil
+
+
+  -- ADD SUBTABLES TO DECIMALS INSTEAD OF HOW IT IS ONE TABLE RN
+
+
+  -- gets the index of left_char and right_char in decimals
+  for index, subtable in ipairs(decimals) do
+    -- print(subtable[left_char])
+    if subtable[left_char] ~= nil then
+      contains_left = index
+    end
+    -- print(subtable[right_char])
+    if subtable[right_char] ~= nil then
+      contains_right = index
+    end
+  end
+
+  -- print(left_char)
+  -- print(right_char)
+  -- print(contains_left)
+  -- print(contains_right)
+  -- sleep(1)
+
+  return contains_left ~= nil and contains_right ~= nil 
 end
 
 function setTwoSegments(left_char, right_char)
@@ -65,12 +94,14 @@ end
 function enterTwoChars()
   term.clear()
   term.setCursorPos(1,1)
+  
+  -- get two chars from the user
   write('Left char: ')
   left_char = read()
   write('Right char: ')
   right_char = read()
 
-  if (decimalContains(decimal, left_char) and decimalContains(decimal, right_char)) then
+  if (decimalContains(decimal, left_char, right_char)) then
     setTwoSegments(left_char, right_char)
   else
     print('You entered an invalid character!')
@@ -94,8 +125,8 @@ function scrollAllChars()
 end
 
 function main()
-  -- enterTwoChars()
-  scrollAllChars()
+  enterTwoChars()
+  -- scrollAllChars()
 end
 
 main()
