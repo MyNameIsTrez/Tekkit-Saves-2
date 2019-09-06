@@ -59,6 +59,35 @@ function getHex(char)
   return _hex
 end
 
+function userEnterChars()
+  -- ready the terminal
+  term.clear()
+  term.setCursorPos(1,1)
+  
+  -- get chars from the user and check if they're valid chars
+  local entered_chars_hex = {}
+  local all_entered_chars_correct = true
+  for i = 1, segment_count do
+    write('Char '..i..': ')
+    local char = read()
+    local hex = getHex(char)
+    entered_chars_hex[i] = hex
+    all_entered_chars_correct = all_entered_chars_correct and hex
+  end
+
+  -- set the segments if the entered chars are valid
+  if (all_entered_chars_correct) then
+    print('Success!')
+    for i = 1, #entered_chars_hex do
+      setSegment(i, entered_chars_hex[i])
+    end
+  else
+    print('One or multiple of the entered character(s) is invalid, try again!')
+    sleep(4)
+    main()
+  end
+end
+
 function scrollAllChars()
   while true do
     -- loops for each char
@@ -67,18 +96,12 @@ function scrollAllChars()
       for segment_index = 1, segment_count do
         -- gets a hex char based on the looped char and segment
         local k = i + segment_index - 1
-        local l = k % (#hex + 1)
-        if (l == 0) then -- dit is een slechte oplossing, want ik zie op de map een 0 en 2 gedisplayed
-          l = 1
-        end
+        local l = (k - 1) % #hex + 1
         -- tells a segment which char to display
-        print('l: '..l)
-        print('hex: '..hex[l])
         setSegment(segment_index, hex[l])
       end
-      print('-----------------')
-      -- sleep before shifting all the chars
-      sleep(0.5)
+      -- sleep before shifting all chars on the displays
+      sleep(1)
     end
   end
 end
@@ -102,35 +125,4 @@ main()
 --   combined_chars = shifted_left_char + right_decimal
 
 --   rs.setBundledOutput(bundledOutputSide, combined_chars)
--- end
-
--- function userEnterChars()
---   -- ready the terminal
---   term.clear()
---   term.setCursorPos(1,1)
-  
---   -- get two chars from the user
---   write('Left char: ')
---   left_char = read()
---   write('Right char: ')
---   right_char = read()
-
---   left_hex = getHex(left_char)
---   right_hex = getHex(right_char)
---   correct_inputs = left_hex and right_hex
-
---   -- check if the two entered chars are valid
---   if (correct_inputs) then
---     print('Success!')
---     setTwoSegments(left_hex, right_hex)
---   else
---     if (left_hex == nil) then
---       print('The first character was invalid, try again!')
---     end
---     if (right_hex == nil) then
---       print('The second character was invalid, try again!')
---     end
---     sleep(2)
---     main()
---   end
 -- end
