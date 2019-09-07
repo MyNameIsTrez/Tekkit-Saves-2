@@ -88,6 +88,11 @@ function userEnterChars()
   end
 end
 
+-- variant of the modulo operator, so it can't output 0
+function moduloWithoutZero(n, mod)
+  return (n - 1) % mod + 1
+end
+
 function scrollAllChars()
   while true do
     -- loops for each char
@@ -96,7 +101,7 @@ function scrollAllChars()
       for segment_index = 1, segment_count do
         -- gets a hex char based on the looped char and segment
         local k = i + segment_index - 1
-        local l = (k - 1) % #hex + 1
+        local l = moduloWithoutZero(k, #hex)
         -- tells a segment which char to display
         setSegment(segment_index, hex[l])
       end
@@ -107,22 +112,8 @@ function scrollAllChars()
 end
 
 function main()
-  -- userEnterChars()
-  scrollAllChars()
+  userEnterChars()
+  -- scrollAllChars()
 end
 
 main()
-
-
-
-
-
--- function setTwoSegments(left_hex, right_hex)
---   local left_decimal = tonumber(left_hex, 16)
---   local right_decimal = tonumber(right_hex, 16)
-  
---   shifted_left_char = bit.blshift(left_decimal, 8)
---   combined_chars = shifted_left_char + right_decimal
-
---   rs.setBundledOutput(bundledOutputSide, combined_chars)
--- end
