@@ -1,78 +1,86 @@
--- Made by MyNameIsTrez in 2019
+-- 16-segment display code for Tekkit Classic
+-- made by MyNameIsTrez in 2019
 local bundledOutputSides = { 'back', 'right', 'left', 'bottom', 'top', 'front' } 
-local segment_count = 2
+local display_count = 1
+-- local segments = 16
+local hex_16 = {}
 
-local hex = {}
-hex[1] = '3F'
-hex[2] = '06'
-hex[3] = '5B'
-hex[4] = '4F'
-hex[5] = '66'
-hex[6] = '6D'
-hex[7] = '7D'
-hex[8] = '07'
-hex[9] = '7F'
-hex[10] = '6F'
-hex[11] = '77'
-hex[12] = '7C'
-hex[13] = '39'
-hex[14] = '5E'
-hex[15] = '79'
-hex[16] = '71'
-hex[17] = '3D'
-hex[18] = '76'
-hex[19] = '30'
-hex[20] = '1E'
-hex[21] = '75'
-hex[22] = '38'
-hex[23] = '37'
-hex[24] = '54'
-hex[25] = '3F'
-hex[26] = '73'
-hex[27] = '67'
-hex[28] = '50'
-hex[29] = '6D'
-hex[30] = '78'
-hex[31] = '3E'
-hex[32] = '1C'
-hex[33] = '2A'
-hex[34] = '76'
-hex[35] = '6E'
-hex[36] = '5B'
+-- 16-segment 0 to 9
+hex_16[1] = '44FF'
+hex_16[2] = '040C'
+hex_16[3] = '8877'
+hex_16[4] = '083F'
+hex_16[5] = '888C'
+hex_16[6] = '90B3'
+hex_16[7] = '88FB'
+hex_16[8] = '000F'
+hex_16[9] = '88FF'
+hex_16[10] = '88BF'
+
+-- 16-segment A to Z
+hex_16[11] = '88CF'
+hex_16[12] = '2A3F'
+hex_16[13] = '00F3'
+hex_16[14] = '223F'
+hex_16[15] = '80F3'
+hex_16[16] = '80C3'
+hex_16[17] = '08FB'
+hex_16[18] = '88CC'
+hex_16[19] = '2233'
+hex_16[20] = '007C'
+hex_16[21] = '94C0'
+hex_16[22] = '00F0'
+hex_16[23] = '05CC'
+hex_16[24] = '11CC'
+hex_16[25] = '00FF'
+hex_16[26] = '88C7'
+hex_16[27] = '10FF'
+hex_16[28] = '98C7'
+hex_16[29] = '88BB'
+hex_16[30] = '2203'
+hex_16[31] = '00FC'
+hex_16[32] = '44C0'
+hex_16[33] = '50CC'
+hex_16[34] = '5500'
+hex_16[35] = '88BC'
+hex_16[36] = '4433'
 
 local chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-function setSegment(segment_index, hex)
-  local decimal = tonumber(hex, 16)
+function setSegment(segment_index, hex_16)
+  local decimal = tonumber(hex_16, 16)
   rs.setBundledOutput(bundledOutputSides[segment_index], decimal)
 end
 
 function getHex(char)
   _hex = nil
-  -- check if the char is in chars and get the hex
+  -- check if the char is in chars and get the hex_16
   for i = 1, #chars do
     if string.sub(chars, i, i) == char then
-      _hex = hex[i]
+      _hex = hex_16[i]
     end
   end
-  -- return the hex
+  -- return the hex_16
   return _hex
 end
 
-function userEnterChars()
-  -- ready the terminal
+function clearTerminal()
   term.clear()
   term.setCursorPos(1,1)
+end
+
+function userEnterChars()
+  clearTerminal()
   
   -- get chars from the user and check if they're valid chars
   local entered_chars_hex = {}
   local all_entered_chars_correct = true
-  for i = 1, segment_count do
-    write('Char '..i..': ')
+  for i = 1, display_count do
+    write('Character '..i..': ')
     local char = read()
-    local hex = getHex(char)
-    entered_chars_hex[i] = hex
-    all_entered_chars_correct = all_entered_chars_correct and hex
+    local hex_16 = getHex(char)
+    entered_chars_hex[i] = hex_16
+    all_entered_chars_correct = all_entered_chars_correct and hex_16
   end
 
   -- set the segments if the entered chars are valid
@@ -96,14 +104,16 @@ end
 function scrollAllChars()
   while true do
     -- loops for each char
-    for i = 1, #hex do
+    for i = 1, #hex_16 do
       -- loops for each segment
-      for segment_index = 1, segment_count do
-        -- gets a hex char based on the looped char and segment
+      for segment_index = 1, display_count do
+        -- gets a hex_16 char based on the looped char and segment
         local k = i + segment_index - 1
-        local l = moduloWithoutZero(k, #hex)
+        local l = moduloWithoutZero(k, #hex_16)
         -- tells a segment which char to display
-        setSegment(segment_index, hex[l])
+        setSegment(segment_index, hex_16[l])
+        clearTerminal()
+        print('Character: '..string.sub(chars, i, i))
       end
       -- sleep before shifting all chars on the displays
       sleep(1)
