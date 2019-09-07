@@ -44,8 +44,9 @@ hex_16[33] = '50CC'
 hex_16[34] = '5500'
 hex_16[35] = '88BC'
 hex_16[36] = '4433'
+hex_16[37] = 'FFFF'
 
-local chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+local chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_'
 
 function setSegment(segment_index, hex_16)
   local decimal = tonumber(hex_16, 16)
