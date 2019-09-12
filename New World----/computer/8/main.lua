@@ -141,18 +141,29 @@ function buildDiagonalSegments()
   buildDiagonalSegment("left")
 end
 
+function restock()
+  local item_count = turtle.getItemCount(1)
+  if (item_count < 48) then
+    turtle.select(2)
+    turtle.place()
+    turtle.suck()
+    turtle.dig()
+  end
+end
+
 function build()
   -- clear the terminal of text and reset the cursor position
   term.clear()
   term.setCursorPos(1,1)
 
   local startTime = os.time()
-  print("Building the edge segments...")
-  buildEdgeSegments()
-  print("Building the vertical and horizontal segments...")
-  buildVerHorSegments()
-  print("Building the diagonal segments...")
-  buildDiagonalSegments()
+  restock()
+  -- print("Building the edge segments...")
+  -- buildEdgeSegments()
+  -- print("Building the vertical and horizontal segments...")
+  -- buildVerHorSegments()
+  -- print("Building the diagonal segments...")
+  -- buildDiagonalSegments()
 
   local endTime = os.time()
   -- 1 in os.time() equals 50 seconds
