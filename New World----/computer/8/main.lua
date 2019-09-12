@@ -19,48 +19,89 @@ loadAPIs() -- run the above code automatically
 
 local t = turtle_functions.t:new("explorer", {1, 2})
 
--- for i = 1, 2 do
---   t:mForward(4)
---   t:zigZag(16)
---   t:mForward(7)
---   t:zigZag(16)
---   t:mForward(3)
---   t:tRight()
-  
---   t:mForward(4)
---   t:zigZag(24)
---   t:mForward(7)
---   t:zigZag(24)
---   t:mForward(3)
---   t:tRight()
--- end
+-- builds the edge segments a, b, c, d, e, f, g, h
+function buildEdgeSegments()
+  for i = 1, 2 do
+    t:mForward(4)
+    t:zigZag(16)
+    t:mForward(7)
+    t:zigZag(16)
+    t:mForward(3)
+    t:tRight()
+    
+    t:mForward(4)
+    t:zigZag(24)
+    t:mForward(7)
+    t:zigZag(24)
+    t:mForward(3)
+    t:tRight()
+  end
+end
 
--- t:mRight()
--- t:mForward(2)
--- t:mLeft()
--- t:mForward(22)
--- t:mRight()
+-- move back to the middle of the display
+function moveToMiddle(n)
+  t:tLeft() -- this can be done with t:tLeft(2) later
+  t:tLeft()
+  t:mForward(n)
+end
 
--- t:zigZag(24)
--- t:mForward(4)
--- t:mRight()
--- t:mForward(3)
+-- builds the vertical and horizontal segments j, p, n, l
+function buildVerHorSegments()
+  -- move to segment j
+  t:mRight()
+  t:mForward(2)
+  t:mLeft()
+  t:mForward(22)
+  t:mRight()
+  -- build segment j
+  t:zigZag(24)
 
--- t:zigZag(16)
--- t:tLeft() -- this can be done with t:tLeft(2) later
--- t:tLeft()
--- t:mForward(16)
+  -- move to segment p
+  t:mForward(4)
+  t:mRight()
+  t:mForward(3)
+  -- build segment p
+  t:zigZag(16)
 
--- t:mForward(5)
--- t:mRight()
--- t:mForward(2)
+  moveToMiddle(16)
 
--- t:zigZag(24)
--- t:tLeft() -- this can be done with t:tLeft(2) later
--- t:tLeft()
--- t:mForward(24)
+  -- move to segment n
+  t:mForward(5)
+  t:mRight()
+  t:mForward(2)
+  -- build segment n
+  t:zigZag(24)
 
--- t:mForward(5)
--- t:mRight()
--- t:mForward(2)
--- t:zigZag(16)
+  moveToMiddle(24)
+
+  -- move to segment l
+  t:mForward(5)
+  t:mRight()
+  t:mForward(2)
+  -- build segment l
+  t:zigZag(16)
+end
+
+function buildDiagonalSegments()
+  moveToMiddle(16)
+end
+
+function build()
+  -- clear the terminal of text and reset the cursor position
+  term.clear()
+  term.setCursorPos(1,1)
+
+  local startTime = os.time()
+  -- print("Building the edge segments...")
+  -- buildEdgeSegments()
+  -- print("Building the vertical and horizontal segments...")
+  -- buildVerHorSegments()
+  print("Building the diagonal segments...")
+  buildDiagonalSegments()
+
+  local endTime = os.time()
+  -- 1 in os.time() equals 50 seconds
+  local elapsedTime = (endTime - startTime) * 50
+  print("Done! Time elapsed: "..elapsedTime.." seconds.")
+end
+build()
