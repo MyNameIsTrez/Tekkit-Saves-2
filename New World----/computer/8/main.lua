@@ -23,16 +23,16 @@ local t = turtle_functions.t:new("explorer", {1, 2})
 function buildEdgeSegments()
   for i = 1, 2 do
     t:mForward(4)
-    t:zigZag(16)
+    t:straightZigZag(16)
     t:mForward(7)
-    t:zigZag(16)
+    t:straightZigZag(16)
     t:mForward(3)
     t:tRight()
     
     t:mForward(4)
-    t:zigZag(24)
+    t:straightZigZag(24)
     t:mForward(7)
-    t:zigZag(24)
+    t:straightZigZag(24)
     t:mForward(3)
     t:tRight()
   end
@@ -54,14 +54,14 @@ function buildVerHorSegments()
   t:mForward(22)
   t:mRight()
   -- build segment j
-  t:zigZag(24)
+  t:straightZigZag(24)
 
   -- move to segment p
   t:mForward(4)
   t:mRight()
   t:mForward(3)
   -- build segment p
-  t:zigZag(16)
+  t:straightZigZag(16)
 
   moveToMiddle(16)
 
@@ -70,7 +70,7 @@ function buildVerHorSegments()
   t:mRight()
   t:mForward(2)
   -- build segment n
-  t:zigZag(24)
+  t:straightZigZag(24)
 
   moveToMiddle(24)
 
@@ -79,11 +79,66 @@ function buildVerHorSegments()
   t:mRight()
   t:mForward(2)
   -- build segment l
-  t:zigZag(16)
+  t:straightZigZag(16)
+end
+
+function buildDiagonalSegment(direction)
+  if (direction == "right") then
+    t:diagonalZigZag("right")
+  
+    -- move back to the middle
+    t:mForward(1)
+    t:tLeft() -- this can be done with tLeft(2)
+    t:tLeft()
+    t:diagonalZigZag("right")
+  elseif (direction == "left") then
+    t:diagonalZigZag("left")
+  
+    -- move back to the middle
+    t:mForward(1)
+    t:tRight() -- this can be done with tLeft(2)
+    t:tRight()
+    t:diagonalZigZag("left")
+  else
+    error("You entered a wrong direction for buildDiagonalSegment()")
+  end
 end
 
 function buildDiagonalSegments()
   moveToMiddle(16)
+
+  -- move to segment k
+  t:mRight()
+  t:mForward(1)
+  t:mRight()
+  t:tLeft()
+
+  -- build segment k
+  buildDiagonalSegment("right")
+
+  -- move to segment i
+  t:mForward(1)
+  t:tRight()
+  t:mForward(10)
+  t:tRight()
+
+  -- build segment i
+  buildDiagonalSegment("left")
+
+  -- move to segment o
+  t:mForward(7)
+
+  -- build segment o
+  buildDiagonalSegment("right")
+
+  -- move to segment m
+  t:mForward(1)
+  t:tRight()
+  t:mForward(10)
+  t:tRight()
+
+  -- build segment m
+  buildDiagonalSegment("left")
 end
 
 function build()
@@ -92,16 +147,18 @@ function build()
   term.setCursorPos(1,1)
 
   local startTime = os.time()
-  -- print("Building the edge segments...")
-  -- buildEdgeSegments()
-  -- print("Building the vertical and horizontal segments...")
-  -- buildVerHorSegments()
+  print("Building the edge segments...")
+  buildEdgeSegments()
+  print("Building the vertical and horizontal segments...")
+  buildVerHorSegments()
   print("Building the diagonal segments...")
   buildDiagonalSegments()
 
   local endTime = os.time()
   -- 1 in os.time() equals 50 seconds
   local elapsedTime = (endTime - startTime) * 50
-  print("Done! Time elapsed: "..elapsedTime.." seconds.")
+  local minutes = math.floor(elapsedTime / 60)
+  local seconds = elapsedTime % 60
+  print("Done! Elapsed time: \n"..minutes.." minutes and "..seconds.." seconds.")
 end
 build()

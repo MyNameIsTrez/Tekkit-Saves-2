@@ -86,7 +86,7 @@ function t:mRight()
   turtle.forward()
 end
 
-function t:zigZag(n)
+function t:straightZigZag(n)
   for i = 1, n/2 do
     t:placeDown()
     t:mRight()
@@ -96,6 +96,34 @@ function t:zigZag(n)
     t:mLeft()
     t:placeDown()
     t:mRight()
+  end
+end
+
+function t:diagonalZigZag(direction)
+  if (direction == "right") then
+  	for i = 1, 12 do
+	  t:mForward(1)
+	  t:placeDown()
+	  t:mForward(1)
+	  t:placeDown()
+	  
+	  t:mRight()
+	  t:tLeft()
+	  t:placeDown()
+    end
+  elseif (direction == "left") then
+  	for i = 1, 12 do
+	  t:mForward(1)
+	  t:placeDown()
+	  t:mForward(1)
+	  t:placeDown()
+	  
+	  t:mLeft()
+	  t:tRight()
+	  t:placeDown()
+    end
+  else
+	error("You entered a wrong direction for diagonalZigZag()")
   end
 end
 
