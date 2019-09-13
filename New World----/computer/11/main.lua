@@ -256,7 +256,7 @@ function restock()
     buildRestocker()
 
     print("Restocking...")
-    sleep(13) -- refill for at least 2*6 = 12 seconds
+    sleep(13) -- refill for at least 2.1s * 6 stacks = 12.6 seconds
 
     print("Dismantling the restocker...")
     dismantleRestocker()
@@ -278,28 +278,32 @@ function build()
   term.clear()
   term.setCursorPos(1,1)
 
-  -- print("Building the edge segments...")
-  -- local startTime = os.time()
-  -- buildEdgeSegments()
-  -- print("Done! Elapsed time: "..getElapsedTime(startTime))
+  local startTime = os.time()
+  restock()
+  print("Done! Elapsed time: "..getElapsedTime(startTime))
+
+  print("Building the edge segments...")
+  local startTime = os.time()
+  buildEdgeSegments()
+  print("Done! Elapsed time: "..getElapsedTime(startTime))
 
   local startTime = os.time()
   restock()
   print("Done! Elapsed time: "..getElapsedTime(startTime))
 
-  -- print("Building the vertical and horizontal segments...")
-  -- local startTime = os.time()
-  -- buildVerHorSegments()
-  -- print("Done! Elapsed time: "..getElapsedTime(startTime))
+  print("Building the vertical and horizontal segments...")
+  local startTime = os.time()
+  buildVerHorSegments()
+  print("Done! Elapsed time: "..getElapsedTime(startTime))
 
-  -- local startTime = os.time()
-  -- restock()
-  -- print("Done! Elapsed time: "..getElapsedTime(startTime))
+  local startTime = os.time()
+  restock()
+  print("Done! Elapsed time: "..getElapsedTime(startTime))
 
-  -- print("Building the diagonal segments...")
-  -- local startTime = os.time()
-  -- buildDiagonalSegments()
-  -- print("Done! Elapsed time: "..getElapsedTime(startTime))
+  print("Building the diagonal segments...")
+  local startTime = os.time()
+  buildDiagonalSegments()
+  print("Done! Elapsed time: "..getElapsedTime(startTime))
 
   print("Finished building the display!")
 end
