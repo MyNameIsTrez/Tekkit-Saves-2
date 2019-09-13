@@ -141,14 +141,105 @@ function buildDiagonalSegments()
   buildDiagonalSegment("left")
 end
 
+function buildRestocker()  
+  -- place the 2 iron blocks on the sides of the turtle
+  turtle.select(1) -- this should be any available slot
+  t:tRight()
+  t:place()
+  t:tLeft() -- this should be t:tLeft(2)
+  t:tLeft()
+  t:place()
+
+  -- place the 2 timers
+  turtle.select(9) -- this should be t:select(n), and the selected slot should be saved to the turtle
+  turtle.up() -- make this t:up(n)
+  t:place()
+  t:tRight()
+  t:tRight()
+  t:place()
+
+  -- make the turtle face the original direction again
+  t:tLeft()
+
+  -- place the ender chest
+  turtle.select(8)
+  turtle.placeUp()
+
+  -- place the filter
+  turtle.select(7)
+  turtle.down()
+  turtle.placeUp()
+end
+
+function dismantleRestocker()
+  -- remove the filter
+  print(1)
+  turtle.select(7)
+  print(2)
+  turtle.digUp()
+  print(3)
+
+  -- remove the ender chest
+  print(4)
+  turtle.up()
+  print(5)
+  turtle.select(8)
+  print(6)
+  turtle.digUp()
+  print(7)
+
+  -- remove the 2 timers
+  print(8)
+  t:tRight()
+  print(9)
+  t:dig()
+  print(10)
+  t:tLeft()
+  print(11)
+  t:tLeft()
+  print(12)
+  t:dig()
+  print(13)
+
+  -- remove the 2 iron blocks
+  print(14)
+  turtle.down()
+  print(15)
+  t:dig()
+  print(16)
+  t:tRight()
+  print(17)
+  t:tRight()
+  print(18)
+  t:dig()
+  print(19)
+
+  -- make the turtle face the original direction again
+  t:tLeft()
+  print(20)
+end
+
 function restock()
-  local item_count = turtle.getItemCount(1)
-  if (item_count < 48) then
-    turtle.select(2)
-    turtle.place()
-    turtle.suck()
-    turtle.dig()
+  local iron_blocks = 0
+  
+  -- item slots 1 to 5 are for iron blocks. 6 * 64 = 384 iron blocks max
+  -- item slot 9 is for 2 timers, item slot 8 is for an ender chest,
+  -- item slot 7 is for a filter
+  for i = 1, 6 do
+    iron_blocks = iron_blocks + turtle.getItemCount(i)
   end
+
+  print("Number of iron blocks: "..iron_blocks)
+  -- if (iron_blocks < 48) then
+    print("Building the restocker...")
+    -- buildRestocker()
+
+    print("Restocking...")
+    -- sleep(13) -- refill for at least 2*6 = 12 seconds
+
+    print("Dismantling the restocker...")
+    dismantleRestocker()
+  -- end
 end
 
 function build()
@@ -157,13 +248,15 @@ function build()
   term.setCursorPos(1,1)
 
   local startTime = os.time()
-  restock()
   -- print("Building the edge segments...")
   -- buildEdgeSegments()
+  restock()
   -- print("Building the vertical and horizontal segments...")
   -- buildVerHorSegments()
+  -- restock()
   -- print("Building the diagonal segments...")
   -- buildDiagonalSegments()
+  -- restock()
 
   local endTime = os.time()
   -- 1 in os.time() equals 50 seconds
