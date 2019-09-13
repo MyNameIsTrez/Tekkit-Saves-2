@@ -19,6 +19,47 @@ loadAPIs() -- run the above code automatically
 
 local t = turtle_functions.t:new("explorer", {1, 2})
 
+function t:straightZigZag(n)
+  for i = 1, n/2 do
+    t:placeDown()
+    t:mRight()
+    t:placeDown()
+    t:mLeft()
+    t:placeDown()
+    t:mLeft()
+    t:placeDown()
+    t:mRight()
+  end
+end
+
+function t:diagonalZigZag(direction)
+  if (direction == "right") then
+  	for i = 1, 12 do
+	  t:mForward(1)
+	  t:placeDown()
+	  t:mForward(1)
+	  t:placeDown()
+	  
+	  t:mRight()
+	  t:tLeft()
+	  t:placeDown()
+    end
+  elseif (direction == "left") then
+  	for i = 1, 12 do
+	  t:mForward(1)
+	  t:placeDown()
+	  t:mForward(1)
+	  t:placeDown()
+	  
+	  t:mLeft()
+	  t:tRight()
+	  t:placeDown()
+    end
+  else
+	error("You entered a wrong direction for diagonalZigZag()")
+  end
+end
+
 -- builds the edge segments a, b, c, d, e, f, g, h
 function buildEdgeSegments()
   for i = 1, 2 do
