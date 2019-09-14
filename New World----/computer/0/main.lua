@@ -1,131 +1,311 @@
--- 16-segment display master controller code for Tekkit Classic.
+-- 16-segment display builder code for Tekkit Classic.
 -- Made by MyNameIsTrez in 2019.
 
-local modemSide = 'back'
-local hex_16 = {}
+function loadAPIs()
+  -- a table of the IDs and names of the APIs to load
+  local APIs = {
+    {id = "NqnSq1wK", name = "turtle_functions"}
+  }
 
--- 16-segment 0 to 9
-hex_16[1] = '44FF'
-hex_16[2] = '040C'
-hex_16[3] = '8877'
-hex_16[4] = '083F'
-hex_16[5] = '888C'
-hex_16[6] = '90B3'
-hex_16[7] = '88FB'
-hex_16[8] = '000F'
-hex_16[9] = '88FF'
-hex_16[10] = '88BF'
+  for i = 1, #APIs do
+    -- delete the old APIs, to make room for the more up-to-date versions
+    -- returns no error if the program has already been deleted
+    fs.delete(APIs[i].name)
 
--- 16-segment A to Z
-hex_16[11] = '88CF'
-hex_16[12] = '2A3F'
-hex_16[13] = '00F3'
-hex_16[14] = '223F'
-hex_16[15] = '80F3'
-hex_16[16] = '80C3'
-hex_16[17] = '08FB'
-hex_16[18] = '88CC'
-hex_16[19] = '2233'
-hex_16[20] = '007C'
-hex_16[21] = '94C0'
-hex_16[22] = '00F0'
-hex_16[23] = '05CC'
-hex_16[24] = '11CC'
-hex_16[25] = '00FF'
-hex_16[26] = '88C7'
-hex_16[27] = '10FF'
-hex_16[28] = '98C7'
-hex_16[29] = '88BB'
-hex_16[30] = '2203'
-hex_16[31] = '00FC'
-hex_16[32] = '44C0'
-hex_16[33] = '50CC'
-hex_16[34] = '5500'
-hex_16[35] = '88BC'
-hex_16[36] = '4433'
-hex_16[37] = '0000'
-hex_16[38] = '1400'
-hex_16[39] = '4100'
+    shell.run("pastebin", "get", APIs[i].id, APIs[i].name)
+    os.loadAPI(APIs[i].name)
+  end
+end
+loadAPIs() -- run the above code automatically
 
-local chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ ()'
+local t = turtle_functions.t:new("explorer", {1, 2})
 
-function setSegment(segment_index, hex_16)
-  local decimal = tonumber(hex_16, 16)
-  rs.setBundledOutput(bundledOutputSides[segment_index], decimal)
+function t:straightZigZag(n)
+  for i = 1, n/2 do
+    t:placeDown()
+    t:mRight()
+    t:placeDown()
+    t:mLeft()
+    t:placeDown()
+    t:mLeft()
+    t:placeDown()
+    t:mRight()
+  end
 end
 
-function getHex(char)
-  _hex = nil
-  -- check if the char is in chars and get the hex_16
-  for i = 1, #chars do
-    if string.sub(chars, i, i) == char then
-      _hex = hex_16[i]
+function t:diagonalZigZag(direction)
+  if (direction == "right") then
+  	for i = 1, 12 do
+	  t:mForward(1)
+	  t:placeDown()
+	  t:mForward(1)
+	  t:placeDown()
+	  
+	  t:mRight()
+	  t:tLeft()
+	  t:placeDown()
     end
-  end
-  -- return the hex_16
-  return _hex
-end
-
-function clearTerminal()
-  term.clear()
-  term.setCursorPos(1,1)
-end
-
-function userEnterChars()
-  clearTerminal()
-  
-  -- get chars from the user and check if they're valid chars
-  local entered_chars_hex = {}
-  local all_entered_chars_correct = true
-  for i = 1, display_count do
-    write('Character '..i..': ')
-    local char = read()
-    local hex_16 = getHex(char)
-    entered_chars_hex[i] = hex_16
-    all_entered_chars_correct = all_entered_chars_correct and hex_16
-  end
-
-  -- set the segments if the entered chars are valid
-  if (all_entered_chars_correct) then
-    print('Success!')
-    for i = 1, #entered_chars_hex do
-      setSegment(i, entered_chars_hex[i])
+  elseif (direction == "left") then
+  	for i = 1, 12 do
+	  t:mForward(1)
+	  t:placeDown()
+	  t:mForward(1)
+	  t:placeDown()
+	  
+	  t:mLeft()
+	  t:tRight()
+	  t:placeDown()
     end
   else
-    print('One or multiple of the entered character(s) is invalid, try again!')
-    sleep(4)
-    main()
+	error("You entered a wrong direction for diagonalZigZag()")
   end
 end
 
--- variant of the modulo operator, so it can't output 0
-function moduloWithoutZero(n, mod)
-  return (n - 1) % mod + 1
-end
-
-function scrollAllChars()
-  while true do
-    -- loops for each char
-    for i = 1, #hex_16 do
-      -- loops for each segment
-      for segment_index = 1, display_count do
-        -- gets a hex_16 char based on the looped char and segment
-        local k = i + segment_index - 1
-        local l = moduloWithoutZero(k, #hex_16)
-        -- tells a segment which char to display
-        setSegment(segment_index, hex_16[l])
-        clearTerminal()
-        print('Character: '..string.sub(chars, i, i))
-      end
-      -- sleep before shifting all chars on the displays
-      sleep(1)
-    end
+-- builds the edge segments a, b, c, d, e, f, g, h
+function buildEdgeSegments()
+  for i = 1, 2 do
+    t:mForward(4)
+    t:straightZigZag(16)
+    t:mForward(7)
+    t:straightZigZag(16)
+    t:mForward(3)
+    t:tRight()
+    
+    t:mForward(4)
+    t:straightZigZag(24)
+    t:mForward(7)
+    t:straightZigZag(24)
+    t:mForward(3)
+    t:tRight()
   end
 end
 
-function main()
-  -- userEnterChars()
-  scrollAllChars()
+-- move back to the middle of the display
+function moveToMiddle(n)
+  t:tLeft() -- this can be done with t:tLeft(2) later
+  t:tLeft()
+  t:mForward(n)
 end
 
-main()
+-- builds the vertical and horizontal segments j, p, n, l
+function buildVerHorSegments()
+  -- move to segment j
+  t:mRight()
+  t:mForward(2)
+  t:mLeft()
+  t:mForward(22)
+  t:mRight()
+  -- build segment j
+  t:straightZigZag(24)
+
+  -- move to segment p
+  t:mForward(4)
+  t:mRight()
+  t:mForward(3)
+  -- build segment p
+  t:straightZigZag(16)
+
+  moveToMiddle(16)
+
+  -- move to segment n
+  t:mForward(5)
+  t:mRight()
+  t:mForward(2)
+  -- build segment n
+  t:straightZigZag(24)
+
+  moveToMiddle(24)
+
+  -- move to segment l
+  t:mForward(5)
+  t:mRight()
+  t:mForward(2)
+  -- build segment l
+  t:straightZigZag(16)
+end
+
+function buildDiagonalSegment(direction)
+  if (direction == "right") then
+    t:diagonalZigZag("right")
+  
+    -- move back to the middle
+    t:mForward(1)
+    t:tLeft() -- this can be done with tLeft(2)
+    t:tLeft()
+    t:diagonalZigZag("right")
+  elseif (direction == "left") then
+    t:diagonalZigZag("left")
+  
+    -- move back to the middle
+    t:mForward(1)
+    t:tRight() -- this can be done with tLeft(2)
+    t:tRight()
+    t:diagonalZigZag("left")
+  else
+    error("You entered a wrong direction for buildDiagonalSegment()")
+  end
+end
+
+function buildDiagonalSegments()
+  moveToMiddle(16)
+
+  -- move to segment k
+  t:mRight()
+  t:mForward(1)
+  t:mRight()
+  t:tLeft()
+
+  -- build segment k
+  buildDiagonalSegment("right")
+
+  -- move to segment i
+  t:mForward(1)
+  t:tRight()
+  t:mForward(10)
+  t:tRight()
+
+  -- build segment i
+  buildDiagonalSegment("left")
+
+  -- move to segment o
+  t:mForward(7)
+
+  -- build segment o
+  buildDiagonalSegment("right")
+
+  -- move to segment m
+  t:mForward(1)
+  t:tRight()
+  t:mForward(10)
+  t:tRight()
+
+  -- build segment m
+  buildDiagonalSegment("left")
+end
+
+function buildRestocker()  
+  -- place the 2 iron blocks on the sides of the turtle
+  turtle.select(1) -- this should be any available slot
+  t:tRight()
+  t:place()
+  t:tLeft() -- this should be t:tLeft(2)
+  t:tLeft()
+  t:place()
+
+  -- place the 2 timers
+  turtle.select(9) -- this should be t:select(n), and the selected slot should be saved to the turtle
+  turtle.up() -- make this t:up(n)
+  t:place()
+  t:tRight()
+  t:tRight()
+  t:place()
+
+  -- make the turtle face the original direction again
+  t:tLeft()
+
+  -- place the ender chest
+  turtle.select(8)
+  turtle.placeUp()
+
+  -- place the filter
+  turtle.select(7)
+  turtle.down()
+  turtle.placeUp()
+end
+
+function dismantleRestocker()
+  -- remove the filter
+  turtle.select(7)
+  turtle.digUp()
+
+  -- remove the ender chest
+  turtle.up()
+  turtle.select(8)
+  turtle.digUp()
+
+  -- remove the 2 timers
+  t:tRight()
+  t:dig()
+  t:tLeft()
+  t:tLeft()
+  t:dig()
+
+  -- remove the 2 iron blocks
+  turtle.select(1)
+  turtle.down()
+  t:dig()
+  t:tRight()
+  t:tRight()
+  t:dig()
+
+  -- make the turtle face the original direction again
+  t:tLeft()
+end
+
+function restock()
+  local iron_blocks = 0
+  
+  -- item slots 1 to 5 are for iron blocks. 6 * 64 = 384 iron blocks max
+  -- item slot 9 is for 2 timers, item slot 8 is for an ender chest,
+  -- item slot 7 is for a filter
+  for i = 1, 6 do
+    iron_blocks = iron_blocks + turtle.getItemCount(i)
+  end
+
+  -- if (iron_blocks < 48) then
+    print("Building the restocker...")
+    buildRestocker()
+
+    print("Restocking...")
+    sleep(13) -- refill for at least 2.1s * 6 stacks = 12.6 seconds
+
+    print("Dismantling the restocker...")
+    dismantleRestocker()
+  -- end
+end
+
+function getElapsedTime(startTime)
+  local endTime = os.time()
+  -- 1 from os.time() equals 50 seconds IRL
+  local elapsedTime = (endTime - startTime) * 50
+
+  local minutes = math.floor(elapsedTime / 60)
+  local seconds = math.floor(elapsedTime % 60)
+  return minutes.." min, "..seconds.." sec."
+end
+
+function build()
+  -- clear the terminal of text and reset the cursor position
+  term.clear()
+  term.setCursorPos(1,1)
+
+  local startTime = os.time()
+  restock()
+  print("Done! Elapsed time: "..getElapsedTime(startTime))
+
+  print("Building the edge segments...")
+  local startTime = os.time()
+  buildEdgeSegments()
+  print("Done! Elapsed time: "..getElapsedTime(startTime))
+
+  local startTime = os.time()
+  restock()
+  print("Done! Elapsed time: "..getElapsedTime(startTime))
+
+  print("Building the vertical and horizontal segments...")
+  local startTime = os.time()
+  buildVerHorSegments()
+  print("Done! Elapsed time: "..getElapsedTime(startTime))
+
+  local startTime = os.time()
+  restock()
+  print("Done! Elapsed time: "..getElapsedTime(startTime))
+
+  print("Building the diagonal segments...")
+  local startTime = os.time()
+  buildDiagonalSegments()
+  print("Done! Elapsed time: "..getElapsedTime(startTime))
+
+  print("Finished building the display!")
+end
+build()

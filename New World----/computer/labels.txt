@@ -1,3 +1,6 @@
-0 master
-1 slave
-2 builder
+0 builder
+1 master
+2 slave_1
+3 slave_2
+4 slave_3
+5 slave_4
