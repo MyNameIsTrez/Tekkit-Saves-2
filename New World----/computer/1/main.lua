@@ -1,16 +1,16 @@
 -- 16-segment display master controller code for Tekkit Classic.
 -- Made by MyNameIsTrez in 2019.
 
-local text = "HELLO THERE"
+local text = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 local displays = 4
 local offset_ID = 1
 local modem_side = "back"
-local sleep_time = 1
+local sleep_time = 0
 
 rednet.open(modem_side)
 
 function getOffsetText(text, offset)
-  start_spaces_count = #text - offset
+  start_spaces_count = displays - offset
   end_spaces_count = offset - #text
 
   -- Remove the last letters in the text, according to the offset.
@@ -18,8 +18,9 @@ function getOffsetText(text, offset)
   local output = string.sub(text, 1, offset)
 
   -- Only remove the first letters in the text, if letters are off-screen on the left.
-  if (offset > #text) then
-    output = string.sub(output, offset - #text + 1, #text)
+  local a = -1 * (displays - 1) + offset
+  if (a > -1) then -- Not sure if this check is necessary.
+    output = string.sub(output, a, a + displays - 1)
   end
 
   -- Add spaces to the start of the text.
@@ -37,8 +38,8 @@ end
 
 function main()
   while true do
-    local offsets = #text * 2
-    for offset = 0, offsets - 1 do
+    local offsets = #text + displays - 1
+    for offset = 0, offsets do
       offset_text = getOffsetText(text, offset)
       print("Displaying: '"..offset_text.."'")
       for displayID = 1, displays do
