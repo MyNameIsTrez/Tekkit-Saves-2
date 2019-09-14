@@ -1,8 +1,7 @@
--- 16-segment display code for Tekkit Classic
--- made by MyNameIsTrez in 2019
-local bundledOutputSides = { 'back', 'right', 'left', 'bottom', 'top', 'front' } 
-local display_count = 1
--- local segments = 16
+-- 16-segment display master controller code for Tekkit Classic.
+-- Made by MyNameIsTrez in 2019.
+
+local modemSide = 'back'
 local hex_16 = {}
 
 -- 16-segment 0 to 9
