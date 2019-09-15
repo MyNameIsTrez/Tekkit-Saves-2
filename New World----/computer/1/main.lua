@@ -17,7 +17,7 @@ function getTemperature()
   local temp = string.sub(str_data, temp_index + 8, temp_index + 11)
   return temp
 end
-local text = 'TEMP:'..getTemperature()
+local text = 'TEMP '..getTemperature()
 
 function getOffsetText(text, offset)
   start_spaces_count = displays - offset
