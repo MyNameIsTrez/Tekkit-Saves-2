@@ -3,7 +3,8 @@
 
 local modem_side = "right"
 local bundled_input_side = "back"
-local measuring_seconds = 60
+local measuring_seconds = 60 -- in seconds
+local update_delay = 1 -- in seconds
 
 local stats = {
   "DIAMONDS",
@@ -28,6 +29,7 @@ function main()
       table.insert(binary_table, 0)
     end
 
+    local timer = os.startTimer(1)
     local measuring = measuring_seconds / 50
     while difference < measuring do
       local state = rs.getBundledInput(bundled_input_side, decimal)
@@ -41,14 +43,13 @@ function main()
       if (difference < 0) then
         difference = difference + 24
       end
-      -- print(difference)
 
       clearTerminal()
       for i = 1, #stats do
         print(stats[i].." "..binary_table[i] / (difference * 50))
       end
 
-      os.pullEvent("redstone")
+      os.pullEvent()
     end
   end
 end
