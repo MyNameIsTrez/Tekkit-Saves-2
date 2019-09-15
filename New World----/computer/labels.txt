@@ -4,3 +4,4 @@
 3 slave_2
 4 slave_3
 5 slave_4
+6 item_counter
