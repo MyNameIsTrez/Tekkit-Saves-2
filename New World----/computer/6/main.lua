@@ -3,8 +3,8 @@
 
 local modem_side = "right"
 local bundled_input_side = "back"
-local measuring_seconds = 60 -- in seconds
-local update_delay = 1 -- in seconds
+local measuring_limit = 60 -- How many updates are measured before the last ones are deleted.
+local update_delay = 1 -- How often the measurements update in seconds.
 
 local stats = {
   "DIAMONDS",
@@ -24,138 +24,94 @@ function round(n, decimals)
   return math.floor(n * m) / m
 end
 
-function main()
-  while true do
-    local start_time = os.time()
-    local difference = 0 -- Temporary assignment.
-
-    local binary_table = {}
-    for i = 1, 16 do
-      table.insert(binary_table, 0)
+function getFullBinary(full_binary, positive_binaries)
+  for i = 1, #stats do
+    if (positive_binaries[i] == 1) then
+      table.insert(full_binary, 1)
+    else
+      table.insert(full_binary, 0)
     end
+  end
+  return full_binary
+end
 
-    local measuring = measuring_seconds / 50
-    while difference < measuring do
-      local timer = os.startTimer(1)
+function getFullDecimal(full_decimal, full_binary)
+  for i = 1, #stats do
+    if (full_decimal[i] == nil) then
+      full_decimal[i] = full_binary[i]
+    else
+      full_decimal[i] = full_decimal[i] + full_binary[i]
+    end
+  end
+  return full_decimal
+end
 
-      local state = rs.getBundledInput(bundled_input_side, decimal)
-      new_binary_table = bit.tobits(state)
-      for i, value in ipairs(new_binary_table) do
-        binary_table[i] = binary_table[i] + value
+function pushToFinalBinary(final_binary, full_decimal)
+  -- Add full_decimal to the beginning.
+  for i, value in ipairs(full_decimal) do
+    table.insert(final_binary[i], 1, value)
+    -- If the table is longer than measuring_limit, remove the last element.
+    if (#final_binary[i] > measuring_limit) then
+      table.remove(final_binary[i])
+    end
+  end
+  return final_binary
+end
+
+function main()
+  local full_decimal = {}
+  local final_binary = {}
+  for i = 1, #stats do
+    table.insert(final_binary, {})
+  end
+  local update_timer = os.startTimer(update_delay)
+  -- Because the "redstone" event gets called when a redstone line turns on or off,
+  -- we have the redstone_on variable to make sure we only activate the redstone code
+  -- once every two times the "redstone" event gets recognized.
+  local redstone_on = true
+
+  -- Prevents breaking out of the loop when the computer receives rednet_message.
+  while true do
+    local event,p1,p2,p3 = os.pullEvent()
+    if (event == "redstone") then
+      if (redstone_on) then
+        local state = rs.getBundledInput(bundled_input_side, decimal)
+        -- Get all the binary numbers that are positive in a table.
+        local positive_binaries = bit.tobits(state)
+    
+        -- Create a full table of 0's and the 1's from positive_binaries.
+        local full_binary = {}
+        full_binary = getFullBinary(full_binary, positive_binaries)
+
+        full_decimal = getFullDecimal(full_decimal, full_binary)
       end
-
-      -- Sleep for one tick, so difference is always > 0.
-      -- This also means the program doesn't get a "Too long without yielding" error.
-      sleep(0)
-
-      local end_time = os.time()
-      difference = end_time - start_time
-      if (difference < 0) then
-        difference = difference + 24
-      end
-
-      clearTerminal()
-      for i = 1, #stats do
-        local n = binary_table[i] / (difference * 50)
-        print(stats[i].." "..round(n, 2))
-      end
-      
-      -- Prevents breaking out of the loop when the computer receives rednet_message.
-      while true do
-        local event,p1,p2,p3 = os.pullEvent()
-        if (event == "redstone" or event == "timer") then
-          break
+      redstone_on = not redstone_on
+    elseif (event == "timer") then
+      local update_timer = os.startTimer(update_delay)
+  
+      -- Add full_decimal to the final binary.
+      -- If full_decimal is empty, fill it with zeros first.
+      local empty = full_decimal[1] == nil
+      if (empty) then
+        for i = 1, #stats do
+          full_decimal[i] = 0
         end
+      end
+      final_binary = pushToFinalBinary(final_binary, full_decimal)
+      full_decimal = {}
+  
+      clearTerminal()
+      local n = #final_binary[1] / measuring_limit * 100
+      print("CALIBRATED "..round(n, 2).."%\n")
+      for i = 1, #final_binary do
+        local total = 0
+        for j = 1, #final_binary[i] do
+          total = total + final_binary[i][j]
+        end
+        print(stats[i].." "..total.."/MIN")
       end
     end
   end
 end
 
 main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--- function userEnterChars()
---   clearTerminal()
-  
---   -- get chars from the user and check if they're valid chars
---   local entered_chars_hex = {}
---   local all_entered_chars_correct = true
-
---   write("Character "..i..": ")
---   local char = read()
---   local hex_16 = getHex(char)
---   entered_chars_hex[i] = hex_16
---   all_entered_chars_correct = all_entered_chars_correct and hex_16
-
---   -- set the segments if the entered chars are valid
---   if (all_entered_chars_correct) then
---     print("Success!")
---     for i = 1, #entered_chars_hex do
---       setSegment(i, entered_chars_hex[i])
---     end
---   else
---     print("One or multiple of the entered character(s) is invalid, try again!")
---     sleep(4)
---     main()
---   end
--- end
-
--- -- variant of the modulo operator, so it can't output 0
--- function moduloWithoutZero(n, mod)
---   return (n - 1) % mod + 1
--- end
-
--- function scrollAllChars()
---   while true do
---     -- loops for each char
---     for i = 1, #hex_16 do
---       -- gets a hex_16 char based on the looped char and segment
---       local k = i
---       local l = moduloWithoutZero(k, #hex_16)
---       -- tells a segment which char to display
---       setSegment(hex_16[l])
---       clearTerminal()
---       print("Character: "..string.sub(chars, i, i))
---       -- sleep before shifting all chars on the displays
---       sleep(1)
---     end
---   end
--- end
