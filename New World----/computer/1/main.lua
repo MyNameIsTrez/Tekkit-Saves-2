@@ -1,13 +1,23 @@
 -- 16-segment display master controller code for Tekkit Classic.
 -- Made by MyNameIsTrez in 2019.
 
-local text = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+-- local text = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 local displays = 4
 local offset_ID = 1
 local modem_side = "back"
-local sleep_time = 0
+local sleep_time = 0.5
 
 rednet.open(modem_side)
+
+function getTemperature()
+  local URL = 'http://weerlive.nl/api/json-data-10min.php?key=demo&locatie=Amsterdam'
+  local table = http.get(URL)
+  local str_data = table.readAll()
+  local temp_index = str_data:find("temp")
+  local temp = string.sub(str_data, temp_index + 8, temp_index + 11)
+  return temp
+end
+local text = 'TEMP:'..getTemperature()
 
 function getOffsetText(text, offset)
   start_spaces_count = displays - offset
