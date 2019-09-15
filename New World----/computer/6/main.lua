@@ -19,24 +19,34 @@ function clearTerminal()
   term.setCursorPos(1,1)
 end
 
+function round(n, decimals)
+  local m = math.pow(10, decimals)
+  return math.floor(n * m) / m
+end
+
 function main()
   while true do
     local start_time = os.time()
-    local difference = 0
+    local difference = 0 -- Temporary assignment.
 
     local binary_table = {}
     for i = 1, 16 do
       table.insert(binary_table, 0)
     end
 
-    local timer = os.startTimer(1)
     local measuring = measuring_seconds / 50
     while difference < measuring do
+      local timer = os.startTimer(1)
+
       local state = rs.getBundledInput(bundled_input_side, decimal)
       new_binary_table = bit.tobits(state)
       for i, value in ipairs(new_binary_table) do
         binary_table[i] = binary_table[i] + value
       end
+
+      -- Sleep for one tick, so difference is always > 0.
+      -- This also means the program doesn't get a "Too long without yielding" error.
+      sleep(0)
 
       local end_time = os.time()
       difference = end_time - start_time
@@ -46,10 +56,17 @@ function main()
 
       clearTerminal()
       for i = 1, #stats do
-        print(stats[i].." "..binary_table[i] / (difference * 50))
+        local n = binary_table[i] / (difference * 50)
+        print(stats[i].." "..round(n, 2))
       end
-
-      os.pullEvent()
+      
+      -- Prevents breaking out of the loop when the computer receives rednet_message.
+      while true do
+        local event,p1,p2,p3 = os.pullEvent()
+        if (event == "redstone" or event == "timer") then
+          break
+        end
+      end
     end
   end
 end
