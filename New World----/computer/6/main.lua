@@ -1,9 +1,6 @@
 -- Item counter code for Tekkit Classic.
 -- Made by MyNameIsTrez in 2019.
 
--- WARNING: The program sometimes gives out wrong readings after a server reset!
--- Temporarily restricting items from entering the Item Detectors and restarting this program fixes this.
-
 local modem_side = "right"
 local bundled_input_side = "back"
 local measuring_limit = 60 -- How many updates are measured before the last ones are deleted.
