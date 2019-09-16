@@ -1,6 +1,9 @@
 -- Item counter code for Tekkit Classic.
 -- Made by MyNameIsTrez in 2019.
 
+-- WARNING: The program sometimes gives out wrong readings after a server reset!
+-- Temporarily restricting items from entering the Item Detectors and restarting this program fixes this.
+
 local modem_side = "right"
 local bundled_input_side = "back"
 local measuring_limit = 60 -- How many updates are measured before the last ones are deleted.
@@ -59,33 +62,30 @@ function pushToFinalBinary(final_binary, full_decimal)
 end
 
 function main()
+  clearTerminal()
+  print("LOADING...")
+
   local full_decimal = {}
   local final_binary = {}
   for i = 1, #stats do
     table.insert(final_binary, {})
   end
   local update_timer = os.startTimer(update_delay)
-  -- Because the "redstone" event gets called when a redstone line turns on or off,
-  -- we have the redstone_on variable to make sure we only activate the redstone code
-  -- once every two times the "redstone" event gets recognized.
-  local redstone_on = true
 
   -- Prevents breaking out of the loop when the computer receives rednet_message.
   while true do
     local event,p1,p2,p3 = os.pullEvent()
     if (event == "redstone") then
-      if (redstone_on) then
-        local state = rs.getBundledInput(bundled_input_side, decimal)
-        -- Get all the binary numbers that are positive in a table.
-        local positive_binaries = bit.tobits(state)
-    
-        -- Create a full table of 0's and the 1's from positive_binaries.
-        local full_binary = {}
-        full_binary = getFullBinary(full_binary, positive_binaries)
+      local state = rs.getBundledInput(bundled_input_side)
 
-        full_decimal = getFullDecimal(full_decimal, full_binary)
-      end
-      redstone_on = not redstone_on
+      -- Get all the binary numbers that are positive in a table.
+      local positive_binaries = bit.tobits(state)
+  
+      -- Create a full table of zeros and the ones from positive_binaries.
+      local full_binary = {}
+      full_binary = getFullBinary(full_binary, positive_binaries)
+
+      full_decimal = getFullDecimal(full_decimal, full_binary)
     elseif (event == "timer") then
       local update_timer = os.startTimer(update_delay)
   
@@ -103,12 +103,16 @@ function main()
       clearTerminal()
       local n = #final_binary[1] / measuring_limit * 100
       print("CALIBRATED "..round(n, 2).."%\n")
+
+      -- Fixes total being 33% higher than it should be.
+      -- This is probably caused by the way the code after the redstone event gets called.
+      local error_mult = 0.75
       for i = 1, #final_binary do
         local total = 0
         for j = 1, #final_binary[i] do
           total = total + final_binary[i][j]
         end
-        print(stats[i].." "..total.."/MIN")
+        print(stats[i].." "..total * error_mult.."/MIN")
       end
     end
   end
