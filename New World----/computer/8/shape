@@ -1,9 +1,9 @@
 function point(p, fill)
   term.setCursorPos(p.x, p.y)
-  if (fill == nil or fill == true) then
-    print("#")
+  if (fill) then
+    print(fill)
   else
-    print(" ")
+    error("You didn't enter a string for the 'fill' argument in the function 'point(p, fill)'.")
   end
   term.setCursorPos(1, 1)
 end
@@ -21,7 +21,7 @@ function circle(center, radius)
       x = center.x + x,
       y = center.y + y
     }
-    point(p)
+    point(p, "#")
   end
 end
 
@@ -44,7 +44,7 @@ function line(p1, p2)
       x = p1.x + x,
       y = p1.y + y
     }
-    point(p)
+    point(p, "#")
   end
 end
 
