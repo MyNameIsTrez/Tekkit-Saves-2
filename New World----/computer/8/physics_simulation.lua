@@ -13,6 +13,7 @@ local w, h = term.getSize()
 
 local gui_x = w/4*3 -- The x value of the left line of the GUI.
 local simulation_middle_x = gui_x / 2 -- The middle is divided into two pixels; we take the left one.
+local entity_symbol = "o"
 
 local entity_min_x = 2
 local entity_max_x = gui_x-1
@@ -227,10 +228,10 @@ function entity:move()
 
   entity.height = entity_max_y - entity.y
   
-  shape.point(entity, "#")
+  shape.point(entity, entity_symbol)
 end
 
-function drawLines()
+function drawRectangleLines()
   shape.rectangle(screen_corners[1], screen_corners[2])
   for i, corner in ipairs(gui_corners) do
     shape.line(corner[1], corner[2])
@@ -259,8 +260,7 @@ function main()
   entity.energy_total = (entity.mass * g * h) * fix
 
   clear()
-  drawLines()
-  shape.point(entity, "#")
+  drawRectangleLines()
 
   while true do
     entity:move()
