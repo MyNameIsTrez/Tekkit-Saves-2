@@ -12,6 +12,7 @@
 local w, h = term.getSize()
 
 local gui_x = w/4*3 -- The x value of the left line of the GUI.
+local simulation_middle_x = gui_x / 2 -- The middle is divided into two pixels; we take the left one.
 
 local entity_min_x = 2
 local entity_max_x = gui_x-1
@@ -19,7 +20,6 @@ local entity_min_y = 2
 local entity_max_y = h-2
 
 local g = 9.81 -- m/s^2 or N/kg. Gravitational acceleration.
-local tick_speed = 1
 
 function loadAPIs()
   -- Makes a table of the IDs and names of the APIs to load.
@@ -43,7 +43,7 @@ function clear()
   term.setCursorPos(1,1)
 end
 
-local corners = {
+local screen_corners = {
   { -- Top-left.
     x = 1,
     y = 1
@@ -54,114 +54,228 @@ local corners = {
   }
 }
 
-local gui_corner = {
-  x = gui_x,
-  y = 1
-}
-
-local entities = {
+local gui_corners = {
   {
-    x = w/2, -- m offset.
-    y = h/2, -- m offset.
-    x_speed = 0, -- m/s.
-    y_speed = 0, -- m/s.
-    facing = 1.5 * math.pi, -- radians, setting it to face south.
-    speed_vertical = 0, -- m/s. pythagoras of x_speed and y_speed.
-    mass = 0.25, -- kg.
-    energy_total = 0, -- J. This value gets set in calcEnergies().
-    energy_potential = 0, -- J.
-    energy_kinetic = 0 -- J. Result of energy_total - energy_potential.
+    {
+      x = gui_x,
+      y = 1
+    },
+    {
+      x = gui_x,
+      y = h-1
+    }
+  },
+  {
+    {
+      x = gui_x + 9,
+      y = 1
+    },
+    {
+      x = gui_x + 9,
+      y = h-1
+    }
+  },
+  {
+    {
+      x = gui_x + 15,
+      y = 1
+    },
+    {
+      x = gui_x + 15,
+      y = h-1
+    }
   }
 }
 
-function writeGUI(string, height)
+local entity = {
+  -- id = 0,
+  x = simulation_middle_x, -- m. offset.
+  y = entity_min_y, -- m. offset.
+  height = 0, -- m. Set by the code.
+  mass = 0.25, -- kg.
+  -- facing = 1.5 * math.pi, -- radians. Setting it to face south by default.
+  speed_horizontal = 0, -- m/s. Isn't affected by anything yet!
+  speed_vertical = 0, -- m/s. Is affected by the gravity.
+  energy_potential = 0, -- J.
+  energy_kinetic = 0, -- J. Result of energy_total - energy_potential.
+  energy_warmth = 0, -- J. (Summation of) the kinetic energy when the potential energy is 0.
+  energy_total = 0 -- J. This value gets set in calcEnergies().
+}
+
+-- function entity:new(id)
+--   setmetatable({}, entity)
+--   self.id = id
+--   return self
+-- end
+
+-- local entities = {}
+-- entities[#entities+1] = entity:new(1)
+-- entities[#entities+1] = entity:new(2)
+-- entities[#entities+1] = entity:new(3)
+
+-- local test = {}
+-- function test:new(id)
+--   setmetatable({}, entity)
+--   self.id = id
+--   return self
+-- end
+
+-- test[#test+1] = test:new(1)
+-- test[#test+1] = test:new(2)
+-- test[#test+1] = test:new(3)
+-- test[#test+1] = test:new(4)
+
+-- print(textutils.serialize(#test))
+
+-- print(textutils.serialize(entities))
+
+-- print(entities[1].id)
+-- print(entities[2].id)
+-- print(entities[3].id)
+
+-- for i, entity in ipairs(entities) do
+--   local entity = entities[i]
+--   -- print(textutils.serialize(entity))
+--   print(entity.id)
+-- end
+
+-- sleep(10)
+
+function round(number, decimals)
+  return math.floor(number * 100) / 100
+end
+
+function writeGUI(number, label, name, height)
+  local rounded_number = round(number)
+
   term.setCursorPos(gui_x + 2, 1 + 2 * height)
-  write("                                                     ")
+  write("      ")
   term.setCursorPos(gui_x + 2, 1 + 2 * height)
-  write(string)
+  write(rounded_number)
+
+  term.setCursorPos(gui_x + 10, 1 + 2 * height)
+  write("   ")
+  term.setCursorPos(gui_x + 10, 1 + 2 * height)
+  write(label)
+
+  term.setCursorPos(gui_x + 17, 1 + 2 * height)
+  write("                                       ")
+  term.setCursorPos(gui_x + 17, 1 + 2 * height)
+  write(name)
 end
 
 function pythagoras(a, b)
   return math.sqrt(math.pow(a, 2) + math.pow(b, 2))
 end
 
-function entities:calcEnergy(i)
-  local entity = entities[i]
-
-  local h = entity_max_y - entity.y
-  entity.energy_potential = entity.mass * g * h
-  entity.energy_kinetic = entity.energy_total - entity.energy_potential
-  entity.energy_total = entity.energy_potential + entity.energy_kinetic
-
-  writeGUI("h: "..h, 1)
-  writeGUI("entity.energy_potential: "..entity.energy_potential.." J", 2)
-  writeGUI("entity.energy_kinetic: "..entity.energy_kinetic.." J", 3)
-  writeGUI("entity.energy_total: "..entity.energy_total.." J", 4)
+function entity:calcEnergy()
+  entity.energy_potential = entity.mass * g * entity.height
+  entity.energy_kinetic = entity.energy_total - entity.energy_potential - entity.energy_warmth
+  if (entity.energy_potential == 0) then
+    entity.energy_warmth = entity.energy_warmth + entity.energy_kinetic
+    entity.energy_kinetic = 0
+  end
+  entity.energy_total = entity.energy_potential + entity.energy_kinetic + entity.energy_warmth
 end
 
-function entities:calcSpeed(i)
-  local entity = entities[i]
-
+function entity:calcSpeed()
   -- Ek = 0.5 * m * v^2
   -- v = math.sqrt(Ek / 0.5 / m)
   entity.speed_vertical = math.sqrt(entity.energy_kinetic / 0.5 / entity.mass)
-
-  writeGUI("entity.speed_vertical: "..entity.speed_vertical.." m/s", 5)
 end
 
-function entities:move(i)
-  local entity = entities[i]
-
-  entity.y_speed = entity.speed_vertical
-
-  local dist_wall_north = entity_min_y - entity.y
+function entity:move()
+  local dist_wall_north = entity.y - entity_min_y
   local dist_wall_east = entity_max_x - entity.x
   local dist_wall_south = entity_max_y - entity.y
   local dist_wall_west = entity_min_x - entity.x
 
-  if (entity.y_speed < dist_wall_north) then
-    entity.y_speed = dist_wall_north
-  end
-  if (entity.x_speed > dist_wall_east) then
-    entity.x_speed = dist_wall_east
-  end
-  if ( entity.y_speed > dist_wall_south) then
-    entity.y_speed = dist_wall_south
-  end
-  if (entity.x_speed < dist_wall_west) then
-    entity.x_speed = dist_wall_west
-  end
-
   -- Remove the currently drawn position of the entity.
   shape.point(entity, " ")
-  entity.x = entity.x + entity.x_speed
-  entity.y = entity.y + entity.y_speed
-  -- Draw the new position of the entity.
+
+  local x_movement
+  if (entity.speed_horizontal > 0) then
+    x_movement = 1
+  elseif (entity.speed_horizontal == 0) then
+    x_movement = 0
+  else
+    x_movement = -1
+  end
+
+  local y_movement
+  if (entity.speed_vertical > 0) then
+    y_movement = 1
+  elseif (entity.speed_vertical == 0) then
+    y_movement = 0
+  else
+    y_movement = -1
+  end
+
+  if (dist_wall_east >= 1 and x_movement == 1) then
+    entity.x = entity.x + x_movement
+  end
+  if (dist_wall_west >= 1 and x_movement == -1) then
+    entity.x = entity.x + x_movement
+  end
+
+  if (dist_wall_north >= 1 and y_movement == -1) then
+    entity.y = entity.y + y_movement
+  end
+  if (dist_wall_south >= 1 and y_movement == 1) then
+    entity.y = entity.y + y_movement
+  end
+
+  entity.height = entity_max_y - entity.y
+  
   shape.point(entity, "#")
 end
 
+function drawLines()
+  shape.rectangle(screen_corners[1], screen_corners[2])
+  for i, corner in ipairs(gui_corners) do
+    shape.line(corner[1], corner[2])
+  end
+end
+
 function drawGUI()
-  shape.rectangle(corners[1], corners[2])
-  shape.rectangle(gui_corner, corners[2])
+  writeGUI(entity.x, " m", "x", 1)
+  writeGUI(entity.y, " m", "y", 2)
+  writeGUI(entity.height, " m", "h", 3)
+  writeGUI(entity.mass, " kg", "weight", 4)
+  writeGUI(entity.speed_horizontal, " m/s", "entity.speed_horizontal", 5)
+  writeGUI(entity.speed_vertical, " m/s", "entity.speed_vertical", 6)
+  writeGUI(entity.energy_potential, " J", "entity.energy_potential", 7)
+  writeGUI(entity.energy_kinetic, " J", "entity.energy_kinetic", 8)
+  writeGUI(entity.energy_warmth, " J", "entity.energy_warmth", 9)
+  writeGUI(entity.energy_total, " J", "entity.energy_total", 10)
 end
 
 function main()
-  local entity = entities[1]
   local h = entity_max_y - entity.y
+
   -- We need to make the total energy a tiny bit larger than the potential energy
-  -- for the entities to start moving. I should fix this somehow.
-  local tiny = 0.000001
-  entity.energy_total = entity.mass * g * h + tiny
+  -- for the entity to start moving. I should fix differently this somehow.
+  local fix = 1.000001
+  entity.energy_total = (entity.mass * g * h) * fix
 
   clear()
-  drawGUI()
-  shape.point(entities[1], "#")
+  drawLines()
+  shape.point(entity, "#")
 
   while true do
-    entities:move(1)
-    entities:calcEnergy(1)
-    entities:calcSpeed(1)
-    sleep(1/tick_speed)
+    entity:move()
+    entity:calcEnergy()
+    entity:calcSpeed()
+    drawGUI()
+    
+    -- If the vertical speed is 16 m/s, the entity gets updated 16 times in a second.
+    -- To prevent the game taking incredibly long to update when the vertical speed is tiny,
+    -- we set a maximum sleep time of 1 second.
+    if (entity.speed_vertical > 1) then
+      sleep(1/entity.speed_vertical)
+    else
+      sleep(1)
+    end
   end
 end
 main()
