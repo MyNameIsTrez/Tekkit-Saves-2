@@ -25,7 +25,7 @@ function clear()
   term.setCursorPos(1,1)
 end
 
-local p = {
+local corners = {
   {
     x = 1,
     y = 1
@@ -36,8 +36,27 @@ local p = {
   }
 }
 
+local entities = {
+  {
+    x = w/2,
+    y = h/2
+  }
+}
+
+function entities:move(x_diff, y_diff)
+  self.x = self.x + x_diff
+  self.y = self.y + y_diff
+end
+
 function main()
   clear()
-  shape.rectangle(p[1], p[2])
+  shape.rectangle(corners[1], corners[2])
+  shape.point(entities[1])
+  sleep(1)
+  entities[1].move(1, 1)
+  sleep(1)
+  entities[1].move(1, 1)
+  sleep(1)
+  entities[1].move(1, 1)
 end
 main()
