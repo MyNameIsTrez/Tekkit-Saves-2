@@ -1,6 +1,10 @@
-function point(p)
+function point(p, fill)
   term.setCursorPos(p.x, p.y)
-  print("#")
+  if (fill == nil or fill == true) then
+    print("#")
+  else
+    print(" ")
+  end
   term.setCursorPos(1, 1)
 end
 

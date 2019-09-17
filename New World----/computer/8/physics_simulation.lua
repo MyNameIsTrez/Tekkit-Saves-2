@@ -43,20 +43,24 @@ local entities = {
   }
 }
 
-function entities:move(x_diff, y_diff)
-  self.x = self.x + x_diff
-  self.y = self.y + y_diff
+function entities:move(i, x_diff, y_diff)
+  local e = entities[i]
+  local not_touching_wall = true
+  if (not_touching_wall) then
+    shape.point(e, false)
+    e.x = e.x + x_diff
+    e.y = e.y + y_diff
+    shape.point(e)
+  end
 end
 
 function main()
-  clear()
-  shape.rectangle(corners[1], corners[2])
   shape.point(entities[1])
-  sleep(1)
-  entities[1].move(1, 1)
-  sleep(1)
-  entities[1].move(1, 1)
-  sleep(1)
-  entities[1].move(1, 1)
+  while true do
+    clear()
+    shape.rectangle(corners[1], corners[2])
+    entities:move(1, 1, 1)
+    sleep(1)
+  end
 end
 main()
