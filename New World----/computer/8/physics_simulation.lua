@@ -4,10 +4,10 @@
 -- The default terminal ratio is 25:9, with the standard being 50:18.
 
 -- To get the terminal to fill the entire screen, use these widths and heights:
--- 426 by 160 on a 31.5" monitor in fullscreen mode.
--- 426 by 153 on a 31.5" monitor in windowed mode.
--- 114:39 on the laptop in windowed mode.
--- 114:43 on the laptop in fullscreen mode.
+-- 426:153 on a 31.5" monitor in windowed mode.
+-- 426:160 on a 31.5" monitor in fullscreen mode.
+-- 227:78 on the laptop in windowed mode.
+-- 227:85 on the laptop in fullscreen mode.
 
 function loadAPIs()
   -- Makes a table of the IDs and names of the APIs to load.
