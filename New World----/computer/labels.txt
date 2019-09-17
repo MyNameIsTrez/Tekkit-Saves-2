@@ -6,3 +6,4 @@
 5 slave_4
 6 item_counter
 7 shape_drawer
+8 physics_simulator

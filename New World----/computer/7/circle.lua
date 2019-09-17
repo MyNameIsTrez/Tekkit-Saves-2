@@ -8,47 +8,31 @@ local start_time = os.time()
 
 local w, h = term.getSize()
 
-function clearTerminal()
+function clear()
   term.clear()
   term.setCursorPos(1,1)
 end
 
-function point(x, y)
-  term.setCursorPos(x, y)
+function point(p)
+  term.setCursorPos(p.x, p.y)
   print("#")
   term.setCursorPos(1, 1)
 end
 
-function circle(c, r)
-  local circle_degrees = 360
-
+function circle(center, radius)
   -- Using radians. -------------------------------------------------------
-  -- 700 to 750 ms
-  -- local radius = r
-  -- local two_pi = 2 * math.pi
-  -- -- Because the text height is about 1.5 times its width,
-  -- -- we need this multiplier to make a circle shape.
-  -- local x_fix = 1.5
-  -- local step = two_pi / circle_degrees
-
-  -- for i = 0, two_pi, step do
-  --   local x = math.cos(i) * radius * x_fix
-  --   local y = math.sin(i) * radius
-  --   point(c.x + x, c.y + y)
-  -- end
-  
-  -- Using degrees. -------------------------------------------------------
-  -- 700 to 750 ms
-  local radius = r
   -- Because the text height is about 1.5 times its width,
   -- we need this multiplier to make a circle shape.
   local x_fix = 1.5
 
-  for i = 0, 359 do
-    local rad = math.rad(i)
-    local x = math.cos(rad) * radius * x_fix
-    local y = math.sin(rad) * radius
-    point(c.x + x, c.y + y)
+  for i = 0, 2 * math.pi, math.pi / 180 do
+    local x = math.cos(i) * radius * x_fix
+    local y = math.sin(i) * radius
+    local p = {
+      x = center.x + x,
+      y = center.y + y
+    }
+    point(p)
   end
 end
 
@@ -67,11 +51,15 @@ function line(p1, p2)
   for i = 0, distance do
     local x = i * step_x
     local y = i * step_y
-    point(p1.x + x, p1.y + y)
+    local p = {
+      x = p1.x + x,
+      y = p1.y + y
+    }
+    point(p)
   end
 end
 
-function rect(p1, p2)
+function rectangle(p1, p2)
   local x_diff = p2.x - p1.x
   local y_diff = p2.y - p1.y
   local p = {
@@ -123,7 +111,7 @@ function main()
     }
   }
 
-  clearTerminal()
+  clear()
   local max = 24 -- Fullscreen mode.
   -- local max = 23 -- Windowed mode.
   for i = max, 0, -1 do
