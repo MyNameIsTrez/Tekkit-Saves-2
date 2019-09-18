@@ -269,18 +269,6 @@ function prepareDynamicGUI()
   end
 end
 
--- The sleep calculation is currently only dependent on the vertical speed of the entities,
--- but it should take the general speed of the entity in the future instead in the future.
-function calcSoonestEntityUpdate()
-  local update_intervals = {}
-  for i, entity in ipairs(entities) do
-    update_intervals[i] = 1/entity.speed_vertical
-  end
-
-  local soonest_entity_update = math.min(update_intervals) 
-  return soonest_entity_update
-end
-
 function main()
   -- We need to make the total energy a tiny bit larger than the potential energy
   -- for the entity to start moving. I should fix this differently somehow.
