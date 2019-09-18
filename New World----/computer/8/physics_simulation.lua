@@ -88,59 +88,52 @@ local gui_corners = {
   }
 }
 
-local entity = {
-  x = simulation_middle_x, -- m. offset.
-  y = entity_min_y, -- m. offset.
-  height = 0, -- m. Set by the code.
-  mass = 0.25, -- kg.
-  facing = 1.5 * 180, -- degrees. Setting it to face south by default.
-  id = 0,
-  speed_horizontal = 0, -- m/s. Isn't affected by anything yet!
-  speed_vertical = 0, -- m/s. Is affected by the gravity.
-  energy_potential = 0, -- J.
-  energy_kinetic = 0, -- J. Result of energy_total - energy_potential.
-  energy_warmth = 0, -- J. (Summation of) the kinetic energy when the potential energy is 0.
-  energy_total = 0 -- J. This value gets set in calcEnergies().
+Entity = {
+  new = function(self, id)
+    local starting_values = {
+      x = simulation_middle_x, -- m. offset.
+      y = entity_min_y, -- m. offset.
+      height = 0, -- m. Set by the code.
+      mass = 0.25, -- kg.
+      facing = 1.5 * 180, -- degrees. Setting it to face south by default.
+      id = id,
+      speed_horizontal = 0, -- m/s. Isn't affected by anything yet!
+      speed_vertical = 0, -- m/s. Is affected by the gravity.
+      energy_potential = 0, -- J.
+      energy_kinetic = 0, -- J. Result of energy_total - energy_potential.
+      energy_warmth = 0, -- J. (Summation of) the kinetic energy when the potential energy is 0.
+      energy_total = 0 -- J. This value gets set in calcEnergies().
+    }
+    setmetatable(starting_values, {__index = self})
+    return starting_values
+  end,
+  setVar = function(self, var)
+    self.var = var
+  end,
+  printVar = function(self)
+    print(self.var)
+  end,
+  printID = function(self)
+    print(self.id)
+  end
 }
 
--- function entity:new(id)
---   setmetatable({}, entity)
---   self.id = id
---   return self
--- end
+local entities = {}
+function createEntities()
+  for id = 1, 2 do
+    entities[#entities+1] = Entity:new(id)
+  end
+end
+createEntities()
 
--- local entities = {}
--- entities[#entities+1] = entity:new(1)
--- entities[#entities+1] = entity:new(2)
--- entities[#entities+1] = entity:new(3)
+local entity = entities[1]
 
--- local test = {}
--- function test:new(id)
---   setmetatable({}, entity)
---   self.id = id
---   return self
--- end
-
--- test[#test+1] = test:new(1)
--- test[#test+1] = test:new(2)
--- test[#test+1] = test:new(3)
--- test[#test+1] = test:new(4)
-
--- print(textutils.serialize(#test))
-
--- print(textutils.serialize(entities))
-
--- print(entities[1].id)
--- print(entities[2].id)
--- print(entities[3].id)
-
--- for i, entity in ipairs(entities) do
---   local entity = entities[i]
---   -- print(textutils.serialize(entity))
---   print(entity.id)
--- end
-
--- sleep(10)
+-- entities[1]:setVar("a")
+-- entities[2]:setVar("b")
+-- entities[1]:printVar()
+-- entities[2]:printVar()
+-- entities[1]:printID()
+-- entities[2]:printID()
 
 function round(number, decimals)
   return math.floor(number * 100) / 100

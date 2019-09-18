@@ -1,2 +1,2 @@
--- shell.run('physics_simulation.lua')
-shell.run('entities_test.lua')
+shell.run('physics_simulation.lua')
+-- shell.run('entities_test.lua')
