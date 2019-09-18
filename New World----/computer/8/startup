@@ -1,2 +1,1 @@
 shell.run('physics_simulation.lua')
--- shell.run('entities_test.lua')

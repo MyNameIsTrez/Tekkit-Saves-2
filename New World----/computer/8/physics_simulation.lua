@@ -126,17 +126,9 @@ function createEntities()
 end
 createEntities()
 
-local entity = entities[1]
-
--- entities[1]:setVar("a")
--- entities[2]:setVar("b")
--- entities[1]:printVar()
--- entities[2]:printVar()
--- entities[1]:printID()
--- entities[2]:printID()
-
 function round(number, decimals)
-  return math.floor(number * 100) / 100
+  local c = math.pow(10, decimals)
+  return math.floor(number * c) / c
 end
 
 function writeStaticGUI(label, name, height)
@@ -152,7 +144,7 @@ function writeStaticGUI(label, name, height)
 end
 
 function writeDynamicGUI(number, height)
-  local rounded_number = round(number)
+  local rounded_number = round(number, 2)
 
   term.setCursorPos(gui_x + 2, 1 + 2 * height)
   write("      ")
@@ -277,32 +269,60 @@ function prepareDynamicGUI()
   end
 end
 
-function main()
-  local h = entity_max_y - entity.y
+-- The sleep calculation is currently only dependent on the vertical speed of the entities,
+-- but it should take the general speed of the entity in the future instead in the future.
+function calcSoonestEntityUpdate()
+  local update_intervals = {}
+  for i, entity in ipairs(entities) do
+    update_intervals[i] = 1/entity.speed_vertical
+  end
 
+  local soonest_entity_update = math.min(update_intervals) 
+  return soonest_entity_update
+end
+
+function main()
   -- We need to make the total energy a tiny bit larger than the potential energy
-  -- for the entity to start moving. I should fix differently this somehow.
-  local fix = 1.000001
-  entity.energy_total = (entity.mass * g * h) * fix
+  -- for the entity to start moving. I should fix this differently somehow.
+  for i, entity in ipairs(entities) do
+    local h = entity_max_y - entity.y
+    local fix = 1.000001
+    entity.energy_total = (entity.mass * g * h) * fix
+  end
 
   clear()
   drawRectangleLines()
   prepareStaticGUI()
 
+  -- Keeps track of how long the program has slept.
+  local total_time_slept = 0
   while true do
-    entity:move()
-    entity:calcEnergy()
-    entity:calcSpeed()
-    prepareDynamicGUI()
+    local soonest_entity_update = calcSoonestEntityUpdate()
+    total_time_slept = soonest_entity_update + soonest_entity_update
+    sleep(soonest_entity_update)
+  
+
+
+
+
+
+    -- local tiny = 0.000001 -- Makes sure the for loop always at least runs once.
+    -- local iterations = math.ceil(math.abs(entity.speed_vertical) + 0.1) -- The range is [ 1, -> >.
+    -- for i = 1, iterations do
+    --   entity:move()
+    --   entity:calcEnergy()
+    --   entity:calcSpeed()
+    -- end
+    -- prepareDynamicGUI()
     
-    -- If the vertical speed is 16 m/s, the entity gets updated 16 times in a second.
-    -- To prevent the game taking incredibly long to update when the vertical speed is tiny,
-    -- we set a maximum sleep time of 1 second.
-    if (entity.speed_vertical > 1) then
-      sleep(1/entity.speed_vertical)
-    else
-      sleep(1)
-    end
+    -- -- If the vertical speed is 16 m/s, the entity gets updated 16 times in a second.
+    -- -- To prevent the game taking incredibly long to update when the vertical speed is tiny,
+    -- -- we set a maximum sleep time of 1 second.
+    -- if (entity.speed_vertical > 1) then
+    --   sleep(1/entity.speed_vertical)
+    -- else
+    --   sleep(1)
+    -- end
   end
 end
 main()
