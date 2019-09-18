@@ -89,12 +89,12 @@ local gui_corners = {
 }
 
 local entity = {
-  -- id = 0,
   x = simulation_middle_x, -- m. offset.
   y = entity_min_y, -- m. offset.
   height = 0, -- m. Set by the code.
   mass = 0.25, -- kg.
-  -- facing = 1.5 * math.pi, -- radians. Setting it to face south by default.
+  facing = 1.5 * 180, -- degrees. Setting it to face south by default.
+  id = 0,
   speed_horizontal = 0, -- m/s. Isn't affected by anything yet!
   speed_vertical = 0, -- m/s. Is affected by the gravity.
   energy_potential = 0, -- J.
@@ -146,14 +146,7 @@ function round(number, decimals)
   return math.floor(number * 100) / 100
 end
 
-function writeGUI(number, label, name, height)
-  local rounded_number = round(number)
-
-  term.setCursorPos(gui_x + 2, 1 + 2 * height)
-  write("      ")
-  term.setCursorPos(gui_x + 2, 1 + 2 * height)
-  write(rounded_number)
-
+function writeStaticGUI(label, name, height)
   term.setCursorPos(gui_x + 10, 1 + 2 * height)
   write("   ")
   term.setCursorPos(gui_x + 10, 1 + 2 * height)
@@ -163,6 +156,15 @@ function writeGUI(number, label, name, height)
   write("                                       ")
   term.setCursorPos(gui_x + 17, 1 + 2 * height)
   write(name)
+end
+
+function writeDynamicGUI(number, height)
+  local rounded_number = round(number)
+
+  term.setCursorPos(gui_x + 2, 1 + 2 * height)
+  write("      ")
+  term.setCursorPos(gui_x + 2, 1 + 2 * height)
+  write(rounded_number)
 end
 
 function pythagoras(a, b)
@@ -238,17 +240,48 @@ function drawRectangleLines()
   end
 end
 
-function drawGUI()
-  writeGUI(entity.x, " m", "x", 1)
-  writeGUI(entity.y, " m", "y", 2)
-  writeGUI(entity.height, " m", "h", 3)
-  writeGUI(entity.mass, " kg", "weight", 4)
-  writeGUI(entity.speed_horizontal, " m/s", "entity.speed_horizontal", 5)
-  writeGUI(entity.speed_vertical, " m/s", "entity.speed_vertical", 6)
-  writeGUI(entity.energy_potential, " J", "entity.energy_potential", 7)
-  writeGUI(entity.energy_kinetic, " J", "entity.energy_kinetic", 8)
-  writeGUI(entity.energy_warmth, " J", "entity.energy_warmth", 9)
-  writeGUI(entity.energy_total, " J", "entity.energy_total", 10)
+function prepareStaticGUI()
+  local args = {
+    {" m", "x"},
+    {" m", "y"},
+    {" m", "h"},
+    {" kg", "weight"},
+    {" deg", "facing"},
+    {" num", "id"},
+    {" m/s", "entity.speed_horizontal"},
+    {" m/s", "entity.speed_vertical"},
+    {" J", "entity.energy_potential"},
+    {" J", "entity.energy_kinetic"},
+    {" J", "entity.energy_warmth"},
+    {" J", "entity.energy_total"}
+  }
+
+  for i = 1, #args do
+    local arg = args[i]
+    writeStaticGUI(arg[1], arg[2], i)
+  end
+end
+
+function prepareDynamicGUI()
+  local args = {
+    {entity.x},
+    {entity.y},
+    {entity.height},
+    {entity.mass},
+    {entity.facing},
+    {entity.id},
+    {entity.speed_horizontal},
+    {entity.speed_vertical},
+    {entity.energy_potential},
+    {entity.energy_kinetic},
+    {entity.energy_warmth},
+    {entity.energy_total}
+  }
+
+  for i = 1, #args do
+    local arg = args[i]
+    writeDynamicGUI(arg[1], i)
+  end
 end
 
 function main()
@@ -261,12 +294,13 @@ function main()
 
   clear()
   drawRectangleLines()
+  prepareStaticGUI()
 
   while true do
     entity:move()
     entity:calcEnergy()
     entity:calcSpeed()
-    drawGUI()
+    prepareDynamicGUI()
     
     -- If the vertical speed is 16 m/s, the entity gets updated 16 times in a second.
     -- To prevent the game taking incredibly long to update when the vertical speed is tiny,
