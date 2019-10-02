@@ -9,15 +9,27 @@ local sleep_time = 0.5
 
 rednet.open(modem_side)
 
-function getTemperature()
-  local URL = 'http://weerlive.nl/api/json-data-10min.php?key=demo&locatie=Amsterdam'
-  local table = http.get(URL)
-  local str_data = table.readAll()
-  local temp_index = str_data:find("temp")
-  local temp = string.sub(str_data, temp_index + 8, temp_index + 11)
-  return temp
+function loadAPIs()
+  -- Makes a table of the IDs and names of the APIs to load.
+  local APIs = {
+    {id = "c4BgMWbg", name = "temperature"},
+    {id = "4nRg9CHU", name = "json"}
+  }
+
+  for i = 1, #APIs do
+    -- Delete the old APIs to make room for
+    -- a potential more up-to-date version on Pastebin.
+    
+    -- This returns no error if this API doesn't exist on the computer yet.
+    fs.delete(APIs[i].name)
+
+    shell.run("pastebin", "get", APIs[i].id, APIs[i].name)
+    os.loadAPI(APIs[i].name)
+  end
 end
-local text = 'TEMP '..getTemperature()
+loadAPIs()
+
+local text = 'TEMP '..temperature.getTemperature()
 
 function getOffsetText(text, offset)
   start_spaces_count = displays - offset
