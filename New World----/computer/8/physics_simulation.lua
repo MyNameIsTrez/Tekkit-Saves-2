@@ -30,7 +30,7 @@ function loadAPIs()
 
   for i = 1, #APIs do
     -- Delete the old APIs, to make room for the more up-to-date online version.
-    -- This returns no error if the program doesn't exist on the computer.
+    -- This returns no error if the API doesn't exist on the computer yet.
     fs.delete(APIs[i].name)
 
     shell.run("pastebin", "get", APIs[i].id, APIs[i].name)
