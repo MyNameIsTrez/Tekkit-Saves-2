@@ -21,5 +21,5 @@ loadAPIs()
 
 term.clear()
 term.setCursorPos(1, 1)
-print('The current temperature in Amsterdam is '..temperature.getTemperature()..' degrees.')
--- discord.sendMessage('Hello, Discord!')
+-- print('The current temperature in Amsterdam is '..temperature.getTemperature()..' degrees.')
+discord.sendMessage("hello, this is a test message!")

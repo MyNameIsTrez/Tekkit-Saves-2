@@ -1,3 +1,4 @@
+-- Made by MyNameIsTrez.
 -- This API relies on the 'json' API being installed! https://pastebin.com/4nRg9CHU
 
 function getTemperature()

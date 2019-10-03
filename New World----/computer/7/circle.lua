@@ -1,7 +1,7 @@
 -- Shape drawer code for Tekkit Classic.
 -- Made by MyNameIsTrez in 2019.
 
--- The default terminal ratio is 25:9, with the standard being 50:18
+-- The default terminal ratio is 25:9. My preference is 50:18 or 75:27.
 -- 426 by 160 is a fullscreen monitor when Minecraft is in fullscreen mode.
 -- 426 by 153 is a fullscreen monitor when Minecraft is in windowed mode.
 local start_time = os.time()

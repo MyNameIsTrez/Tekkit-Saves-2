@@ -1,3 +1,20 @@
+-- Made by MyNameIsTrez.
+-- This API relies on the 'json' API being installed! https://pastebin.com/4nRg9CHU
+
 function sendMessage(msg)
-  print('Sending this message via Discord: '..msg)
+  print("Sending this message via Discord: "..msg)
+  local encoded = json.encode(msg)
+  print("Encoded message: "..encoded)
+
+  local baseUrl = "http://discordapp.com/api/webhooks/629261583448801319/WpzKoYbkJa5tDzNi6kt6OGzH1XH6yh0kQI5qiJjip_bm_L8lLyJdGWMKOWEAV_32IgPt"
+  local response = http.post(baseUrl, "content='hello, this is a test message! '")
+  local tbl = json.decode(response)
+  local str = tbl.readAll()
+  print("Response:\n"..str)
 end
+
+--local baseUrl = "http://example.com"
+--  local encoded = {}
+--  encoded[1] = "test1"
+--  encoded[2] = "test2"
+--  encoded[3] = "test3"
