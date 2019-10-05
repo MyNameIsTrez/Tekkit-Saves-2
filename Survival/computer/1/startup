@@ -6,15 +6,9 @@
 -----------------------------------------------------------------------------------------------------------------------------
 
 -- Editable variables.
-rednet.open("top")
 targetComputerID = 0
 outputSide = "back"
-monitorSide = "bottom"
 monitorTextScale = 3
-
--- Initializes the monitor.
-local monitor = peripheral.wrap(monitorSide)
-monitor.setTextScale(monitorTextScale)
 
 -- The item names.
 itemList = {
@@ -35,6 +29,23 @@ itemList = {
 "oak planks",
 "steak"
 }
+
+function detectDevice(deviceName)
+  local deviceSide = "none"
+  for k, v in pairs(redstone.getSides()) do
+    if peripheral.getType(v) == DeviceName then
+      deviceSide = v
+      break
+    end
+  end
+  return(deviceSide)
+end
+
+rednet.open(detectDevice('modem'))
+
+-- Initializes the monitor.
+local monitor = peripheral.wrap(detectDevice('monitor'))
+monitor.setTextScale(monitorTextScale)
 
 -- All the color names.
 colorList = {

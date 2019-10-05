@@ -1,2 +1,5 @@
 0 LogicGates
 2 explorer
+7 Slave Requestor 1
+8 Master Requestor
+9 Slave Requestor 2
