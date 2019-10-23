@@ -1,3 +1,5 @@
+-- Made by MyNameIsTrez.
+
 function point(p, fill)
   term.setCursorPos(p.x, p.y)
   if (fill) then
