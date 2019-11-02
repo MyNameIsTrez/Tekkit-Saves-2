@@ -5,6 +5,7 @@ local modem_side = "right"
 local bundled_input_side = "back"
 local measuring_limit = 60 -- How many updates are measured before the last ones are deleted.
 local update_delay = 1 -- How often the measurements update in seconds.
+local item_multiplier = 64 -- If you are counting the number of stacks per minute, this is 64.
 
 local stats = {
   "DIAMONDS",
@@ -109,7 +110,7 @@ function main()
         for j = 1, #final_binary[i] do
           total = total + final_binary[i][j]
         end
-        print(stats[i].." "..total * error_mult.."/MIN")
+        print(stats[i].." "..total * error_mult * item_multiplier.." items/min")
       end
     end
   end

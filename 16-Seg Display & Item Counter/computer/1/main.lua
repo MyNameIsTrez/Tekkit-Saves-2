@@ -59,6 +59,7 @@ function getOffsetText(text, offset)
 end
 
 function main()
+  print("Text: "..text)
   while true do
     local offsets = #text + displays - 1
     for offset = 0, offsets do
