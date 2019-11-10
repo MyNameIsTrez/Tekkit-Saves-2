@@ -3,3 +3,4 @@
 7 Slave Requestor 1
 8 Master Requestor
 9 Slave Requestor 2
+12 simple_planets

@@ -1,0 +1,40 @@
+function clamp(n, min, max)
+	if (n < min) then
+		return min
+	elseif (n > max) then
+		return max
+	else
+		return n
+	end
+end
+
+function randomFloat(min, max)
+	if (max) then
+		return min + math.random() * (max - min)
+	else
+		-- min means max when only one argument is provided
+		return math.random() * min
+	end
+end
+
+function pythagoras(a, b)
+	return math.sqrt(a * a + b * b)
+end
+
+function round(number, decimals)
+	if (decimals == nil or decimals > 0) then
+		if (decimals) then
+			local p = math.pow(10, decimals)
+			return math.floor(number * p) / p
+		else
+			return math.floor(number + 0.5)
+		end
+	else
+		print("can't give round() a decimal number smaller than 1")
+	end
+end
+
+function clearTerm()
+	term.clear()
+	term.setCursorPos(1, 1)
+end
