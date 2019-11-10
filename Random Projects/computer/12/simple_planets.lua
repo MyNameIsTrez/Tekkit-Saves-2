@@ -17,10 +17,10 @@ end
 loadAPIs()
 
 Particle = {
-	new = function(self, x, y, w, h)
+	new = function(self, x, y, w, h, velMult)
 		local starting_values = {
 			pos = vector.new(x, y),
-			vel = vector.new(cf.randomFloat(-1, 1), cf.randomFloat(-1, 1)),
+			vel = vector.new(cf.randomFloat(-1 * velMult, 1 * velMult), cf.randomFloat(-1 * velMult, 1 * velMult)),
 			acc = vector.new(),
 			icon = "*",
 			w = w,
@@ -89,10 +89,11 @@ Attractor = {
 	end
 }
 
-function createParticles(n, w, h)
+function createParticles(n, x, y, w, h, velMult)
 	local particles = {}
 	for id = 1, n do
-		particles[#particles+1] = Particle:new(math.random(w), math.random(h), w, h)
+		particles[#particles+1] = Particle:new(x, y, w, h, velMult)
+		-- particles[#particles+1] = Particle:new(math.random(w-1), math.random(h-1), w, h, velMult)
 	end
 	return particles
 end
@@ -105,18 +106,19 @@ end
 
 function main()
 	local G = 1
-	local constraint = 1
+	local constraint = 0.1
 	local fps = 75
-	local particleCount = 10
+	local particleCount = 100
+	local velMult = 0.1
 
 	local w, h = term.getSize()
 	local dt = 1/fps
-	local particles = createParticles(particleCount, w, h)
+	local particles = createParticles(particleCount, w/4, h/4, w, h, velMult)
+	-- local particles = createParticles(particleCount, w-1, h-1, w, h, velMult)
 	local attractors = createAttractors(5, w/2, h/2)
 
 	while true do
 		cf.clearTerm()
-		
 		for i = 1, #particles do
 			particle = particles[i]
 			for j = 1, #attractors do
@@ -128,9 +130,6 @@ function main()
 			particle.acc = particle.acc:mul(0) -- reset the acceleration
 		end
 		attractors[1]:show()
-
-		-- drawing is the limiting factor with this program,
-		-- it doesn't matter if we sleep for a ms or two too long
 		sleep(dt)
 	end
 end
