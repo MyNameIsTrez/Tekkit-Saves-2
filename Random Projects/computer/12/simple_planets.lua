@@ -17,24 +17,69 @@ end
 loadAPIs()
 
 Particle = {
-	new = function(self, x, y, r, m)
+	new = function(self, x, y, w, h)
 		local starting_values = {
 			pos = vector.new(x, y),
-			icon = "."
+			vel = vector.new(cf.randomFloat(-1, 1), cf.randomFloat(-1, 1)),
+			acc = vector.new(),
+			icon = "*",
+			w = w,
+			h = h,
+			mass = 10
 		}
 		setmetatable(starting_values, {__index = self})
 		return starting_values
 	end,
 	show = function(self)
-		shape.point(self.pos, self.icon)
+		shape.point(self.pos, self.icon) -- draw the particle
+		
+		-- draw an arrow for the velocity vector
+		-- if (self.vel.x < -0.5) then
+		-- 	local x = self.pos.x - 1
+		-- 	if (x >= 1) then
+		-- 		shape.point({x=x, y=self.pos.y}, "-")
+		-- 	end
+		-- elseif (self.vel.x > 0.5) then
+		-- 	local x = self.pos.x + 1
+		-- 	if (x <= self.w-1) then
+		-- 		shape.point({x=x, y=self.pos.y}, "-")
+		-- 	end
+		-- end
+		
+		-- if (self.vel.y < -0.5) then
+		-- 	local y = self.pos.y - 1
+		-- 	if (y >= 1) then
+		-- 		shape.point({x=self.pos.x, y=y}, "|")
+		-- 	end
+		-- elseif (self.vel.y > 0.5) then
+		-- 	local y = self.pos.y + 1
+		-- 	if (y <= self.h-1) then
+		-- 		shape.point({x=self.pos.x, y=y}, "|")
+		-- 	end
+		-- end
+	end,
+	attracted = function(self, target, G, constraint)
+		local force = target.pos:sub(self.pos) -- target.pos - self.pos
+		local distanceSquared = cf.magSq(force)
+		local strength = cf.clamp(G * ((self.mass * target.mass) / distanceSquared), 0, constraint)
+		  
+		force = force:normalize() -- normalizes the vector, so the hypothenuse is 1
+		force = force:mul(strength)
+		
+		self.acc = self.acc:add(force:mul(1/self.mass)) -- F = m * a, a = F / m, a = F * (1/m)
+	end,
+	update = function(self)
+		self.vel = self.vel:add(self.acc)
+		self.pos = self.pos:add(self.vel)
 	end
 }
 
 Attractor = {
-	new = function(self, x, y, r, m)
+	new = function(self, x, y)
 		local starting_values = {
 			pos = vector.new(x, y),
-			icon = "o"
+			icon = "o",
+			mass = 400
 		}
 		setmetatable(starting_values, {__index = self})
 		return starting_values
@@ -47,7 +92,7 @@ Attractor = {
 function createParticles(n, w, h)
 	local particles = {}
 	for id = 1, n do
-		particles[#particles+1] = Particle:new(math.random(w), math.random(h))
+		particles[#particles+1] = Particle:new(math.random(w), math.random(h), w, h)
 	end
 	return particles
 end
@@ -59,21 +104,49 @@ function createAttractors(n, w, h)
 end
 
 function main()
-	local w, h = term.getSize()
-	local fps = 60
+	local G = 1
+	local constraint = 1
+	local fps = 75
+	local particleCount = 50
 
-	particles = createParticles(5, w, h)
-	attractors = createAttractors(5, w/2, h/2)
+	local w, h = term.getSize()
+	local dt = 1/fps
+	local particles = createParticles(particleCount, w, h)
+	local attractors = createAttractors(5, w/2, h/2)
 
 	while true do
-		cf.clearTerm()
+		local startTime = os.clock()
 
+		cf.clearTerm()
+		
 		for i = 1, #particles do
-			particles[i]:show()
+			particle = particles[i]
+			for j = 1, #attractors do
+				attractor = attractors[j]
+				particle:attracted(attractor, G, constraint)
+			end
+			particle:update()
+			particle:show()
+			particle.acc = particle.acc:mul(0) -- reset the acceleration
 		end
 		attractors[1]:show()
 
-		sleep(1/fps)
+		-- sleep
+		local endTime = os.clock()
+		local elapsedTime = endTime - startTime
+		local sleepTime = dt - elapsedTime
+		term.setCursorPos(1,1)
+		print(elapsedTime)
+		if (sleepTime > 0) then
+			sleep(sleepTime)
+		else
+			sleep(0)
+		end
 	end
+
+	-- term.setCursorPos(1,1)
+	-- acc = particles[1].acc
+	-- print(acc.x)
+	-- print(acc.y)
 end
 main()
