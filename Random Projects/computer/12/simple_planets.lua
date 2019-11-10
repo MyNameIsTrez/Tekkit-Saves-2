@@ -107,7 +107,7 @@ function main()
 	local G = 1
 	local constraint = 1
 	local fps = 75
-	local particleCount = 50
+	local particleCount = 10
 
 	local w, h = term.getSize()
 	local dt = 1/fps
@@ -115,8 +115,6 @@ function main()
 	local attractors = createAttractors(5, w/2, h/2)
 
 	while true do
-		local startTime = os.clock()
-
 		cf.clearTerm()
 		
 		for i = 1, #particles do
@@ -131,22 +129,9 @@ function main()
 		end
 		attractors[1]:show()
 
-		-- sleep
-		local endTime = os.clock()
-		local elapsedTime = endTime - startTime
-		local sleepTime = dt - elapsedTime
-		term.setCursorPos(1,1)
-		print(elapsedTime)
-		if (sleepTime > 0) then
-			sleep(sleepTime)
-		else
-			sleep(0)
-		end
+		-- drawing is the limiting factor with this program,
+		-- it doesn't matter if we sleep for a ms or two too long
+		sleep(dt)
 	end
-
-	-- term.setCursorPos(1,1)
-	-- acc = particles[1].acc
-	-- print(acc.x)
-	-- print(acc.y)
 end
 main()
