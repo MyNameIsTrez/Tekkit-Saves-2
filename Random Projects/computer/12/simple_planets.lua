@@ -109,7 +109,7 @@ function main()
 	local constraint = 0.1
 	local fps = 75
 	local particleCount = 100
-	local velMult = 0.1
+	local velMult = 1
 
 	local w, h = term.getSize()
 	local dt = 1/fps
