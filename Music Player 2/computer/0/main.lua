@@ -6,14 +6,17 @@ local cursor = {x = 4, y = 3}
 local spacing = 5 -- Need a better name. Vertical line that separates the instrument notes.
 local spacingSymbol = "."
 local clearingKey = 42 -- The key to clear instrument notes from the song array. 42 is the shift key.
+local saveKey = 33 -- The key to save the song table to a file. 33 is the f key.
+local songName = "song1"
 
 -- Fill the song table with empty tables, based on the width of the terminal.
 local songSteps = width - 5
 local song = {}
+song.notes = {}
 for x = 1, songSteps do
-	song[x] = {}
+	song.notes[x] = {}
 	for y = 1, 25 do
-		song[x][y] = 0
+		song.notes[x][y] = 0
 	end
 end
 
@@ -35,7 +38,7 @@ for i = 1, 25 do
 end
 
 -- Draw bottom line.
-term.setCursorPos(1, height)
+term.setCursorPos(1, 28)
 write(string.rep("-", width - 1))
 
 -- Draw right line.
@@ -52,7 +55,7 @@ term.setCursorPos(cursor.x, cursor.y)
 write("x")
 
 function drawSpacingLines()
-	for x = 1, #song do
+	for x = 1, #song.notes do
 		if (x % spacing == 0) then
 			for y = 1, 25 do
 				term.setCursorPos(x + 3, y + 2)
@@ -63,9 +66,9 @@ function drawSpacingLines()
 end
 
 function drawInstrumentNotes()
-	for x = 1, #song do
+	for x = 1, #song.notes do
 		for y = 1, 25 do
-			local instrumentNumber = song[x][y]
+			local instrumentNumber = song.notes[x][y]
 			if (instrumentNumber ~= 0) then
 				term.setCursorPos(x + 3, y + 2)
 				write(instrumentNumber)
@@ -83,9 +86,9 @@ while true do
 	-- Display the selected instrument.
 	local selectedInstrument = instruments[instrumentKeys[key]]
 	if (selectedInstrument) then
-		-- Clear the first row of characters.
+		-- Clear the first row of characters that display the selected instrument.
 		term.setCursorPos(1, 1)
-		write(string.rep(" ", width - 1))
+		write(string.rep(" ", 18))
 		
 		term.setCursorPos(1, 1)
 		write("Selected: "..selectedInstrument)
@@ -128,7 +131,7 @@ while true do
 	-- Placing instruments.
 	local instrumentKey = instrumentKeys[key]
 	if (instrumentKey) then
-		song[cursor.x - 3][cursor.y - 2] = instrumentKey
+		song.notes[cursor.x - 3][cursor.y - 2] = instrumentKey
 
 		-- Immediately draw the new instrument note.
 		term.setCursorPos(cursor.x, cursor.y)
@@ -137,10 +140,21 @@ while true do
 
 	-- Clear instrument notes.
 	if (key == clearingKey) then
-		song[cursor.x - 3][cursor.y - 2] = 0
+		song.notes[cursor.x - 3][cursor.y - 2] = 0
 
 		-- Immediately clear the instrument note.
 		term.setCursorPos(cursor.x, cursor.y)
 		write("x")
-	end
+    end
+    
+    -- Save the song table to a file.
+    if (key == saveKey) then
+        local file = fs.open("songs/"..songName, "w")
+        file.write(textutils.serialize(song))
+        file.close()
+
+        local savedMsg = "Saved as "..songName
+        term.setCursorPos(width - #savedMsg, 1)
+        write(savedMsg)
+    end
 end
