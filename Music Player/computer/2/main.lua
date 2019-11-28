@@ -26,10 +26,10 @@ startingSettings() -- run the above function upon the startup of this program
 function drawStartingGraphInfo()
   term.redirect(m) -- redirect the code to be ran on the monitor
 
-  for i = 0, 24 do
+  for i = 1, 25 do
     -- screen : max x-coordinate ratio is 1:6, 2:16, 3:26, 4:36
     -- screen : max y-coordinate ratio is 1:5, 2:11, 3:18, 4:25
-    m.setCursorPos(1, 25 - i) -- set the cursor on the monitor to x, y
+    m.setCursorPos(1, 26 - i) -- set the cursor on the monitor to x, y
     if i <= 9 then
       i = "0"..i
     end
