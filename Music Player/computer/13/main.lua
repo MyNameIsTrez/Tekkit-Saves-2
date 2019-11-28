@@ -1,11 +1,12 @@
 local width, height = term.getSize()
 local instruments = {"bass", "snare", "hat", "bassdrum", "harp"}
-local instrumentKeys = {["1"] = 1, ["2"] = 2, ["3"] = 3, ["4"] = 4, ["5"] = 5}
-local movement = {["w"] = "w", ["a"] = "a", ["s"] = "s", ["d"] = "d", ["200"] = "w", ["203"] = "a", ["208"] = "s", ["205"] = "d"}
+local instrumentKeys = {["1"] = 1, ["2"] = 2, ["3"] = 3, ["4"] = 4, ["5"] = 5, ["i"] = 1, ["o"] = 2, ["p"] = 3, ["["] = 4, ["]"] = 5}
+-- The index values that are numbers are for the arrow keys.
+local movement = {["w"] = "w", ["a"] = "a", ["s"] = "s", ["d"] = "d", [200] = "w", [203] = "a", [208] = "s", [205] = "d"}
 local cursor = {x = 4, y = 3}
 local spacing = 5 -- Need a better name. Vertical line that separates the notes.
 local spacingSymbol = "."
-local songName = "we_are_number_one_timing"
+local songName = "we_are_number_one_basic"
 local clearingKey = 42 -- The key to clear notes from the song array. 42 is the shift key.
 local saveKey = 33 -- The key to save the song table to a file. 33 is the f key.
 local playResetKey = 57 -- The key to start and stop transmitting the notes of the song to the other computers. 57 is the spacebar key.
@@ -16,9 +17,7 @@ local playing = false
 local playedColumn -- The column of notes that the song starts playing at.
 local song
 
-rednet.open("back") -- Activate the modem.
-
-local colorsTable = { -- Needed for addressing insulated wires.
+local colorsTable = { -- Under the hood 2^n starting at n = 0, used for addressing colored insulated wires.
   colors.white, colors.orange, colors.magenta,
   colors.lightBlue, colors.yellow, colors.lime,
   colors.pink, colors.gray, colors.lightGray,
@@ -26,6 +25,50 @@ local colorsTable = { -- Needed for addressing insulated wires.
   colors.brown, colors.green, colors.red,
   colors.black
 }
+
+function drawTopLine()
+    -- Draw top line.
+    term.setCursorPos(1, 2)
+	write(string.rep("_", width - 1))
+end
+
+function drawBottomLine()
+    -- Draw bottom line.
+    term.setCursorPos(1, 28)
+	write(string.rep("-", width - 1))
+end
+
+function drawRightLine()
+    -- Draw right line.
+    for i = 1, 25 do
+        term.setCursorPos(width - 1, 2 + i)
+        write("|")
+	end
+end
+
+function drawNotePitches()
+	-- Write down 01 to 25 for the number of pitches.
+	for i = 25, 1, -1 do
+		term.setCursorPos(1, 3 + 25 - i)
+		if (i < 10) then
+			write(0)
+		end
+		write(i)
+		-- Draw left line.
+		write("|")
+	end
+end
+
+function drawSelectedStartingInstrument()
+    term.setCursorPos(1, 1)
+	write("Selected: "..instruments[1])
+end
+
+function drawStartingCursorPos()
+    -- Draw the cursor starting position.
+    term.setCursorPos(cursor.x, cursor.y)
+	write("x")
+end
 
 function drawSpacingLines()
 	for x = 1, #song.notes do
@@ -50,16 +93,13 @@ function drawInstrumentNotes()
 	end
 end
 
-function drawSelectedInstrument(value)
-    local selectedInstrument = instruments[instrumentKeys[value]]
-    if (selectedInstrument) then
-        -- Clear the first row of characters that display the selected instrument.
-        term.setCursorPos(1, 1)
-        write(string.rep(" ", 18))
-        
-        term.setCursorPos(1, 1)
-        write("Selected: "..selectedInstrument)
-    end
+function drawSelectedInstrument(selectedInstrument)
+	-- Clear the first row of characters that display the selected instrument.
+	term.setCursorPos(1, 1)
+	write(string.rep(" ", 18))
+	
+	term.setCursorPos(1, 1)
+	write("Selected: "..selectedInstrument)
 end
 
 function move(direction)
@@ -79,12 +119,10 @@ function move(direction)
     end
 end
 
-function drawCursor(direction)
+function drawCursor()
     -- Draw the cursor.
-    if (direction) then
-        term.setCursorPos(cursor.x, cursor.y)
-        write("x")
-    end
+	term.setCursorPos(cursor.x, cursor.y)
+	write("x")
 end
 
 function debugWriteKeys(value)
@@ -95,69 +133,66 @@ function debugWriteKeys(value)
     write("Key "..value.." pressed")
 end
 
-function clearNotes(value)
+function clearNotes()
     -- Clear notes.
-    if (value == clearingKey) then
-        table.remove(song.notes[cursor.x - 3], 4 + 26 - cursor.y - 2)
+	table.remove(song.notes[cursor.x - 3], 4 + 26 - cursor.y - 2)
 
-        -- Immediately clear the note by drawing the cursor over it.
-        term.setCursorPos(cursor.x, cursor.y)
-        write("x")
-    end
+	-- Immediately clear the note by drawing the cursor over it.
+	term.setCursorPos(cursor.x, cursor.y)
+	write("x")
 end
 
-function placeInstrument(value)
+function placeNote(instrumentKey)
     -- Placing instruments.
-    local instrumentKey = instrumentKeys[value]
-    if (instrumentKey) then
-        song.notes[cursor.x - 3][4 + 26 - cursor.y - 2] = instrumentKey
+	if (song.notes[cursor.x - 3][4 + 26 - cursor.y - 2] ~= instrumentKey) then
+		-- Add the note.
+		song.notes[cursor.x - 3][4 + 26 - cursor.y - 2] = instrumentKey
 
-        -- Immediately draw the new note.
-        term.setCursorPos(cursor.x, cursor.y)
-        write(instrumentKeys[value])
-    end
+		-- Immediately draw the new note.
+		term.setCursorPos(cursor.x, cursor.y)
+		write(instrumentKey)
+	else
+		-- Remove the note.
+		clearNotes()
+	end
 end
 
 function saveSong(value)
     -- Save the song table to a file.
-    if (value == saveKey) then
-        local file = fs.open("songs/"..songName, "w")
-        file.write(textutils.serialize(song))
-        file.close()
+	local file = fs.open("songs/"..songName, "w")
+	file.write(textutils.serialize(song))
+	file.close()
 
-        local savedMsg = "Saved as "..songName
-        term.setCursorPos(width - #savedMsg, 1)
-        write(savedMsg)
-    end
+	local savedMsg = "Saved as "..songName
+	term.setCursorPos(width - #savedMsg, 1)
+	write(savedMsg)
 end
 
 function checkStartStopSong(value)
     -- Start or stop playing the song.
-    if (value == playResetKey) then
-        if (playing) then
-            playing = false
-            
-            -- Clear the last progress cursor.
-            term.setCursorPos(playedColumn + 2, 2)
-            write("_")
-        else
-            playing = true
-            playedColumn = 1
-        end
-    end
+	if (playing) then
+		playing = false
+		
+		-- Clear the last progress cursor.
+		term.setCursorPos(playedColumn + 2, 2)
+		write("_")
+	else
+		playing = true
+		playedColumn = 1
+	end
 end
 
 function moveProgressCursor()
-	if (playedColumn <= #song.notes) then
-		-- Clear the previous progress cursor.
-		if (playedColumn >= 2) then
-			term.setCursorPos(playedColumn + 2, 2)
-			write("_")
-		end
-
-		term.setCursorPos(playedColumn + 3, 2)
-		write(playingProgressCursorSymbol)
+	-- Clear the previous progress cursor.
+	-- Don't need to clear behind the first progress cursor.
+	if (playedColumn >= 2) then
+		term.setCursorPos(playedColumn + 2, 2)
+		write("_")
 	end
+
+	-- Draw the new progress cursor.
+	term.setCursorPos(playedColumn + 3, 2)
+	write(playingProgressCursorSymbol)
 end
 
 function fillSongTable()
@@ -210,45 +245,60 @@ function sendNotesColumn()
 	end
 end
 
-function setup()
-    term.clear()
-    
-    -- Draw top line.
-    term.setCursorPos(1, 2)
-    write(string.rep("_", width - 1))
-    
-    -- Write down 01 to 25 for the number of pitches.
-    for i = 25, 1, -1 do
-        term.setCursorPos(1, 3 + 25 - i)
-        if (i < 10) then
-            write(0)
-        end
-        write(i)
-        -- Draw left line.
-        write("|")
-    end
-    
-    -- Draw bottom line.
-    term.setCursorPos(1, 28)
-    write(string.rep("-", width - 1))
-    
-    -- Draw right line.
-    for i = 1, 25 do
-        term.setCursorPos(width - 1, 2 + i)
-        write("|")
-    end
-    
-    term.setCursorPos(1, 1)
-    write("Selected: "..instruments[1])
-    
-    -- Draw the cursor starting position.
-    term.setCursorPos(cursor.x, cursor.y)
-    write("x")
+function removeLastProgressCursor()
+	-- Remove the remaining progress cursor.
+	term.setCursorPos(playedColumn + 3, 2)
+	write("_")
+end
 
-    fillSongTable()
+function getAllSongNames()
+	return fs.list("songs/")
+end
+
+function tableContains(table, element)
+	for _, value in pairs(table) do
+		if value == element then
+			return true
+		end
+	end
+	return false
+end
+
+function setup()
+	term.clear()
+
+	local allSongNames = getAllSongNames()
+	local chosenSongName = read()
+	-- local chosenSongName = "we_are_number_one"
+	if (chosenSongName == "new") then
+
+	else
+		if (tableContains(allSongNames, chosenSongName)) then
+			-- User reads an existing song file.
+			sleep(2)
+		else
+			write("You need to enter the name of an existing song. Type 'new' to create a new song.")
+			sleep(2)
+		end
+	end
+	
+	term.clear()
+	
+	-- Draw the outlines of the program.
+	drawTopLine()
+	drawBottomLine()
+	drawRightLine()
+
+	drawNotePitches()
+	drawSelectedStartingInstrument()
+
+	fillSongTable()
 	drawSpacingLines()
 	drawSpacingSeconds()
-    drawInstrumentNotes()
+	drawInstrumentNotes()
+	drawStartingCursorPos()
+
+	rednet.open("back") -- Activate the modem.
 end
 
 function main()
@@ -257,37 +307,44 @@ function main()
 
         -- The 'key' event is fired when keys like shift are pressed.
         if (event == "char" or event == "key") then
-            drawSelectedInstrument(value)
+			local selectedInstrument = instruments[instrumentKeys[value]]
+			if (selectedInstrument) then drawSelectedInstrument(selectedInstrument) end
 
             local direction = movement[value]
             -- sleep(0.1) -- Why does this break the program??
-            if (direction) then
-                move(direction)
-            end
+            if (direction) then move(direction) end
 
             drawSpacingLines()
             drawInstrumentNotes()
-            drawCursor(direction)
-            -- debugWriteKeys(value)
-            placeInstrument(value)
-            clearNotes(value)
-            saveSong(value)
-            checkStartStopSong(value)
-		elseif (event == "timer") then
-			if (playing) then
-				moveProgressCursor()
-				sendNotesColumn()
-				if (playedColumn < #song.notes) then -- If the end of the song hasn't been reached.
-					playedColumn = playedColumn + 1
-					sleep(playingSleep) -- One game tick of delay between each column.
-				else
-					playing = false
-					playedColumn = 1
-				end
+			if (direction) then drawCursor() end
+			
+			-- Meant for debugging/adding new keys.
+			-- debugWriteKeys(value)
+			
+			local instrumentKey = instrumentKeys[value]
+			if instrumentKey then placeNote(instrumentKey) end
+            
+			if value == clearingKey then clearNotes() end
+            if value == saveKey then saveSong(value) end
+            if value == playResetKey then checkStartStopSong(value) end
+		elseif event == "timer" and playing then
+			moveProgressCursor()
+			sendNotesColumn()
+
+			-- If the end of the song hasn't been reached.
+			if (playedColumn < #song.notes) then
+				playedColumn = playedColumn + 1
+				-- One game tick of delay between each column.
+				sleep(playingSleep)
+			else
+				playing = false
+				removeLastProgressCursor()
+				playedColumn = 1
 			end
         end
 
-		playTimer = os.startTimer(0.05) -- Loop to keep playing music while listening for user inputs.
+		-- Loop to keep playing music while listening for user inputs.
+		playTimer = os.startTimer(0.05)
     end
 end
 
