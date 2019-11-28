@@ -69,7 +69,7 @@ end
 
 
 
-colorList = { -- all the colors to choose from
+colorList = { -- needed for addressing insulated wires
   colors.white, colors.orange, colors.magenta,
   colors.lightBlue, colors.yellow, colors.lime,
   colors.pink, colors.gray, colors.lightGray,

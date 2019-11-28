@@ -5,7 +5,7 @@ local movement = {["w"] = "w", ["a"] = "a", ["s"] = "s", ["d"] = "d", ["200"] = 
 local cursor = {x = 4, y = 3}
 local spacing = 5 -- Need a better name. Vertical line that separates the notes.
 local spacingSymbol = "."
-local songName = "song1"
+local songName = "we_are_number_one_timing"
 local clearingKey = 42 -- The key to clear notes from the song array. 42 is the shift key.
 local saveKey = 33 -- The key to save the song table to a file. 33 is the f key.
 local playResetKey = 57 -- The key to start and stop transmitting the notes of the song to the other computers. 57 is the spacebar key.
@@ -14,7 +14,18 @@ local playingSleep = 0.05 -- The time slept between played notes.
 local playTimer
 local playing = false
 local playedColumn -- The column of notes that the song starts playing at.
-local song = {}
+local song
+
+rednet.open("back") -- Activate the modem.
+
+local colorsTable = { -- Needed for addressing insulated wires.
+  colors.white, colors.orange, colors.magenta,
+  colors.lightBlue, colors.yellow, colors.lime,
+  colors.pink, colors.gray, colors.lightGray,
+  colors.cyan, colors.purple, colors.blue,
+  colors.brown, colors.green, colors.red,
+  colors.black
+}
 
 function drawSpacingLines()
 	for x = 1, #song.notes do
@@ -89,7 +100,7 @@ function clearNotes(value)
     if (value == clearingKey) then
         table.remove(song.notes[cursor.x - 3], 4 + 26 - cursor.y - 2)
 
-        -- Immediately clear the note.
+        -- Immediately clear the note by drawing the cursor over it.
         term.setCursorPos(cursor.x, cursor.y)
         write("x")
     end
@@ -107,7 +118,7 @@ function placeInstrument(value)
     end
 end
 
-function checkSaveSong(value)
+function saveSong(value)
     -- Save the song table to a file.
     if (value == saveKey) then
         local file = fs.open("songs/"..songName, "w")
@@ -137,37 +148,66 @@ function checkStartStopSong(value)
 end
 
 function moveProgressCursor()
-    if (playing == true) then
-        if (playedColumn <= #song.notes) then
-            -- Clear the previous progress cursor.
-            if (playedColumn >= 2) then
-                term.setCursorPos(playedColumn + 2, 2)
-                write("_")
-            end
-    
-            term.setCursorPos(playedColumn + 3, 2)
-            write(playingProgressCursorSymbol)
-            
-            playedColumn = playedColumn + 1
-            sleep(playingSleep) -- One game tick of delay between each column.
-        end
-    end
+	if (playedColumn <= #song.notes) then
+		-- Clear the previous progress cursor.
+		if (playedColumn >= 2) then
+			term.setCursorPos(playedColumn + 2, 2)
+			write("_")
+		end
+
+		term.setCursorPos(playedColumn + 3, 2)
+		write(playingProgressCursorSymbol)
+	end
 end
 
 function fillSongTable()
-    -- Fill the song table with empty tables, based on the width of the terminal.
-    local songSteps = width - 5
-    song.notes = {}
-    for x = 1, songSteps do
-        song.notes[x] = {}
-        -- for y = 1, 25 do
-        --     song.notes[x][y] = 0
-        -- end
-    end
+	if fs.exists("songs/"..songName) then
+		-- Load the existing song.
+		local file = fs.open("songs/"..songName, "r")
+		local string = file.readAll()
+		file.close()
+		song = textutils.unserialize(string)
+	else
+		-- Fill the song table with empty tables.
+		song = {}
+		local songSteps = width - 5
+		song.notes = {}
+		for x = 1, songSteps do
+			song.notes[x] = {}
+		end
+	end
 end
 
-function sendNote()
-    
+function drawSpacingSeconds()
+	for x = 1, #song.notes do
+		local temp = 1 / playingSleep
+		if (x % temp == 0) then
+			term.setCursorPos(x + 3, 29)
+			write(tostring(x / temp).."s")
+		end
+	end
+end
+
+function sendNotesColumn()
+	for songRow, instrumentNumber in pairs(song.notes[playedColumn]) do
+		-- Broadcast the instrument/slave computer name.
+		local instrument = instruments[instrumentNumber]
+		if songRow <= 16 then
+			instrument = instrument.."1"
+		else
+			instrument = instrument.."2"
+		end
+		rednet.broadcast(instrument)
+
+		-- Broadcast the pitch of the instrument.
+		local bundledColor
+		if songRow <= 16 then
+			bundledColor = colorsTable[songRow]
+		else
+			bundledColor = colorsTable[songRow - 16]
+		end
+		rednet.broadcast(tostring(bundledColor))
+	end
 end
 
 function setup()
@@ -206,7 +246,8 @@ function setup()
     write("x")
 
     fillSongTable()
-    drawSpacingLines()
+	drawSpacingLines()
+	drawSpacingSeconds()
     drawInstrumentNotes()
 end
 
@@ -219,8 +260,7 @@ function main()
             drawSelectedInstrument(value)
 
             local direction = movement[value]
-            -- write(tostring(direction))
-            -- sleep(0.1)
+            -- sleep(0.1) -- Why does this break the program??
             if (direction) then
                 move(direction)
             end
@@ -231,14 +271,23 @@ function main()
             -- debugWriteKeys(value)
             placeInstrument(value)
             clearNotes(value)
-            checkSaveSong(value)
+            saveSong(value)
             checkStartStopSong(value)
-        elseif (event == "timer") then
-            moveProgressCursor()
-            sendNote()
+		elseif (event == "timer") then
+			if (playing) then
+				moveProgressCursor()
+				sendNotesColumn()
+				if (playedColumn < #song.notes) then -- If the end of the song hasn't been reached.
+					playedColumn = playedColumn + 1
+					sleep(playingSleep) -- One game tick of delay between each column.
+				else
+					playing = false
+					playedColumn = 1
+				end
+			end
         end
 
-        playTimer = os.startTimer(0.05)
+		playTimer = os.startTimer(0.05) -- Loop to keep playing music while listening for user inputs.
     end
 end
 
