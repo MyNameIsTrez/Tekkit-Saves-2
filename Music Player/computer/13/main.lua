@@ -166,6 +166,10 @@ function fillSongTable()
     end
 end
 
+function sendNote()
+    
+end
+
 function setup()
     term.clear()
     
@@ -231,6 +235,7 @@ function main()
             checkStartStopSong(value)
         elseif (event == "timer") then
             moveProgressCursor()
+            sendNote()
         end
 
         playTimer = os.startTimer(0.05)
