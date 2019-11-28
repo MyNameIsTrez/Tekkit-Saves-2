@@ -3,7 +3,7 @@ local instruments = {"bass", "snare", "hat", "bassdrum", "harp"}
 local instrumentKeys = {["1"] = 1, ["2"] = 2, ["3"] = 3, ["4"] = 4, ["5"] = 5}
 local movement = {["w"] = "w", ["a"] = "a", ["s"] = "s", ["d"] = "d", ["200"] = "w", ["203"] = "a", ["208"] = "s", ["205"] = "d"}
 local cursor = {x = 4, y = 3}
-local spacing = 10 -- Need a better name. Vertical line that separates the notes.
+local spacing = 5 -- Need a better name. Vertical line that separates the notes.
 local spacingSymbol = "."
 local songName = "song1"
 local clearingKey = 42 -- The key to clear notes from the song array. 42 is the shift key.
@@ -31,7 +31,7 @@ function drawInstrumentNotes()
 	for x = 1, #song.notes do
 		for y = 1, 25 do
 			local instrumentNumber = song.notes[x][y]
-			if (instrumentNumber ~= 0) then
+			if (instrumentNumber ~= nil) then
 				term.setCursorPos(x + 3, 26 - y + 2)
 				write(instrumentNumber)
 			end
@@ -87,7 +87,7 @@ end
 function clearNotes(value)
     -- Clear notes.
     if (value == clearingKey) then
-        song.notes[cursor.x - 3][4 + 26 - cursor.y - 2] = 0
+        table.remove(song.notes[cursor.x - 3], 4 + 26 - cursor.y - 2)
 
         -- Immediately clear the note.
         term.setCursorPos(cursor.x, cursor.y)
@@ -160,9 +160,9 @@ function fillSongTable()
     song.notes = {}
     for x = 1, songSteps do
         song.notes[x] = {}
-        for y = 1, 25 do
-            song.notes[x][y] = 0
-        end
+        -- for y = 1, 25 do
+        --     song.notes[x][y] = 0
+        -- end
     end
 end
 
