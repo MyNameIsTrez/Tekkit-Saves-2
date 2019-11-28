@@ -14,53 +14,7 @@ local playingSleep = 0.05 -- The time slept between played notes.
 local playTimer
 local playing = false
 local playedColumn -- The column of notes that the song starts playing at.
-
--- Fill the song table with empty tables, based on the width of the terminal.
-local songSteps = width - 5
 local song = {}
-song.notes = {}
-for x = 1, songSteps do
-	song.notes[x] = {}
-	for y = 1, 25 do
-		song.notes[x][y] = 0
-	end
-end
-
-function setup()
-    term.clear()
-    
-    -- Draw top line.
-    term.setCursorPos(1, 2)
-    write(string.rep("_", width - 1))
-    
-    -- Write down 01 to 25 for the number of pitches.
-    for i = 25, 1, -1 do
-        term.setCursorPos(1, 3 + 25 - i)
-        if (i < 10) then
-            write(0)
-        end
-        write(i)
-        -- Draw left line.
-        write("|")
-    end
-    
-    -- Draw bottom line.
-    term.setCursorPos(1, 28)
-    write(string.rep("-", width - 1))
-    
-    -- Draw right line.
-    for i = 1, 25 do
-        term.setCursorPos(width - 1, 2 + i)
-        write("|")
-    end
-    
-    term.setCursorPos(1, 1)
-    write("Selected: "..instruments[1])
-    
-    -- Draw the cursor starting position.
-    term.setCursorPos(cursor.x, cursor.y)
-    write("x")
-end
 
 function drawSpacingLines()
 	for x = 1, #song.notes do
@@ -107,7 +61,7 @@ function move(direction)
         cursor.y = cursor.y - 1
     elseif (direction == "a" and cursor.x >= 5) then
         cursor.x = cursor.x - 1
-    elseif (direction == "s" and cursor.y <= height - 2) then
+    elseif (direction == "s" and cursor.y <= 26) then
         cursor.y = cursor.y + 1
     elseif (direction == "d" and cursor.x <= width - 3) then
         cursor.x = cursor.x + 1
@@ -200,35 +154,88 @@ function moveProgressCursor()
     end
 end
 
-setup()
-drawSpacingLines()
-drawInstrumentNotes()
+function fillSongTable()
+    -- Fill the song table with empty tables, based on the width of the terminal.
+    local songSteps = width - 5
+    song.notes = {}
+    for x = 1, songSteps do
+        song.notes[x] = {}
+        for y = 1, 25 do
+            song.notes[x][y] = 0
+        end
+    end
+end
 
-while true do
-    local event, value = os.pullEvent()
+function setup()
+    term.clear()
+    
+    -- Draw top line.
+    term.setCursorPos(1, 2)
+    write(string.rep("_", width - 1))
+    
+    -- Write down 01 to 25 for the number of pitches.
+    for i = 25, 1, -1 do
+        term.setCursorPos(1, 3 + 25 - i)
+        if (i < 10) then
+            write(0)
+        end
+        write(i)
+        -- Draw left line.
+        write("|")
+    end
+    
+    -- Draw bottom line.
+    term.setCursorPos(1, 28)
+    write(string.rep("-", width - 1))
+    
+    -- Draw right line.
+    for i = 1, 25 do
+        term.setCursorPos(width - 1, 2 + i)
+        write("|")
+    end
+    
+    term.setCursorPos(1, 1)
+    write("Selected: "..instruments[1])
+    
+    -- Draw the cursor starting position.
+    term.setCursorPos(cursor.x, cursor.y)
+    write("x")
 
-    -- The 'key' event is fired when keys like shift are pressed.
-    if (event == "char" or event == "key") then
-        drawSelectedInstrument(value)
+    fillSongTable()
+    drawSpacingLines()
+    drawInstrumentNotes()
+end
 
-        local direction = movement[value]
-        -- write(tostring(direction))
-        -- sleep(0.1)
-        if (direction) then
-            move(direction)
+function main()
+    while true do
+        local event, value = os.pullEvent()
+
+        -- The 'key' event is fired when keys like shift are pressed.
+        if (event == "char" or event == "key") then
+            drawSelectedInstrument(value)
+
+            local direction = movement[value]
+            -- write(tostring(direction))
+            -- sleep(0.1)
+            if (direction) then
+                move(direction)
+            end
+
+            drawSpacingLines()
+            drawInstrumentNotes()
+            drawCursor(direction)
+            -- debugWriteKeys(value)
+            placeInstrument(value)
+            clearNotes(value)
+            checkSaveSong(value)
+            checkStartStopSong(value)
+        elseif (event == "timer") then
+            moveProgressCursor()
         end
 
-        drawSpacingLines()
-        drawInstrumentNotes()
-        drawCursor(direction)
-        debugWriteKeys(value)
-        placeInstrument(value)
-        clearNotes(value)
-        checkSaveSong(value)
-        checkStartStopSong(value)
-    elseif (event == "timer") then
-        moveProgressCursor()
+        playTimer = os.startTimer(0.05)
     end
-
-    playTimer = os.startTimer(0.05)
 end
+
+setup()
+main()

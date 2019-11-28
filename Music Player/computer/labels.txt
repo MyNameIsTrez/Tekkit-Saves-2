@@ -9,3 +9,4 @@
 8 SlaveBassDrum2
 9 SlaveHarp1
 10 SlaveHarp2
+13 MasterEditor
