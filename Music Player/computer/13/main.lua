@@ -6,7 +6,7 @@ local movement = {["w"] = "w", ["a"] = "a", ["s"] = "s", ["d"] = "d", [200] = "w
 local cursor = {x = 4, y = 3}
 local spacing = 5 -- Need a better name. Vertical line that separates the notes.
 local spacingSymbol = "."
-local songName = "we_are_number_one_basic"
+local chosenSongName
 local clearingKey = 42 -- The key to clear notes from the song array. 42 is the shift key.
 local saveKey = 33 -- The key to save the song table to a file. 33 is the f key.
 local playResetKey = 57 -- The key to start and stop transmitting the notes of the song to the other computers. 57 is the spacebar key.
@@ -25,6 +25,21 @@ local colorsTable = { -- Under the hood 2^n starting at n = 0, used for addressi
   colors.brown, colors.green, colors.red,
   colors.black
 }
+
+function listExistingSongNames()
+	print("Songs you can load:")
+	local songNames = fs.list("songs/")
+	for _, songName in ipairs(songNames) do
+		print("- "..songName)
+	end
+	print()
+end
+
+function askUserSongName()
+	-- Ask the user to enter a song name to load.
+	print("Load a song or create a new one:")
+	chosenSongName = read()
+end
 
 function drawTopLine()
     -- Draw top line.
@@ -159,11 +174,11 @@ end
 
 function saveSong(value)
     -- Save the song table to a file.
-	local file = fs.open("songs/"..songName, "w")
+	local file = fs.open("songs/"..chosenSongName, "w")
 	file.write(textutils.serialize(song))
 	file.close()
 
-	local savedMsg = "Saved as "..songName
+	local savedMsg = "Saved as "..chosenSongName
 	term.setCursorPos(width - #savedMsg, 1)
 	write(savedMsg)
 end
@@ -196,9 +211,9 @@ function moveProgressCursor()
 end
 
 function fillSongTable()
-	if fs.exists("songs/"..songName) then
+	if fs.exists("songs/"..chosenSongName) then
 		-- Load the existing song.
-		local file = fs.open("songs/"..songName, "r")
+		local file = fs.open("songs/"..chosenSongName, "r")
 		local string = file.readAll()
 		file.close()
 		song = textutils.unserialize(string)
@@ -267,20 +282,8 @@ end
 function setup()
 	term.clear()
 
-	local allSongNames = getAllSongNames()
-	local chosenSongName = read()
-	-- local chosenSongName = "we_are_number_one"
-	if (chosenSongName == "new") then
-
-	else
-		if (tableContains(allSongNames, chosenSongName)) then
-			-- User reads an existing song file.
-			sleep(2)
-		else
-			write("You need to enter the name of an existing song. Type 'new' to create a new song.")
-			sleep(2)
-		end
-	end
+	listExistingSongNames()
+	askUserSongName()
 	
 	term.clear()
 	
