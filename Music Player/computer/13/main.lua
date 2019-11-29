@@ -81,7 +81,7 @@ end
 
 -- Spacing.
 function drawSpacingLines()
-	for x = 1, #song.notes do
+	for x = 1, width - 2 do
 		if (x % spacing == 0) then
 			for y = 1, 25 do
 				term.setCursorPos(x + 3, y + 2)
@@ -131,11 +131,13 @@ end
 
 -- Miscellaneous.
 function drawNotes()
-	for x = 1, #song.notes do
-		for y = 1, 25 do
-			local instrumentNumber = song.notes[x][y]
+	for col, _ in pairs(song.notes) do
+	-- for x = 1, #song.notes do
+		-- for y = 1, 25 do
+		for row, _ in pairs(song.notes[col]) do
+			local instrumentNumber = song.notes[col][row]
 			if (instrumentNumber ~= nil) then
-				term.setCursorPos(x + 3, 26 - y + 2)
+				term.setCursorPos(col + 3, 26 - row + 2)
 				write(instrumentNumber)
 			end
 		end
@@ -187,7 +189,12 @@ end
 
 -- Notes.
 function placeNote(instrumentKey)
-    -- Placing instruments.
+	-- If there's no song column for this note, create one.
+	if (not song.notes[cursor.x - 3]) then
+		song.notes[cursor.x - 3] = {}
+	end
+
+	-- If the note you're placing isn't already saved at its spot.
 	if (song.notes[cursor.x - 3][4 + 26 - cursor.y - 2] ~= instrumentKey) then
 		-- Add the note.
 		song.notes[cursor.x - 3][4 + 26 - cursor.y - 2] = instrumentKey
@@ -202,19 +209,28 @@ function placeNote(instrumentKey)
 end
 
 function clearNotes()
-    -- Clear notes.
-	table.remove(song.notes[cursor.x - 3], 4 + 26 - cursor.y - 2)
+	-- If there is a note in this column.
+	if (song.notes[cursor.x - 3]) then
+		-- If the note that gets removed is the only one left in its column, remove the column.
+		if (getNotesInColumnCount()) then
+			table.remove(song.notes, cursor.x - 3)
+		else
+			-- Clear notes.
+			table.remove(song.notes[cursor.x - 3], 4 + 26 - cursor.y - 2)
+		end
 
-	-- Immediately clear the note by drawing the cursor over it.
-	term.setCursorPos(cursor.x, cursor.y)
-	write("x")
+		-- Immediately clear the note by drawing the cursor over it.
+		term.setCursorPos(cursor.x, cursor.y)
+		write("x")
+	end
 end
 
-function sendNotesColumn()
-	for songRow, instrumentNumber in pairs(song.notes[playedColumn]) do
+function broadcastNotesColumn()
+	-- No clue why, but this needs to be pairs() and doesn't work with ipairs().
+	for row, instrumentNumber in pairs(song.notes[playedColumn]) do
 		-- Broadcast the instrument/slave computer name.
 		local instrument = instruments[instrumentNumber]
-		if songRow <= 16 then
+		if row <= 16 then
 			instrument = instrument.."1"
 		else
 			instrument = instrument.."2"
@@ -223,10 +239,10 @@ function sendNotesColumn()
 
 		-- Broadcast the pitch of the instrument.
 		local bundledColor
-		if songRow <= 16 then
-			bundledColor = colorsTable[songRow]
+		if row <= 16 then
+			bundledColor = colorsTable[row]
 		else
-			bundledColor = colorsTable[songRow - 16]
+			bundledColor = colorsTable[row - 16]
 		end
 		rednet.broadcast(tostring(bundledColor))
 	end
@@ -244,11 +260,7 @@ function loadSong()
 	else
 		-- Fill the song table with empty tables.
 		song = {}
-		local songSteps = width - 5
 		song.notes = {}
-		for x = 1, songSteps do
-			song.notes[x] = {}
-		end
 	end
 end
 
@@ -271,23 +283,10 @@ function moveCursor(direction)
     write(" ")
 
     -- moveCursor the cursor.
-    if (direction == "w" and cursor.y >= 4) then
-        cursor.y = cursor.y - 1
-    elseif (direction == "a" and cursor.x >= 5) then
-        cursor.x = cursor.x - 1
-    elseif (direction == "s" and cursor.y <= 26) then
-        cursor.y = cursor.y + 1
-    elseif (direction == "d" and cursor.x <= width - 3) then
-        cursor.x = cursor.x + 1
-    end
-end
-
-function debugWriteKeys(value)
-    -- Write the key that's being pressed, for debugging purposes.
-    term.setCursorPos(1, 1)
-    write(string.rep(" ", width - 1))
-    term.setCursorPos(1, 1)
-    write("Key "..value.." pressed")
+    if (direction == "w" and cursor.y >= 4) then cursor.y = cursor.y - 1
+    elseif (direction == "a" and cursor.x >= 5) then cursor.x = cursor.x - 1
+    elseif (direction == "s" and cursor.y <= 26) then cursor.y = cursor.y + 1
+    elseif (direction == "d" and cursor.x <= width - 3) then cursor.x = cursor.x + 1 end
 end
 
 function checkStartStopSong()
@@ -302,6 +301,20 @@ function checkStartStopSong()
 		playing = true
 		playedColumn = 1
 	end
+end
+
+function getNotesInColumnCount()
+	local count = 0
+	for key, value in ipairs(song.notes[cursor.x - 3]) do count = count + 1 end
+	return count
+end
+
+function debugWriteKeys(value)
+    -- Write the key that's being pressed, for debugging purposes.
+    term.setCursorPos(1, 1)
+    write(string.rep(" ", width - 1))
+    term.setCursorPos(1, 1)
+    write("Key "..value.." pressed")
 end
 
 
@@ -361,7 +374,7 @@ function main()
             if value == playResetKey then checkStartStopSong(value) end
 		elseif event == "timer" and playing then
 			drawMovedProgressCursor()
-			sendNotesColumn()
+			broadcastNotesColumn()
 
 			-- If the end of the song hasn't been reached.
 			if (playedColumn < #song.notes) then
