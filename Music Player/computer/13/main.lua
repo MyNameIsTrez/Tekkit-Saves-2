@@ -1,21 +1,35 @@
-local width, height = term.getSize()
-local instruments = {"bass", "snare", "hat", "bassdrum", "harp"}
+-- EDITABLE -------------------------------------------
+local playingSleep = 0.05 -- The time slept between played notes.
+
+local spacing = 5 -- Vertical line that separates the notes.
+
+local modemSide = "back" -- The side of the computer the modem is placed on.
+
 local instrumentKeys = {["1"] = 1, ["2"] = 2, ["3"] = 3, ["4"] = 4, ["5"] = 5, ["i"] = 1, ["o"] = 2, ["p"] = 3, ["["] = 4, ["]"] = 5}
+
 -- The index values that are numbers are for the arrow keys.
 local movement = {["w"] = "w", ["a"] = "a", ["s"] = "s", ["d"] = "d", [200] = "w", [203] = "a", [208] = "s", [205] = "d"}
+
 local cursor = {x = 4, y = 3}
-local spacing = 5 -- Need a better name. Vertical line that separates the notes.
-local spacingSymbol = "."
-local chosenSongName
+
 local clearingKey = 42 -- The key to clear notes from the song array. 42 is the shift key.
 local saveKey = 33 -- The key to save the song table to a file. 33 is the f key.
 local playResetKey = 57 -- The key to start and stop transmitting the notes of the song to the other computers. 57 is the spacebar key.
+
+local spacingSymbol = "."
 local playingProgressCursorSymbol = "|"
-local playingSleep = 0.05 -- The time slept between played notes.
-local playTimer
-local playing = false
-local playedColumn -- The column of notes that the song starts playing at.
+
+
+
+-- NOT EDITABLE -------------------------------------------
+local width, height = term.getSize()
+local instruments = {"bass", "snare", "hat", "bassdrum", "harp"}
+
+local playing
 local song
+local playTimer
+local playedColumn -- The column of notes that the song starts playing at.
+local chosenSongName
 
 local colorsTable = { -- Under the hood 2^n starting at n = 0, used for addressing colored insulated wires.
   colors.white, colors.orange, colors.magenta,
@@ -26,21 +40,11 @@ local colorsTable = { -- Under the hood 2^n starting at n = 0, used for addressi
   colors.black
 }
 
-function listExistingSongNames()
-	print("Songs you can load:")
-	local songNames = fs.list("songs/")
-	for _, songName in ipairs(songNames) do
-		print("- "..songName)
-	end
-	print()
-end
 
-function askUserSongName()
-	-- Ask the user to enter a song name to load.
-	print("Load a song or create a new one:")
-	chosenSongName = read()
-end
 
+-- DRAWING FUNCTIONS -------------------------------------------
+
+-- Program outlines.
 function drawTopLine()
     -- Draw top line.
     term.setCursorPos(1, 2)
@@ -61,19 +65,8 @@ function drawRightLine()
 	end
 end
 
-function drawNotePitches()
-	-- Write down 01 to 25 for the number of pitches.
-	for i = 25, 1, -1 do
-		term.setCursorPos(1, 3 + 25 - i)
-		if (i < 10) then
-			write(0)
-		end
-		write(i)
-		-- Draw left line.
-		write("|")
-	end
-end
 
+-- Startup program.
 function drawSelectedStartingInstrument()
     term.setCursorPos(1, 1)
 	write("Selected: "..instruments[1])
@@ -85,6 +78,8 @@ function drawStartingCursorPos()
 	write("x")
 end
 
+
+-- Spacing.
 function drawSpacingLines()
 	for x = 1, #song.notes do
 		if (x % spacing == 0) then
@@ -96,7 +91,46 @@ function drawSpacingLines()
 	end
 end
 
-function drawInstrumentNotes()
+function drawSpacingSeconds()
+	for x = 1, #song.notes do
+		local temp = 1 / playingSleep
+		if (x % temp == 0) then
+			term.setCursorPos(x + 3, 29)
+			write(tostring(x / temp).."s")
+		end
+	end
+end
+
+
+-- Cursor.
+function drawCursor()
+    -- Draw the cursor.
+	term.setCursorPos(cursor.x, cursor.y)
+	write("x")
+end
+
+function drawMovedProgressCursor()
+	-- Clear the previous progress cursor.
+	-- Don't need to clear behind the first progress cursor.
+	if (playedColumn >= 2) then
+		term.setCursorPos(playedColumn + 2, 2)
+		write("_")
+	end
+
+	-- Draw the new progress cursor.
+	term.setCursorPos(playedColumn + 3, 2)
+	write(playingProgressCursorSymbol)
+end
+
+function drawRemoveLastProgressCursor()
+	-- Remove the remaining progress cursor.
+	term.setCursorPos(playedColumn + 3, 2)
+	write("_")
+end
+
+
+-- Miscellaneous.
+function drawNotes()
 	for x = 1, #song.notes do
 		for y = 1, 25 do
 			local instrumentNumber = song.notes[x][y]
@@ -117,46 +151,41 @@ function drawSelectedInstrument(selectedInstrument)
 	write("Selected: "..selectedInstrument)
 end
 
-function move(direction)
-    -- Undraw the cursor.
-    term.setCursorPos(cursor.x, cursor.y)
-    write(" ")
-
-    -- Move the cursor.
-    if (direction == "w" and cursor.y >= 4) then
-        cursor.y = cursor.y - 1
-    elseif (direction == "a" and cursor.x >= 5) then
-        cursor.x = cursor.x - 1
-    elseif (direction == "s" and cursor.y <= 26) then
-        cursor.y = cursor.y + 1
-    elseif (direction == "d" and cursor.x <= width - 3) then
-        cursor.x = cursor.x + 1
-    end
+function drawNotePitches()
+	-- Write down 01 to 25 for the number of pitches.
+	for i = 25, 1, -1 do
+		term.setCursorPos(1, 3 + 25 - i)
+		if (i < 10) then
+			write(0)
+		end
+		write(i)
+		-- Draw left line.
+		write("|")
+	end
 end
 
-function drawCursor()
-    -- Draw the cursor.
-	term.setCursorPos(cursor.x, cursor.y)
-	write("x")
+
+
+-- CALCULATION FUNCTIONS -------------------------------------------
+
+-- Startup.
+function listExistingSongNames()
+	print("Songs you can load:")
+	local songNames = fs.list("songs/")
+	for _, songName in ipairs(songNames) do
+		print("- "..songName)
+	end
+	print()
 end
 
-function debugWriteKeys(value)
-    -- Write the key that's being pressed, for debugging purposes.
-    term.setCursorPos(1, 1)
-    write(string.rep(" ", width - 1))
-    term.setCursorPos(1, 1)
-    write("Key "..value.." pressed")
+function askUserSongName()
+	-- Ask the user to enter a song name to load.
+	print("Load a song or create a new one:")
+	chosenSongName = read()
 end
 
-function clearNotes()
-    -- Clear notes.
-	table.remove(song.notes[cursor.x - 3], 4 + 26 - cursor.y - 2)
 
-	-- Immediately clear the note by drawing the cursor over it.
-	term.setCursorPos(cursor.x, cursor.y)
-	write("x")
-end
-
+-- Notes.
 function placeNote(instrumentKey)
     -- Placing instruments.
 	if (song.notes[cursor.x - 3][4 + 26 - cursor.y - 2] ~= instrumentKey) then
@@ -172,70 +201,13 @@ function placeNote(instrumentKey)
 	end
 end
 
-function saveSong(value)
-    -- Save the song table to a file.
-	local file = fs.open("songs/"..chosenSongName, "w")
-	file.write(textutils.serialize(song))
-	file.close()
+function clearNotes()
+    -- Clear notes.
+	table.remove(song.notes[cursor.x - 3], 4 + 26 - cursor.y - 2)
 
-	local savedMsg = "Saved as "..chosenSongName
-	term.setCursorPos(width - #savedMsg, 1)
-	write(savedMsg)
-end
-
-function checkStartStopSong(value)
-    -- Start or stop playing the song.
-	if (playing) then
-		playing = false
-		
-		-- Clear the last progress cursor.
-		term.setCursorPos(playedColumn + 2, 2)
-		write("_")
-	else
-		playing = true
-		playedColumn = 1
-	end
-end
-
-function moveProgressCursor()
-	-- Clear the previous progress cursor.
-	-- Don't need to clear behind the first progress cursor.
-	if (playedColumn >= 2) then
-		term.setCursorPos(playedColumn + 2, 2)
-		write("_")
-	end
-
-	-- Draw the new progress cursor.
-	term.setCursorPos(playedColumn + 3, 2)
-	write(playingProgressCursorSymbol)
-end
-
-function fillSongTable()
-	if fs.exists("songs/"..chosenSongName) then
-		-- Load the existing song.
-		local file = fs.open("songs/"..chosenSongName, "r")
-		local string = file.readAll()
-		file.close()
-		song = textutils.unserialize(string)
-	else
-		-- Fill the song table with empty tables.
-		song = {}
-		local songSteps = width - 5
-		song.notes = {}
-		for x = 1, songSteps do
-			song.notes[x] = {}
-		end
-	end
-end
-
-function drawSpacingSeconds()
-	for x = 1, #song.notes do
-		local temp = 1 / playingSleep
-		if (x % temp == 0) then
-			term.setCursorPos(x + 3, 29)
-			write(tostring(x / temp).."s")
-		end
-	end
+	-- Immediately clear the note by drawing the cursor over it.
+	term.setCursorPos(cursor.x, cursor.y)
+	write("x")
 end
 
 function sendNotesColumn()
@@ -260,25 +232,81 @@ function sendNotesColumn()
 	end
 end
 
-function removeLastProgressCursor()
-	-- Remove the remaining progress cursor.
-	term.setCursorPos(playedColumn + 3, 2)
-	write("_")
-end
 
-function getAllSongNames()
-	return fs.list("songs/")
-end
-
-function tableContains(table, element)
-	for _, value in pairs(table) do
-		if value == element then
-			return true
+-- Load/Save song.
+function loadSong()
+	if fs.exists("songs/"..chosenSongName) then
+		-- Load the existing song.
+		local file = fs.open("songs/"..chosenSongName, "r")
+		local string = file.readAll()
+		file.close()
+		song = textutils.unserialize(string)
+	else
+		-- Fill the song table with empty tables.
+		song = {}
+		local songSteps = width - 5
+		song.notes = {}
+		for x = 1, songSteps do
+			song.notes[x] = {}
 		end
 	end
-	return false
 end
 
+function saveSong(value)
+    -- Save the song table to a file.
+	local file = fs.open("songs/"..chosenSongName, "w")
+	file.write(textutils.serialize(song))
+	file.close()
+
+	local savedMsg = "Saved as "..chosenSongName
+	term.setCursorPos(width - #savedMsg, 1)
+	write(savedMsg)
+end
+
+
+-- Miscellaneous.
+function moveCursor(direction)
+    -- Undraw the cursor.
+    term.setCursorPos(cursor.x, cursor.y)
+    write(" ")
+
+    -- moveCursor the cursor.
+    if (direction == "w" and cursor.y >= 4) then
+        cursor.y = cursor.y - 1
+    elseif (direction == "a" and cursor.x >= 5) then
+        cursor.x = cursor.x - 1
+    elseif (direction == "s" and cursor.y <= 26) then
+        cursor.y = cursor.y + 1
+    elseif (direction == "d" and cursor.x <= width - 3) then
+        cursor.x = cursor.x + 1
+    end
+end
+
+function debugWriteKeys(value)
+    -- Write the key that's being pressed, for debugging purposes.
+    term.setCursorPos(1, 1)
+    write(string.rep(" ", width - 1))
+    term.setCursorPos(1, 1)
+    write("Key "..value.." pressed")
+end
+
+function checkStartStopSong()
+    -- Start or stop playing the song.
+	if (playing) then
+		playing = false
+		
+		-- Clear the last progress cursor.
+		term.setCursorPos(playedColumn + 2, 2)
+		write("_")
+	else
+		playing = true
+		playedColumn = 1
+	end
+end
+
+
+
+-- CODE EXECUTION -------------------------------------------
 function setup()
 	term.clear()
 
@@ -295,14 +323,15 @@ function setup()
 	drawNotePitches()
 	drawSelectedStartingInstrument()
 
-	fillSongTable()
+	loadSong()
 	drawSpacingLines()
 	drawSpacingSeconds()
-	drawInstrumentNotes()
+	drawNotes()
 	drawStartingCursorPos()
 
-	rednet.open("back") -- Activate the modem.
+	rednet.open(modemSide) -- Activate the modem.
 end
+
 
 function main()
     while true do
@@ -315,10 +344,10 @@ function main()
 
             local direction = movement[value]
             -- sleep(0.1) -- Why does this break the program??
-            if (direction) then move(direction) end
+            if (direction) then moveCursor(direction) end
 
             drawSpacingLines()
-            drawInstrumentNotes()
+            drawNotes()
 			if (direction) then drawCursor() end
 			
 			-- Meant for debugging/adding new keys.
@@ -331,7 +360,7 @@ function main()
             if value == saveKey then saveSong(value) end
             if value == playResetKey then checkStartStopSong(value) end
 		elseif event == "timer" and playing then
-			moveProgressCursor()
+			drawMovedProgressCursor()
 			sendNotesColumn()
 
 			-- If the end of the song hasn't been reached.
@@ -341,7 +370,7 @@ function main()
 				sleep(playingSleep)
 			else
 				playing = false
-				removeLastProgressCursor()
+				drawRemoveLastProgressCursor()
 				playedColumn = 1
 			end
         end
@@ -350,6 +379,7 @@ function main()
 		playTimer = os.startTimer(0.05)
     end
 end
+
 
 setup()
 main()
