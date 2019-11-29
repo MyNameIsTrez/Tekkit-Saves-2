@@ -28,8 +28,9 @@ local instruments = {"bass", "snare", "hat", "bassdrum", "harp"}
 local playing
 local song
 local playTimer
-local playedColumn -- The column of notes that the song starts playing at.
+local playedColumn
 local chosenSongName
+local maxColumn -- The x position of the last column.
 
 local colorsTable = { -- Under the hood 2^n starting at n = 0, used for addressing colored insulated wires.
   colors.white, colors.orange, colors.magenta,
@@ -225,8 +226,13 @@ function clearNotes()
 	end
 end
 
+function getNotesInColumnCount()
+	local count = 0
+	for key, value in pairs(song.notes[cursor.x - 3]) do count = count + 1 end
+	return count
+end
+
 function broadcastNotesColumn()
-	-- No clue why, but this needs to be pairs() and doesn't work with ipairs().
 	for row, instrumentNumber in pairs(song.notes[playedColumn]) do
 		-- Broadcast the instrument/slave computer name.
 		local instrument = instruments[instrumentNumber]
@@ -235,7 +241,7 @@ function broadcastNotesColumn()
 		else
 			instrument = instrument.."2"
 		end
-		rednet.broadcast(instrument)
+		local instrumentBroadcast = rednet.broadcast(instrument)
 
 		-- Broadcast the pitch of the instrument.
 		local bundledColor
@@ -244,7 +250,17 @@ function broadcastNotesColumn()
 		else
 			bundledColor = colorsTable[row - 16]
 		end
-		rednet.broadcast(tostring(bundledColor))
+		local bundledColorBroadcast = rednet.broadcast(tostring(bundledColor))
+
+		-- USEFUL WHEN DEBUGGING ---------------------
+		-- term.setCursorPos(1, 29)
+		-- print("row: "..row.."       ")
+		-- print("instrumentNumber: "..instrumentNumber.."       ")
+		-- print("instrument: "..instrument.."       ")
+		-- print("bundledColor: "..bundledColor.."       ")
+		-- print("instrumentBroadcast: "..tostring(instrumentBroadcast).."       ")
+		-- print("bundledColorBroadcast: "..tostring(bundledColorBroadcast).."       ")
+		-- sleep(5)
 	end
 end
 
@@ -303,10 +319,12 @@ function checkStartStopSong()
 	end
 end
 
-function getNotesInColumnCount()
-	local count = 0
-	for key, value in ipairs(song.notes[cursor.x - 3]) do count = count + 1 end
-	return count
+function setMaxColumn()
+	-- Finds the x position of the last column.
+	maxColumn = 0
+	for col, _ in pairs(song.notes) do
+		if (col > maxColumn) then maxColumn = col end
+	end
 end
 
 function debugWriteKeys(value)
@@ -337,6 +355,7 @@ function setup()
 	drawSelectedStartingInstrument()
 
 	loadSong()
+	setMaxColumn()
 	drawSpacingLines()
 	drawSpacingSeconds()
 	drawNotes()
@@ -374,12 +393,14 @@ function main()
             if value == playResetKey then checkStartStopSong(value) end
 		elseif event == "timer" and playing then
 			drawMovedProgressCursor()
-			broadcastNotesColumn()
+
+			-- If the column currently selected by the progress cursor has a note in it, play it.
+			if song.notes[playedColumn] then broadcastNotesColumn() end
 
 			-- If the end of the song hasn't been reached.
-			if (playedColumn < #song.notes) then
+			if playedColumn < maxColumn then
 				playedColumn = playedColumn + 1
-				-- One game tick of delay between each column.
+				-- One game tick of delay between playing each column by default.
 				sleep(playingSleep)
 			else
 				playing = false
