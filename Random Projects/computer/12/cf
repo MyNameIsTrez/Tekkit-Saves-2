@@ -42,3 +42,9 @@ end
 function magSq(vector)
 	return vector.x * vector.x + vector.y * vector.y
 end
+
+function dist(a, b)
+  local xDiff = b.pos.x - a.pos.x
+  local yDiff = b.pos.y - a.pos.y
+  return math.sqrt(xDiff^2 + yDiff^2)
+end
