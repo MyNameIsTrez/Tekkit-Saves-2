@@ -48,3 +48,11 @@ function dist(a, b)
   local yDiff = b.pos.y - a.pos.y
   return math.sqrt(xDiff^2 + yDiff^2)
 end
+
+function reverseTable(tab)
+	reversedTable = {}
+	for i = #tab, 1, -1 do
+		reversedTable[#reversedTable + 1] = tab[i]
+	end
+	return reversedTable
+end

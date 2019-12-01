@@ -45,7 +45,9 @@ Entity = {
 			id = id,
 			pos = vector.new(x, y),
 			icon = "e",
-			targetId
+
+			targetEntityId,
+			path
 		}
 		setmetatable(startingValues, {__index = self})
 		return startingValues
@@ -74,8 +76,8 @@ Entity = {
 				local furthestNode = openSet[currentIndex]
 
 				-- Found a solution.
-				local target = entities[self.targetId]
-				local targetNode = nodes[target.pos.x][target.pos.y]
+				local targetEntity = entities[self.targetEntityId]
+				local targetNode = nodes[targetEntity.pos.x][targetEntity.pos.y]
 				if furthestNode == targetNode then
 					return
 				end
@@ -115,7 +117,7 @@ Entity = {
 							-- What is targetNode exactly?
 							neighborNode.h[self.id] = self:heuristic(neighborNode, targetNode)
 							neighborNode.f[self.id] = neighborNode.g[self.id] + neighborNode.h[self.id]
-							neighborNode.parents[self.id] = furthestNode
+							neighborNode.parentNode[self.id] = furthestNode
 						end
 					end
 				end
@@ -146,9 +148,36 @@ Entity = {
 
 	heuristic = function(self, a, b)
 		return cf.dist(a, b)
+	end,
+
+	setPath = function(self)
+		-- Sets a path from itself to the target.
+		local targetEntity = entities[self.targetEntityId]
+		local targetNode = nodes[targetEntity.pos.x][targetEntity.pos.y]
+		local childNode = targetNode
+		
+		local pathFromTargetEntity = {}
+		pathFromTargetEntity[#pathFromTargetEntity + 1] = childNode
+
+		while childNode.parentNode[self.id] do
+			-- 'childNode.parentNode[self.id]' doesn't have to be written twice here, I think.
+			pathFromTargetEntity[#pathFromTargetEntity + 1] = childNode.parentNode[self.id]
+			childNode = childNode.parentNode[self.id]
+		end
+
+		self.path = cf.reverseTable(pathFromTargetEntity)
+	end,
+
+	showPath = function(self)
+		for i = 1, #self.path do
+			local pathNode = self.path[i]
+			term.setCursorPos(pathNode.pos.x, pathNode.pos.y)
+			write("@")
+		end
 	end
 
 }
+
 
 Node = {
 
@@ -158,7 +187,7 @@ Node = {
 			impassable = impassable,
 
 			neighborNodes = {},
-			parents = {},
+			parentNode = {},
 			f = {}, -- g + h.
 			g = {}, -- Cost from the start.
 			h = {} -- Minimum cost to the end.
@@ -192,7 +221,7 @@ Node = {
 	show = function(self)
 		term.setCursorPos(self.pos.x, self.pos.y)
 		if self.impassable then
-			write("#")
+			write(".")
 		end
 	end
 
@@ -201,14 +230,6 @@ Node = {
 
 
 -- FUNCTIONS --------------------------------------------------------
-
--- Enemies.
-function createEntities()
-	for id = 1, entityCount do
-		entities[id] = Entity:new(id, math.random(w), math.random(h))
-	end
-end
-
 
 function createNodes()
 	for x = 1, w do
@@ -227,17 +248,31 @@ function createNodes()
 	end
 end
 
+function createEntities()
+	for id = 1, entityCount do
+		local x = math.random(w)
+		local y = math.random(h)
+		-- Makes sure the entity doesn't spawn inside an impassable node.
+		while nodes[x][y].impassable do
+			x = math.random(w)
+			y = math.random(h)
+		end
+		-- !!! This code should also check if the entity doesn't spawn inside another entity !!!
+		entities[id] = Entity:new(id, x, y)
+	end
+end
+
 
 
 -- CODE EXECUTION --------------------------------------------------------
 
 function setup()
 	term.clear()
-
-	createEntities()
-	entities[1].targetId = 2
 	
 	createNodes()
+
+	createEntities()
+	entities[1].targetEntityId = 2
 end
 
 
@@ -252,8 +287,10 @@ function main()
 
 		for id = 1, entityCount do
 			local entity = entities[id]
-			if (entity.targetId) then
+			if (entity.targetEntityId) then
 				entity:pathfind()
+				entity:setPath()
+				entity:showPath()
 			end
 			entity:show()
 		end

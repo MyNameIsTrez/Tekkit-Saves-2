@@ -1,6 +1,7 @@
-local w, h = term.getSize()
-w = w - 1
+tab = {}
+tab[1] = "c"
+tab[2] = "b"
+tab[3] = "a"
 
-term.clear()
-term.setCursorPos(w, h)
-write("e")
+reversedTable = reverseTable(tab)
+print(textutils.serialize(reversedTable))
