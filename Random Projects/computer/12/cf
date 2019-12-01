@@ -56,3 +56,8 @@ function reverseTable(tab)
 	end
 	return reversedTable
 end
+
+function yield()
+	os.queueEvent("randomEvent")
+	os.pullEvent("randomEvent")
+end

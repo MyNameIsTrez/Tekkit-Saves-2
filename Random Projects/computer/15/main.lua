@@ -1,3 +1,15 @@
+-- README --------------------------------------------------------
+
+-- The default terminal ratio is 25:9, which is absolutely tiny.
+
+-- To get the terminal to fill the entire screen, use these widths and heights:
+-- 426:153 on my 31.5" monitor in windowed mode.
+-- 426:160 on my 31.5" monitor in fullscreen mode.
+-- 227:78 on my laptop in windowed mode.
+-- 227:85 on my laptop in fullscreen mode.
+
+
+
 -- IMPORTING --------------------------------------------------------
 
 function import()
@@ -24,9 +36,13 @@ import()
 -- EDITABLE VARIABLES --------------------------------------------------------
 
 local entityCount = 2
-local diagonalMoving = true
+local diagonalMoving = false
 local movingThroughDiagonalWalls = false
-local noOccupyingTargetNode = false
+local noOccupyingTargetNode = true
+
+local entityIcon = "e"
+local entityPathIcon = "@"
+local wallIcon = "#"
 
 
 
@@ -36,7 +52,7 @@ local w, h = term.getSize()
 w = w - 1
 local entities = {}
 local nodes = {}
-local sleepTime = 0
+local sleepTime = 0 -- 0 is the same as 0.05.
 
 
 
@@ -44,13 +60,14 @@ local sleepTime = 0
 
 Entity = {
 
-	new = function(self, id, x, y, noOccupyingTargetNode)
+	new = function(self, id, x, y, icon, pathIcon, noOccupyingTargetNode)
 		local startingValues = {
 			id = id,
 			pos = vector.new(x, y),
+			icon = icon,
+			pathIcon = pathIcon,
 			noOccupyingTargetNode = noOccupyingTargetNode,
 
-			icon = "e",
 			targetEntityId,
 			path
 		}
@@ -68,6 +85,7 @@ Entity = {
 
 		local closedSet = {}
 
+		-- term.setCursorPos(1, 1)
 		while true do
 			if #openSet >= 1 then
 				local currentIndex = 1
@@ -90,10 +108,19 @@ Entity = {
 				self:removeFromTable(openSet, furthestNode)
 				closedSet[#closedSet + 1] = furthestNode
 
+				-- print()
+				-- print()
+				-- print("furthestNode x: "..furthestNode.pos.x..", furthestNode y: "..furthestNode.pos.y)
+				-- print("self.pos.x: "..self.pos.x..", self.pos.y: "..self.pos.y)
+				-- print("#furthestNode.neighborNodes: "..#furthestNode.neighborNodes)
+				-- print()
+
 				for i = 1, #furthestNode.neighborNodes do
+					-- write("1")
 					local neighborNode = furthestNode.neighborNodes[i]
 
-					if not self:tableContains(closedSet, neighborNode) and not neighborNode.impassable then
+					if not self:tableContains(closedSet, neighborNode) and neighborNode then -- !!!!!!! can probably remove 'and neighborNode' !!!!!!!!!!
+						-- write("2")
 						-- I removed 'n / tileSizeFull', because each tile is 1 wide and high.
 						local heur = self:heuristic(neighborNode, furthestNode)
 						
@@ -105,6 +132,7 @@ Entity = {
 						else
 							tempG = heur
 						end
+						-- write("3")
 
 						local newPath = false
 						if self:tableContains(openSet, neighborNode) then
@@ -180,8 +208,7 @@ Entity = {
 	showPath = function(self)
 		for i = 1, #self.path do
 			local pathNode = self.path[i]
-			term.setCursorPos(pathNode.pos.x, pathNode.pos.y)
-			write("@")
+			shape.point(pathNode.pos, self.pathIcon)
 		end
 	end,
 
@@ -204,14 +231,13 @@ Entity = {
 
 Node = {
 
-	new = function(self, x, y, impassable, diagonalMoving, movingThroughDiagonalWalls)
+	new = function(self, x, y, icon, diagonalMoving, movingThroughDiagonalWalls)
 		local startingValues = {
 			pos = vector.new(x, y),
-			impassable = impassable,
+			icon = icon,
 			diagonalMoving = diagonalMoving,
 			movingThroughDiagonalWalls = movingThroughDiagonalWalls,
 
-			icon = "#",
 			neighborNodes = {},
 			parentNode = {},
 			f = {}, -- g + h.
@@ -227,25 +253,43 @@ Node = {
 		local notLeftBorder = self.pos.x > 1
 		local notBottomBorder = self.pos.y < h
 		local notRightBorder = self.pos.x < w
+		
+		-- print("x: "..self.pos.x..", y: "..self.pos.y)
+		-- sleep(0.2)
 
 		-- Top.
 		if notTopBorder then
-			self.neighborNodes[#self.neighborNodes + 1] = nodes[self.pos.x][self.pos.y - 1]
+			local neighbor = nodes[self.pos.x][self.pos.y - 1]
+			-- print("x: "..self.pos.x..", y: "..self.pos.y)
+			-- print(type(nodes[self.pos.x][self.pos.y - 1]))
+			-- sleep(100)
+			if neighbor then
+				self.neighborNodes[#self.neighborNodes + 1] = neighbor
+			end
 		end
 
 		-- Left.
 		if notLeftBorder then
-			self.neighborNodes[#self.neighborNodes + 1] = nodes[self.pos.x - 1][self.pos.y]
+			local neighbor = nodes[self.pos.x - 1][self.pos.y]
+			if neighbor then
+				self.neighborNodes[#self.neighborNodes + 1] = neighbor
+			end
 		end
 
 		-- Bottom.
 		if notBottomBorder then
-			self.neighborNodes[#self.neighborNodes + 1] = nodes[self.pos.x][self.pos.y + 1]
+			local neighbor = nodes[self.pos.x][self.pos.y + 1]
+			if neighbor then
+				self.neighborNodes[#self.neighborNodes + 1] = neighbor
+			end
 		end
 
 		-- Right.
 		if notRightBorder then
-			self.neighborNodes[#self.neighborNodes + 1] = nodes[self.pos.x + 1][self.pos.y]
+			local neighbor = nodes[self.pos.x + 1][self.pos.y]
+			if neighbor then
+				self.neighborNodes[#self.neighborNodes + 1] = neighbor
+			end
 		end
 
 		if self.diagonalMoving then
@@ -253,19 +297,19 @@ Node = {
 			local neighborTopIsWall, neighborLeftIsWall, neighborBottomIsWall, neighborRightIsWall
 
 			if notTopBorder then
-				neighborTopIsWall = nodes[self.pos.x][self.pos.y - 1].impassable
+				neighborTopIsWall = not nodes[self.pos.x][self.pos.y - 1]
 			end
 
 			if notLeftBorder then
-				neighborLeftIsWall = nodes[self.pos.x - 1][self.pos.y].impassable
+				neighborLeftIsWall = not nodes[self.pos.x - 1][self.pos.y]
 			end
 
 			if notBottomBorder then
-				neighborBottomIsWall = nodes[self.pos.x][self.pos.y + 1].impassable
+				neighborBottomIsWall = not nodes[self.pos.x][self.pos.y + 1]
 			end
 
 			if notRightBorder then
-				neighborRightIsWall = nodes[self.pos.x + 1][self.pos.y].impassable
+				neighborRightIsWall = not nodes[self.pos.x + 1][self.pos.y]
 			end
 
 
@@ -301,13 +345,6 @@ Node = {
 				end
 			end
 		end
-	end,
-
-	show = function(self)
-		term.setCursorPos(self.pos.x, self.pos.y)
-		if self.impassable then
-			write(self.icon)
-		end
 	end
 
 }
@@ -321,14 +358,18 @@ function createNodes()
 		nodes[x] = {}
 		for y = 1, h do
 			local impassable = math.random(0, 3) == 3
-			nodes[x][y] = Node:new(x, y, impassable, diagonalMoving, movingThroughDiagonalWalls)
+			-- local impassable = false
+			if not impassable then
+				nodes[x][y] = Node:new(x, y, wallIcon, diagonalMoving, movingThroughDiagonalWalls)
+			end
 		end
 	end
 
-	-- This loop can be done with pairs() or ipairs() later.
-	for x = 1, w do
-		for y = 1, h do
+	for x, _ in ipairs(nodes) do
+		for y, _ in ipairs(nodes[x]) do
 			nodes[x][y]:setNeighborNodes()
+			-- print(textutils.serialize(nodes[x][y].neighborNodes))
+			-- sleep(1)
 		end
 	end
 end
@@ -337,13 +378,13 @@ function createEntities()
 	for id = 1, entityCount do
 		local x = math.random(w)
 		local y = math.random(h)
-		-- Makes sure the entity doesn't spawn inside an impassable node.
-		while nodes[x][y].impassable do
+		-- Makes sure the entity doesn't spawn inside a wall.
+		while nodes[x][y] == nil do
 			x = math.random(w)
 			y = math.random(h)
 		end
 		-- !!! This code should also check if the entity doesn't spawn inside another entity !!!
-		entities[id] = Entity:new(id, x, y, noOccupyingTargetNode)
+		entities[id] = Entity:new(id, x, y, entityIcon, entityPathIcon, noOccupyingTargetNode)
 	end
 end
 
@@ -359,6 +400,7 @@ function setup()
 	createEntities()
 	entities[1].targetEntityId = 2
 	
+	-- !!! I can use an ipair loop here later !!!
 	-- Prevents the enemy:pathfind() from being one move behind entity.move() in main().
 	for id = 1, entityCount do
 		local entity = entities[id]
@@ -368,12 +410,12 @@ function setup()
 		end
 	end
 
-	-- This loop can be done with pairs() or ipairs() later.
-	for x, _ in ipairs(nodes) do
-		for y, _ in ipairs(nodes[x]) do
-			nodes[x][y]:show()
-		end
-	end
+	-- for x, _ in ipairs(nodes) do
+	-- 	cf.yield()
+	-- 	for y, _ in ipairs(nodes[x]) do
+	-- 		nodes[x][y]:show()
+	-- 	end
+	-- end
 end
 
 
@@ -382,10 +424,10 @@ function main()
 		for id, _ in ipairs(entities) do
 			local entity = entities[id]
 			if entity.targetEntityId then
+				entity:showPath()
 				entity:move()
 				entity:pathfind()
 				entity:setPath()
-				entity:showPath()
 			end
 			entity:show()
 		end
