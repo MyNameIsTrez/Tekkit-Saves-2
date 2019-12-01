@@ -1,0 +1,4 @@
+for i = 32, 126 do
+  local a = string.char(i)
+  write(a)
+end

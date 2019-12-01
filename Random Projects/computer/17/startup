@@ -1,0 +1,5 @@
+local n = 0
+while n < 150000 do
+  n = n + 1
+  print(n)
+end

@@ -24,6 +24,7 @@ local playingProgressCursorSymbol = "|"
 -- NOT EDITABLE -------------------------------------------
 local width, height = term.getSize()
 local instruments = {"bass", "snare", "hat", "bassdrum", "harp"}
+local xOffset = 0
 
 local playing
 local song
@@ -82,10 +83,10 @@ end
 
 -- Spacing.
 function drawSpacingLines()
-	for x = 1, width - 2 do
-		if (x % spacing == 0) then
-			for y = 1, 25 do
-				term.setCursorPos(x + 3, y + 2)
+	for col = 1, width - 2 do
+		if (col % spacing == 0) then
+			for row = 1, 25 do
+				term.setCursorPos(col + 3 - xOffset, row + 2)
 				write(spacingSymbol)
 			end
 		end
@@ -93,11 +94,11 @@ function drawSpacingLines()
 end
 
 function drawSpacingSeconds()
-	for x = 1, #song.notes do
+	for col = 1, width - 2 do
 		local temp = 1 / playingSleep
-		if (x % temp == 0) then
-			term.setCursorPos(x + 3, 29)
-			write(tostring(x / temp).."s")
+		if (col % temp == 0) then
+			term.setCursorPos(col + 3, 29)
+			write(tostring(col / temp).."s")
 		end
 	end
 end
@@ -106,7 +107,7 @@ end
 -- Cursor.
 function drawCursor()
     -- Draw the cursor.
-	term.setCursorPos(cursor.x, cursor.y)
+	term.setCursorPos(cursor.x - xOffset, cursor.y)
 	write("x")
 end
 
@@ -241,7 +242,7 @@ function broadcastNotesColumn()
 		else
 			instrument = instrument.."2"
 		end
-		local instrumentBroadcast = rednet.broadcast(instrument)
+		rednet.broadcast(instrument)
 
 		-- Broadcast the pitch of the instrument.
 		local bundledColor
@@ -250,17 +251,7 @@ function broadcastNotesColumn()
 		else
 			bundledColor = colorsTable[row - 16]
 		end
-		local bundledColorBroadcast = rednet.broadcast(tostring(bundledColor))
-
-		-- USEFUL WHEN DEBUGGING ---------------------
-		-- term.setCursorPos(1, 29)
-		-- print("row: "..row.."       ")
-		-- print("instrumentNumber: "..instrumentNumber.."       ")
-		-- print("instrument: "..instrument.."       ")
-		-- print("bundledColor: "..bundledColor.."       ")
-		-- print("instrumentBroadcast: "..tostring(instrumentBroadcast).."       ")
-		-- print("bundledColorBroadcast: "..tostring(bundledColorBroadcast).."       ")
-		-- sleep(5)
+		rednet.broadcast(tostring(bundledColor))
 	end
 end
 
@@ -300,9 +291,19 @@ function moveCursor(direction)
 
     -- moveCursor the cursor.
     if (direction == "w" and cursor.y >= 4) then cursor.y = cursor.y - 1
-    elseif (direction == "a" and cursor.x >= 5) then cursor.x = cursor.x - 1
+	elseif (direction == "a" and cursor.x >= 5) then
+		cursor.x = cursor.x - 1
+		if (cursor.x > width - 3) then
+			xOffset = xOffset - 1
+		end
     elseif (direction == "s" and cursor.y <= 26) then cursor.y = cursor.y + 1
-    elseif (direction == "d" and cursor.x <= width - 3) then cursor.x = cursor.x + 1 end
+    -- elseif (direction == "d" and cursor.x <= width - 3) then cursor.x = cursor.x + 1 end
+	elseif (direction == "d") then
+		cursor.x = cursor.x + 1
+		if (cursor.x > width - 2) then
+			xOffset = xOffset + 1
+		end
+	end
 end
 
 function checkStartStopSong()
@@ -367,7 +368,12 @@ end
 
 function main()
     while true do
-        local event, value = os.pullEvent()
+		local event, value = os.pullEvent()
+
+		-- USEFUL WHEN DEBUGGING ---------------------
+		term.setCursorPos(1, 29)
+		print("xOffset: "..xOffset.."       ")
+		print("cursor.x: "..cursor.x.."       ")
 
         -- The 'key' event is fired when keys like shift are pressed.
         if (event == "char" or event == "key") then

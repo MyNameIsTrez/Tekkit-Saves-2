@@ -3,11 +3,11 @@
 function point(p, fill)
   term.setCursorPos(p.x, p.y)
   if (fill) then
-    print(fill)
+    write(fill)
   else
     error("You didn't enter a string for the 'fill' argument in the function 'point(p, fill)'.")
   end
-  term.setCursorPos(1, 1)
+  --term.setCursorPos(1, 1)
 end
 
 function circle(center, radius)
