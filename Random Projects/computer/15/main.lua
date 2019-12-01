@@ -26,6 +26,7 @@ import()
 local entityCount = 2
 local diagonalMoving = true
 local movingThroughDiagonalWalls = false
+local noOccupyingTargetNode = false
 
 
 
@@ -35,7 +36,7 @@ local w, h = term.getSize()
 w = w - 1
 local entities = {}
 local nodes = {}
-local sleepTime = 1
+local sleepTime = 0
 
 
 
@@ -43,10 +44,11 @@ local sleepTime = 1
 
 Entity = {
 
-	new = function(self, id, x, y)
+	new = function(self, id, x, y, noOccupyingTargetNode)
 		local startingValues = {
 			id = id,
 			pos = vector.new(x, y),
+			noOccupyingTargetNode = noOccupyingTargetNode,
 
 			icon = "e",
 			targetEntityId,
@@ -169,6 +171,10 @@ Entity = {
 		end
 
 		self.path = cf.reverseTable(pathFromTargetEntity)
+
+		if noOccupyingTargetNode then
+			self:removeFromTable(self.path, self.path[#self.path])
+		end
 	end,
 
 	showPath = function(self)
@@ -337,7 +343,7 @@ function createEntities()
 			y = math.random(h)
 		end
 		-- !!! This code should also check if the entity doesn't spawn inside another entity !!!
-		entities[id] = Entity:new(id, x, y)
+		entities[id] = Entity:new(id, x, y, noOccupyingTargetNode)
 	end
 end
 
@@ -356,7 +362,7 @@ function setup()
 	-- Prevents the enemy:pathfind() from being one move behind entity.move() in main().
 	for id = 1, entityCount do
 		local entity = entities[id]
-		if (entity.targetEntityId) then
+		if entity.targetEntityId then
 			entity:pathfind()
 			entity:setPath()
 		end
@@ -375,7 +381,7 @@ function main()
 	while true do
 		for id, _ in ipairs(entities) do
 			local entity = entities[id]
-			if (entity.targetEntityId) then
+			if entity.targetEntityId then
 				entity:move()
 				entity:pathfind()
 				entity:setPath()
