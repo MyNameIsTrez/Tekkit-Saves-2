@@ -159,10 +159,14 @@ Entity = {
 		local pathFromTargetEntity = {}
 		pathFromTargetEntity[#pathFromTargetEntity + 1] = childNode
 
+		-- local n = 0
 		while childNode.parentNode[self.id] do
 			-- 'childNode.parentNode[self.id]' doesn't have to be written twice here, I think.
 			pathFromTargetEntity[#pathFromTargetEntity + 1] = childNode.parentNode[self.id]
 			childNode = childNode.parentNode[self.id]
+			-- print(n..". x="..childNode.pos.x..", y="..childNode.pos.y)
+			-- n = n + 1
+			-- sleep(0)
 		end
 
 		self.path = cf.reverseTable(pathFromTargetEntity)
@@ -174,7 +178,25 @@ Entity = {
 			term.setCursorPos(pathNode.pos.x, pathNode.pos.y)
 			write("@")
 		end
-	end
+	end,
+
+	move = function(self)
+		if #self.path >= 2 then
+			self:unshow()
+			local nextNode = self.path[2]
+			-- self.path[1].parentNode[self.id] = nil
+			-- print(nextNode.pos.x..", "..nextNode.pos.y.."; "..self.pos.x..", "..self.pos.y)
+			self.pos.x = nextNode.pos.x
+			self.pos.y = nextNode.pos.y
+			nextNode.parentNode[self.id] = nil
+			-- print(nextNode.pos.x..", "..nextNode.pos.y.."; "..self.pos.x..", "..self.pos.y)
+			-- sleep(1)
+		end
+	end,
+
+	unshow = function(self)
+		shape.point(self.pos, " ")
+	end,
 
 }
 
@@ -273,6 +295,15 @@ function setup()
 
 	createEntities()
 	entities[1].targetEntityId = 2
+	
+	-- Prevents the enemy:pathfind() from being one move behind entity.move() in main().
+	for id = 1, entityCount do
+		local entity = entities[id]
+		if (entity.targetEntityId) then
+			entity:pathfind()
+			entity:setPath()
+		end
+	end
 end
 
 
@@ -288,11 +319,14 @@ function main()
 		for id = 1, entityCount do
 			local entity = entities[id]
 			if (entity.targetEntityId) then
+				entity:move()
 				entity:pathfind()
 				entity:setPath()
 				entity:showPath()
 			end
 			entity:show()
+			-- term.setCursorPos(10, 10)
+			-- write(entity.pos.x..","..entity.pos.y)
 		end
 		sleep(0)
 	end
