@@ -24,6 +24,8 @@ import()
 -- EDITABLE VARIABLES --------------------------------------------------------
 
 local entityCount = 2
+local diagonalMoving = true
+local movingThroughDiagonalWalls = false
 
 
 
@@ -33,6 +35,7 @@ local w, h = term.getSize()
 w = w - 1
 local entities = {}
 local nodes = {}
+local sleepTime = 1
 
 
 
@@ -44,8 +47,8 @@ Entity = {
 		local startingValues = {
 			id = id,
 			pos = vector.new(x, y),
-			icon = "e",
 
+			icon = "e",
 			targetEntityId,
 			path
 		}
@@ -122,7 +125,7 @@ Entity = {
 					end
 				end
 			else
-				print("FATAL ERROR: A path couldn't be found, blame the programmer.")
+				print("ERROR: A path couldn't be found.")
 				sleep(100)
 				return
 			end
@@ -159,14 +162,10 @@ Entity = {
 		local pathFromTargetEntity = {}
 		pathFromTargetEntity[#pathFromTargetEntity + 1] = childNode
 
-		-- local n = 0
 		while childNode.parentNode[self.id] do
-			-- 'childNode.parentNode[self.id]' doesn't have to be written twice here, I think.
-			pathFromTargetEntity[#pathFromTargetEntity + 1] = childNode.parentNode[self.id]
-			childNode = childNode.parentNode[self.id]
-			-- print(n..". x="..childNode.pos.x..", y="..childNode.pos.y)
-			-- n = n + 1
-			-- sleep(0)
+			local parentNode = childNode.parentNode[self.id]
+			pathFromTargetEntity[#pathFromTargetEntity + 1] = parentNode
+			childNode = parentNode
 		end
 
 		self.path = cf.reverseTable(pathFromTargetEntity)
@@ -184,13 +183,9 @@ Entity = {
 		if #self.path >= 2 then
 			self:unshow()
 			local nextNode = self.path[2]
-			-- self.path[1].parentNode[self.id] = nil
-			-- print(nextNode.pos.x..", "..nextNode.pos.y.."; "..self.pos.x..", "..self.pos.y)
 			self.pos.x = nextNode.pos.x
 			self.pos.y = nextNode.pos.y
 			nextNode.parentNode[self.id] = nil
-			-- print(nextNode.pos.x..", "..nextNode.pos.y.."; "..self.pos.x..", "..self.pos.y)
-			-- sleep(1)
 		end
 	end,
 
@@ -203,11 +198,14 @@ Entity = {
 
 Node = {
 
-	new = function(self, x, y, impassable)
+	new = function(self, x, y, impassable, diagonalMoving, movingThroughDiagonalWalls)
 		local startingValues = {
 			pos = vector.new(x, y),
 			impassable = impassable,
+			diagonalMoving = diagonalMoving,
+			movingThroughDiagonalWalls = movingThroughDiagonalWalls,
 
+			icon = "#",
 			neighborNodes = {},
 			parentNode = {},
 			f = {}, -- g + h.
@@ -219,31 +217,90 @@ Node = {
 	end,
 
 	setNeighborNodes = function(self)
+		local notTopBorder = self.pos.y > 1
+		local notLeftBorder = self.pos.x > 1
+		local notBottomBorder = self.pos.y < h
+		local notRightBorder = self.pos.x < w
+
 		-- Top.
-		if self.pos.y > 1 then
+		if notTopBorder then
 			self.neighborNodes[#self.neighborNodes + 1] = nodes[self.pos.x][self.pos.y - 1]
 		end
 
 		-- Left.
-		if self.pos.x > 1 then
+		if notLeftBorder then
 			self.neighborNodes[#self.neighborNodes + 1] = nodes[self.pos.x - 1][self.pos.y]
 		end
 
 		-- Bottom.
-		if self.pos.y < h then
+		if notBottomBorder then
 			self.neighborNodes[#self.neighborNodes + 1] = nodes[self.pos.x][self.pos.y + 1]
 		end
 
 		-- Right.
-		if self.pos.x < w then
+		if notRightBorder then
 			self.neighborNodes[#self.neighborNodes + 1] = nodes[self.pos.x + 1][self.pos.y]
+		end
+
+		if self.diagonalMoving then
+			-- Prevents the path from going diagonally through two walls.
+			local neighborTopIsWall, neighborLeftIsWall, neighborBottomIsWall, neighborRightIsWall
+
+			if notTopBorder then
+				neighborTopIsWall = nodes[self.pos.x][self.pos.y - 1].impassable
+			end
+
+			if notLeftBorder then
+				neighborLeftIsWall = nodes[self.pos.x - 1][self.pos.y].impassable
+			end
+
+			if notBottomBorder then
+				neighborBottomIsWall = nodes[self.pos.x][self.pos.y + 1].impassable
+			end
+
+			if notRightBorder then
+				neighborRightIsWall = nodes[self.pos.x + 1][self.pos.y].impassable
+			end
+
+
+			-- Top-left.
+			if notTopBorder and notLeftBorder then
+				-- Prevents the path from going diagonally through two walls.
+				if not (neighborTopIsWall and neighborLeftIsWall) or self.movingThroughDiagonalWalls then
+					self.neighborNodes[#self.neighborNodes + 1] = nodes[self.pos.x - 1][self.pos.y - 1]
+				end
+			end
+
+			-- Bottom-left.
+			if notBottomBorder and notLeftBorder then
+				-- Prevents the path from going diagonally through two walls.
+				if not (neighborBottomIsWall and neighborLeftIsWall) or self.movingThroughDiagonalWalls then
+					self.neighborNodes[#self.neighborNodes + 1] = nodes[self.pos.x - 1][self.pos.y + 1]
+				end
+			end
+
+			-- Bottom-right.
+			if notBottomBorder and notRightBorder then
+				-- Prevents the path from going diagonally through two walls.
+				if not (neighborBottomIsWall and neighborRightIsWall) or self.movingThroughDiagonalWalls then
+					self.neighborNodes[#self.neighborNodes + 1] = nodes[self.pos.x + 1][self.pos.y + 1]
+				end
+			end
+
+			-- Top-right.
+			if notTopBorder and notRightBorder then
+				-- Prevents the path from going diagonally through two walls.
+				if not (neighborTopIsWall and neighborRightIsWall) or self.movingThroughDiagonalWalls then
+					self.neighborNodes[#self.neighborNodes + 1] = nodes[self.pos.x + 1][self.pos.y - 1]
+				end
+			end
 		end
 	end,
 
 	show = function(self)
 		term.setCursorPos(self.pos.x, self.pos.y)
 		if self.impassable then
-			write(".")
+			write(self.icon)
 		end
 	end
 
@@ -258,7 +315,7 @@ function createNodes()
 		nodes[x] = {}
 		for y = 1, h do
 			local impassable = math.random(0, 3) == 3
-			nodes[x][y] = Node:new(x, y, impassable)
+			nodes[x][y] = Node:new(x, y, impassable, diagonalMoving, movingThroughDiagonalWalls)
 		end
 	end
 
@@ -304,19 +361,19 @@ function setup()
 			entity:setPath()
 		end
 	end
+
+	-- This loop can be done with pairs() or ipairs() later.
+	for x, _ in ipairs(nodes) do
+		for y, _ in ipairs(nodes[x]) do
+			nodes[x][y]:show()
+		end
+	end
 end
 
 
 function main()
 	while true do
-		-- This loop can be done with pairs() or ipairs() later.
-		for x = 1, w do
-			for y = 1, h do
-				nodes[x][y]:show()
-			end
-		end
-
-		for id = 1, entityCount do
+		for id, _ in ipairs(entities) do
 			local entity = entities[id]
 			if (entity.targetEntityId) then
 				entity:move()
@@ -325,10 +382,8 @@ function main()
 				entity:showPath()
 			end
 			entity:show()
-			-- term.setCursorPos(10, 10)
-			-- write(entity.pos.x..","..entity.pos.y)
 		end
-		sleep(0)
+		sleep(sleepTime)
 	end
 end
 
