@@ -5,7 +5,7 @@ function import()
 	local APIs = {
 		-- {id = "6qBVrzpK", name = "aStar"},
 		{id = "drESpUSP", name = "shape"},
-		{id = "drESpUSP", name = "cf"}
+		{id = "p9tSSWcB", name = "cf"}
 	}
 
 	for i = 1, #APIs do
@@ -88,11 +88,12 @@ Entity = {
 
 					if not self:tableContains(closedSet, neighborNode) and not neighborNode.impassable then
 						-- I removed 'n / tileSizeFull', because each tile is 1 wide and high.
-						local heur = self:heuristic(neighborNode, furthestNode) / 1
+						local heur = self:heuristic(neighborNode, furthestNode)
 						
 						local tempG
 						-- If the 'g' property exists, add it. Otherwise, keep it at 0.
-						if furthestNode.g[self.id] + heur then
+						-- if furthestNode.g[self.id] + heur then
+						if furthestNode.g[self.id] then
 							tempG = furthestNode.g[self.id] + heur
 						else
 							tempG = heur
@@ -157,6 +158,7 @@ Node = {
 			impassable = impassable,
 
 			neighborNodes = {},
+			parents = {},
 			f = {}, -- g + h.
 			g = {}, -- Cost from the start.
 			h = {} -- Minimum cost to the end.
@@ -168,22 +170,29 @@ Node = {
 	setNeighborNodes = function(self)
 		-- Top.
 		if self.pos.y > 1 then
-			self.neighborNodes[#self.neighborNodes + 1] = nodes[self.x][self.y - 1]
+			self.neighborNodes[#self.neighborNodes + 1] = nodes[self.pos.x][self.pos.y - 1]
 		end
 
 		-- Left.
 		if self.pos.x > 1 then
-			self.neighborNodes[#self.neighborNodes + 1] = nodes[self.x - 1][self.y]
+			self.neighborNodes[#self.neighborNodes + 1] = nodes[self.pos.x - 1][self.pos.y]
 		end
 
 		-- Bottom.
 		if self.pos.y < h then
-			self.neighborNodes[#self.neighborNodes + 1] = nodes[self.x][self.y + 1]
+			self.neighborNodes[#self.neighborNodes + 1] = nodes[self.pos.x][self.pos.y + 1]
 		end
 
 		-- Right.
 		if self.pos.x < w then
-			self.neighborNodes[#self.neighborNodes + 1] = nodes[self.x + 1][self.y]
+			self.neighborNodes[#self.neighborNodes + 1] = nodes[self.pos.x + 1][self.pos.y]
+		end
+	end,
+
+	show = function(self)
+		term.setCursorPos(self.pos.x, self.pos.y)
+		if self.impassable then
+			write("#")
 		end
 	end
 
@@ -205,7 +214,7 @@ function createNodes()
 	for x = 1, w do
 		nodes[x] = {}
 		for y = 1, h do
-			local impassable = math.random(0, 1)
+			local impassable = math.random(0, 3) == 3
 			nodes[x][y] = Node:new(x, y, impassable)
 		end
 	end
@@ -234,6 +243,13 @@ end
 
 function main()
 	while true do
+		-- This loop can be done with pairs() or ipairs() later.
+		for x = 1, w do
+			for y = 1, h do
+				nodes[x][y]:show()
+			end
+		end
+
 		for id = 1, entityCount do
 			local entity = entities[id]
 			if (entity.targetId) then
