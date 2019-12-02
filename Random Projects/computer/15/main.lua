@@ -85,7 +85,6 @@ Entity = {
 
 		local closedSet = {}
 
-		-- term.setCursorPos(1, 1)
 		while true do
 			if #openSet >= 1 then
 				local currentIndex = 1
@@ -108,31 +107,19 @@ Entity = {
 				self:removeFromTable(openSet, furthestNode)
 				closedSet[#closedSet + 1] = furthestNode
 
-				-- print()
-				-- print()
-				-- print("furthestNode x: "..furthestNode.pos.x..", furthestNode y: "..furthestNode.pos.y)
-				-- print("self.pos.x: "..self.pos.x..", self.pos.y: "..self.pos.y)
-				-- print("#furthestNode.neighborNodes: "..#furthestNode.neighborNodes)
-				-- print()
-
 				for i = 1, #furthestNode.neighborNodes do
-					-- write("1")
 					local neighborNode = furthestNode.neighborNodes[i]
 
 					if not self:tableContains(closedSet, neighborNode) and neighborNode then -- !!!!!!! can probably remove 'and neighborNode' !!!!!!!!!!
-						-- write("2")
-						-- I removed 'n / tileSizeFull', because each tile is 1 wide and high.
 						local heur = self:heuristic(neighborNode, furthestNode)
 						
+						-- If the 'g' property exists, add it. Keep it at 0 otherwise.
 						local tempG
-						-- If the 'g' property exists, add it. Otherwise, keep it at 0.
-						-- if furthestNode.g[self.id] + heur then
 						if furthestNode.g[self.id] then
 							tempG = furthestNode.g[self.id] + heur
 						else
 							tempG = heur
 						end
-						-- write("3")
 
 						local newPath = false
 						if self:tableContains(openSet, neighborNode) then
@@ -147,7 +134,6 @@ Entity = {
 						end
 
 						if newPath then
-							-- What is targetNode exactly?
 							neighborNode.h[self.id] = self:heuristic(neighborNode, targetNode)
 							neighborNode.f[self.id] = neighborNode.g[self.id] + neighborNode.h[self.id]
 							neighborNode.parentNode[self.id] = furthestNode
@@ -231,10 +217,9 @@ Entity = {
 
 Node = {
 
-	new = function(self, x, y, icon, diagonalMoving, movingThroughDiagonalWalls)
+	new = function(self, x, y, diagonalMoving, movingThroughDiagonalWalls)
 		local startingValues = {
 			pos = vector.new(x, y),
-			icon = icon,
 			diagonalMoving = diagonalMoving,
 			movingThroughDiagonalWalls = movingThroughDiagonalWalls,
 
@@ -253,16 +238,10 @@ Node = {
 		local notLeftBorder = self.pos.x > 1
 		local notBottomBorder = self.pos.y < h
 		local notRightBorder = self.pos.x < w
-		
-		-- print("x: "..self.pos.x..", y: "..self.pos.y)
-		-- sleep(0.2)
 
 		-- Top.
 		if notTopBorder then
 			local neighbor = nodes[self.pos.x][self.pos.y - 1]
-			-- print("x: "..self.pos.x..", y: "..self.pos.y)
-			-- print(type(nodes[self.pos.x][self.pos.y - 1]))
-			-- sleep(100)
 			if neighbor then
 				self.neighborNodes[#self.neighborNodes + 1] = neighbor
 			end
@@ -357,19 +336,18 @@ function createNodes()
 	for x = 1, w do
 		nodes[x] = {}
 		for y = 1, h do
-			local impassable = math.random(0, 3) == 3
-			-- local impassable = false
-			if not impassable then
-				nodes[x][y] = Node:new(x, y, wallIcon, diagonalMoving, movingThroughDiagonalWalls)
+			local wall = math.random(0, 3) == 3 -- One in four chance.
+			if not wall then
+				nodes[x][y] = Node:new(x, y, diagonalMoving, movingThroughDiagonalWalls)
+			else
+				shape.point(vector.new(x, y), wallIcon)
 			end
 		end
 	end
 
-	for x, _ in ipairs(nodes) do
-		for y, _ in ipairs(nodes[x]) do
+	for x, _ in pairs(nodes) do
+		for y, _ in pairs(nodes[x]) do
 			nodes[x][y]:setNeighborNodes()
-			-- print(textutils.serialize(nodes[x][y].neighborNodes))
-			-- sleep(1)
 		end
 	end
 end
@@ -378,15 +356,32 @@ function createEntities()
 	for id = 1, entityCount do
 		local x = math.random(w)
 		local y = math.random(h)
+
 		-- Makes sure the entity doesn't spawn inside a wall.
 		while nodes[x][y] == nil do
 			x = math.random(w)
 			y = math.random(h)
 		end
+		
 		-- !!! This code should also check if the entity doesn't spawn inside another entity !!!
 		entities[id] = Entity:new(id, x, y, entityIcon, entityPathIcon, noOccupyingTargetNode)
 	end
 end
+
+-- function debugDrawNodesNeighbors()
+-- 	for x, _ in pairs(nodes) do
+-- 		for y, _ in pairs(nodes[x]) do
+-- 	-- for x = 1, w do
+-- 	-- 	for y = 1, h do
+-- 			local node = nodes[x][y]
+-- 			if node then
+-- 				term.setCursorPos(x, y)
+-- 				write(#node.neighborNodes)
+-- 			end
+-- 		end
+-- 	end
+-- 	term.setCursorPos(1, 1)
+-- end
 
 
 
@@ -399,29 +394,22 @@ function setup()
 
 	createEntities()
 	entities[1].targetEntityId = 2
+
+	-- debugDrawNodesNeighbors()
 	
-	-- !!! I can use an ipair loop here later !!!
 	-- Prevents the enemy:pathfind() from being one move behind entity.move() in main().
-	for id = 1, entityCount do
-		local entity = entities[id]
+	for i, entity in pairs(entities) do
 		if entity.targetEntityId then
 			entity:pathfind()
 			entity:setPath()
 		end
 	end
-
-	-- for x, _ in ipairs(nodes) do
-	-- 	cf.yield()
-	-- 	for y, _ in ipairs(nodes[x]) do
-	-- 		nodes[x][y]:show()
-	-- 	end
-	-- end
 end
 
 
 function main()
 	while true do
-		for id, _ in ipairs(entities) do
+		for id, _ in pairs(entities) do
 			local entity = entities[id]
 			if entity.targetEntityId then
 				entity:showPath()
