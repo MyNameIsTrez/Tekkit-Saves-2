@@ -1,7 +1,0 @@
-tab = {}
-tab[1] = "c"
-tab[2] = "b"
-tab[3] = "a"
-
-reversedTable = reverseTable(tab)
-print(textutils.serialize(reversedTable))

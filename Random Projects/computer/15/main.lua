@@ -20,13 +20,17 @@ function import()
 		{id = "p9tSSWcB", name = "cf"}
 	}
 
-	for i = 1, #APIs do
-		-- Delete the old APIs, to make room for the more up-to-date online version.
-		-- This returns no error if the API doesn't exist on the computer yet.
-		fs.delete(APIs[i].name)
+	for _, API in pairs(APIs) do
+		-- Deletes the old API file, to replace it with the more up-to-date version of the API.
+		-- This call doesn't cause any problems when the API didn't exist on the computer.
+		fs.delete("apis/"..API.name)
 
-		shell.run("pastebin", "get", APIs[i].id, APIs[i].name)
-		os.loadAPI(APIs[i].name)
+		-- Creates a folder, causes no problem if the folder already exists.
+		fs.makeDir("apis")
+
+		-- Saving as "apis/"..API.name works, because the API is still referred to without the "apis/" part in the code.
+		shell.run("pastebin", "get", API.id, "apis/"..API.name)
+		os.loadAPI("apis/"..API.name)
 	end
 end
 import()
@@ -39,6 +43,13 @@ local entityCount = 2
 local diagonalMoving = false
 local movingThroughDiagonalWalls = false
 local noOccupyingTargetNode = true
+local showPath = true
+local showWalls = true
+
+local turboSpeed = true -- If turboSpeed is true, sleepTime is ignored.
+local sleepTime = 0 -- 0 is the same as 0.05.
+local setupSleep = true -- After generating the map, wait setupSleepTime seconds before starting to move the entity so you can see the path clearly.
+local setupSleepTime = 5
 
 local entityIcon = "e"
 local entityPathIcon = "@"
@@ -52,7 +63,6 @@ local w, h = term.getSize()
 w = w - 1
 local entities = {}
 local nodes = {}
-local sleepTime = 0 -- 0 is the same as 0.05.
 
 
 
@@ -69,7 +79,8 @@ Entity = {
 			noOccupyingTargetNode = noOccupyingTargetNode,
 
 			targetEntityId,
-			path
+			path,
+			pathStep = 2
 		}
 		setmetatable(startingValues, {__index = self})
 		return startingValues
@@ -107,10 +118,8 @@ Entity = {
 				self:removeFromTable(openSet, furthestNode)
 				closedSet[#closedSet + 1] = furthestNode
 
-				for i = 1, #furthestNode.neighborNodes do
-					local neighborNode = furthestNode.neighborNodes[i]
-
-					if not self:tableContains(closedSet, neighborNode) and neighborNode then -- !!!!!!! can probably remove 'and neighborNode' !!!!!!!!!!
+				for _, neighborNode in pairs(furthestNode.neighborNodes) do
+					if not self:tableContains(closedSet, neighborNode) then
 						local heur = self:heuristic(neighborNode, furthestNode)
 						
 						-- If the 'g' property exists, add it. Keep it at 0 otherwise.
@@ -192,19 +201,19 @@ Entity = {
 	end,
 
 	showPath = function(self)
-		for i = 1, #self.path do
-			local pathNode = self.path[i]
+		for _, pathNode in pairs(self.path) do
 			shape.point(pathNode.pos, self.pathIcon)
 		end
 	end,
 
 	move = function(self)
-		if #self.path >= 2 then
+		if #self.path >= self.pathStep then
 			self:unshow()
-			local nextNode = self.path[2]
+			local nextNode = self.path[self.pathStep]
 			self.pos.x = nextNode.pos.x
 			self.pos.y = nextNode.pos.y
 			nextNode.parentNode[self.id] = nil
+			self.pathStep = self.pathStep + 1
 		end
 	end,
 
@@ -339,15 +348,16 @@ function createNodes()
 			local wall = math.random(0, 3) == 3 -- One in four chance.
 			if not wall then
 				nodes[x][y] = Node:new(x, y, diagonalMoving, movingThroughDiagonalWalls)
-			else
+			elseif showWalls then
 				shape.point(vector.new(x, y), wallIcon)
 			end
 		end
+		cf.yield()
 	end
 
 	for x, _ in pairs(nodes) do
-		for y, _ in pairs(nodes[x]) do
-			nodes[x][y]:setNeighborNodes()
+		for _, node in pairs(nodes[x]) do
+			node:setNeighborNodes()
 		end
 	end
 end
@@ -368,20 +378,16 @@ function createEntities()
 	end
 end
 
--- function debugDrawNodesNeighbors()
--- 	for x, _ in pairs(nodes) do
--- 		for y, _ in pairs(nodes[x]) do
--- 	-- for x = 1, w do
--- 	-- 	for y = 1, h do
--- 			local node = nodes[x][y]
--- 			if node then
--- 				term.setCursorPos(x, y)
--- 				write(#node.neighborNodes)
--- 			end
--- 		end
--- 	end
--- 	term.setCursorPos(1, 1)
--- end
+function debugShowNodesNeighbors()
+	for x, _ in pairs(nodes) do
+		for y, node in pairs(nodes[x]) do
+			if node then
+				shape.point(vector.new(x, y), #node.neighborNodes)
+			end
+		end
+	end
+	term.setCursorPos(1, 1)
+end
 
 
 
@@ -395,31 +401,41 @@ function setup()
 	createEntities()
 	entities[1].targetEntityId = 2
 
-	-- debugDrawNodesNeighbors()
+	-- debugShowNodesNeighbors()
 	
 	-- Prevents the enemy:pathfind() from being one move behind entity.move() in main().
 	for i, entity in pairs(entities) do
 		if entity.targetEntityId then
 			entity:pathfind()
 			entity:setPath()
+
+			if showPath then
+				entity:showPath()
+			end
 		end
 	end
 end
 
 
 function main()
+	if setupSleep then
+		sleep(setupSleepTime)
+	end
+
 	while true do
 		for id, _ in pairs(entities) do
 			local entity = entities[id]
 			if entity.targetEntityId then
-				entity:showPath()
 				entity:move()
-				entity:pathfind()
-				entity:setPath()
 			end
 			entity:show()
 		end
-		sleep(sleepTime)
+		
+		if turboSpeed then
+			cf.yield()
+		else
+			sleep(sleepTime)
+		end
 	end
 end
 
