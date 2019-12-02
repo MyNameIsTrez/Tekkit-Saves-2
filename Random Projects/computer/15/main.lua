@@ -42,23 +42,23 @@ import()
 
 -- EDITABLE VARIABLES --------------------------------------------------------
 
-local entityCount = 2
-local diagonalMoving = true
-local movingThroughDiagonalWalls = false
-local noOccupyingTargetNode = true
-local showPath = true
-local showWalls = true
-local wallChance = 0.25 -- Where 0 is 0% and 1 is 100%.
+local entityCount = 2 -- Default is 2.
+local diagonalMoving = true -- Default is true.
+local movingThroughDiagonalWalls = false -- Default is false.
+local noOccupyingTargetNode = true -- Default is true.
+local showPath = true -- Default is true.
+local showWalls = true -- Default is true.
+local wallChance = 0.25 -- Where 0 is 0% and 1 is 100%. Default is 0.25.
 
-local turboSpeed = false -- If turboSpeed is true, sleepTime is ignored.
-local sleepTime = 0.15 -- 0 is the same as 0.05, which is the minimum.
+local turboSpeed = false -- If turboSpeed is true, sleepTime is ignored. Default is false.
+local sleepTime = 0.15 -- 0 is the same as 0.05, which is the minimum. Default is 0.15.
 
-local setupSleep = false -- After generating the map, wait setupSleepTime seconds before starting to move the entity so you can see the path clearly.
-local setupSleepTime = 5
+local setupSleep = false -- After generating the map, wait setupSleepTime seconds before starting to move the entity so you can see the path clearly. Default is false.
+local setupSleepTime = 5 -- Default is 5.
 
-local entityIcon = "e"
-local entityPathIcon = "."
-local wallIcon = "O"
+local entityIcon = "e" -- Default is "e".
+local entityPathIcon = "." -- Default is ".".
+local wallIcon = "O" -- Default is "O".
 
 
 
@@ -215,16 +215,33 @@ Entity = {
 		-- self.pathStep starts at 2, because self.pathStep 1 is where it's already standing.
 		if #self.path >= self.pathStep then
 			self:unshow()
+
 			local nextNode = self.path[self.pathStep]
 			self.pos.x = nextNode.pos.x
 			self.pos.y = nextNode.pos.y
 			nextNode.parentNode[self.id] = nil
+
+			-- !!!!! Example code of die() being called. !!!!!
+			if noOccupyingTargetNode then
+				if self.pathStep == #self.path then
+					self:unshow()
+					self:die()
+				end
+			end
+
 			self.pathStep = self.pathStep + 1
 		end
 	end,
 
 	unshow = function(self)
 		shape.point(self.pos, " ")
+	end,
+
+	die = function(self)
+		for _, pathNode in pairs(self.path) do
+			pathNode.parentNode[self.id] = nil
+		end
+		table.remove(entities, self.id)
 	end
 
 }
