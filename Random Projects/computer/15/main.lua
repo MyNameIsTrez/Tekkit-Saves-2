@@ -3,10 +3,13 @@
 -- The default terminal ratio is 25:9, which is absolutely tiny.
 
 -- To get the terminal to fill the entire screen, use these widths and heights:
--- 426:153 on my 31.5" monitor in windowed mode.
--- 426:160 on my 31.5" monitor in fullscreen mode.
--- 227:78 on my laptop in windowed mode.
--- 227:85 on my laptop in fullscreen mode.
+	-- My 31.5" monitor:
+		-- 426:153 in windowed mode.
+		-- 426:160 in fullscreen mode.
+		-- 200:70 in windowed mode with GUI Scale: Normal. (for debugging)
+	-- My laptop:
+		-- 227:78 in windowed mode.
+		-- 227:85 in fullscreen mode.
 
 
 
@@ -40,20 +43,22 @@ import()
 -- EDITABLE VARIABLES --------------------------------------------------------
 
 local entityCount = 2
-local diagonalMoving = false
+local diagonalMoving = true
 local movingThroughDiagonalWalls = false
 local noOccupyingTargetNode = true
 local showPath = true
 local showWalls = true
+local wallChance = 0.25 -- Where 0 is 0% and 1 is 100%.
 
-local turboSpeed = true -- If turboSpeed is true, sleepTime is ignored.
-local sleepTime = 0 -- 0 is the same as 0.05.
-local setupSleep = true -- After generating the map, wait setupSleepTime seconds before starting to move the entity so you can see the path clearly.
+local turboSpeed = false -- If turboSpeed is true, sleepTime is ignored.
+local sleepTime = 0.15 -- 0 is the same as 0.05, which is the minimum.
+
+local setupSleep = false -- After generating the map, wait setupSleepTime seconds before starting to move the entity so you can see the path clearly.
 local setupSleepTime = 5
 
 local entityIcon = "e"
-local entityPathIcon = "@"
-local wallIcon = "#"
+local entityPathIcon = "."
+local wallIcon = "O"
 
 
 
@@ -207,6 +212,7 @@ Entity = {
 	end,
 
 	move = function(self)
+		-- self.pathStep starts at 2, because self.pathStep 1 is where it's already standing.
 		if #self.path >= self.pathStep then
 			self:unshow()
 			local nextNode = self.path[self.pathStep]
@@ -219,7 +225,7 @@ Entity = {
 
 	unshow = function(self)
 		shape.point(self.pos, " ")
-	end,
+	end
 
 }
 
@@ -345,7 +351,7 @@ function createNodes()
 	for x = 1, w do
 		nodes[x] = {}
 		for y = 1, h do
-			local wall = math.random(0, 3) == 3 -- One in four chance.
+			local wall = math.random() < wallChance
 			if not wall then
 				nodes[x][y] = Node:new(x, y, diagonalMoving, movingThroughDiagonalWalls)
 			elseif showWalls then
@@ -408,11 +414,11 @@ function setup()
 		if entity.targetEntityId then
 			entity:pathfind()
 			entity:setPath()
-
 			if showPath then
 				entity:showPath()
 			end
 		end
+		entity:show()
 	end
 end
 
