@@ -58,6 +58,13 @@ Entity = {
 					return
 				end
 
+				-- Found a node that will be put into the closedSet table.
+				if showClosedSet then
+					-- if not (furthestNode.pos == self.pos) then -- I can't get this to work.
+					if not (furthestNode.pos.x == self.pos.x and furthestNode.pos.y == self.pos.y) then
+						shape.point(vector.new(furthestNode.pos.x, furthestNode.pos.y), closedSetIcon)
+					end
+				end
 				self:removeFromTable(openSet, furthestNode)
 				closedSet[#closedSet + 1] = furthestNode
 
@@ -97,6 +104,7 @@ Entity = {
 				sleep(100)
 				return
 			end
+			cf.yield()
 		end
 	end,
 
