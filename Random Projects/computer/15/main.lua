@@ -15,10 +15,10 @@
 
 -- IMPORTING --------------------------------------------------------
 
-function import()
+function importAPIs()
 	-- Makes a table of the IDs and names of the APIs to load.
 	local APIs = {
-		-- {id = "6qBVrzpK", name = "aStar"},
+		{id = "6qBVrzpK", name = "aStar"},
 		{id = "drESpUSP", name = "shape"},
 		{id = "p9tSSWcB", name = "cf"}
 	}
@@ -36,380 +36,46 @@ function import()
 		os.loadAPI("apis/"..API.name)
 	end
 end
-import()
 
 
 
 -- EDITABLE VARIABLES --------------------------------------------------------
 
-local entityCount = 2 -- Default is 2.
-local diagonalMoving = true -- Default is true.
-local movingThroughDiagonalWalls = false -- Default is false.
-local noOccupyingTargetNode = true -- Default is true.
-local showPath = true -- Default is true.
-local showWalls = true -- Default is true.
-local wallChance = 0.25 -- Where 0 is 0% and 1 is 100%. Default is 0.25.
+entityCount = 2 -- Default is 2.
+diagonalMoving = true -- Default is true.
+movingThroughDiagonalWalls = false -- Default is false.
+noOccupyingTargetNode = true -- Default is true.
+showPath = true -- Default is true.
+showWalls = true -- Default is true.
+wallChance = 0.25 -- Where 0 is 0% and 1 is 100%. Default is 0.25.
 
-local turboSpeed = false -- If turboSpeed is true, sleepTime is ignored. Default is false.
-local sleepTime = 0.15 -- 0 is the same as 0.05, which is the minimum. Default is 0.15.
+turboSpeed = false -- If turboSpeed is true, sleepTime is ignored. Default is false.
+sleepTime = 0.15 -- 0 is the same as 0.05, which is the minimum. Default is 0.15.
 
-local setupSleep = false -- After generating the map, wait setupSleepTime seconds before starting to move the entity so you can see the path clearly. Default is false.
-local setupSleepTime = 5 -- Default is 5.
+setupSleep = false -- After generating the map, wait setupSleepTime seconds before starting to move the entity so you can see the path clearly. Default is false.
+setupSleepTime = 5 -- Default is 5.
 
-local entityIcon = "e" -- Default is "e".
-local entityPathIcon = "." -- Default is ".".
-local wallIcon = "O" -- Default is "O".
+entityIcon = "e" -- Default is "e".
+entityPathIcon = "." -- Default is ".".
+wallIcon = "#" -- Default is "#".
 
 
 
 -- UNEDITABLE VARIABLES --------------------------------------------------------
 
-local w, h = term.getSize()
+w, h = term.getSize()
 w = w - 1
-local entities = {}
-local nodes = {}
-
-
-
--- CLASSES --------------------------------------------------------
-
-Entity = {
-
-	new = function(self, id, x, y, icon, pathIcon, noOccupyingTargetNode)
-		local startingValues = {
-			id = id,
-			pos = vector.new(x, y),
-			icon = icon,
-			pathIcon = pathIcon,
-			noOccupyingTargetNode = noOccupyingTargetNode,
-
-			targetEntityId,
-			path,
-			pathStep = 2
-		}
-		setmetatable(startingValues, {__index = self})
-		return startingValues
-	end,
-
-	show = function(self)
-		shape.point(self.pos, self.icon)
-	end,
-
-	pathfind = function(self)
-		local openSet = {}
-		openSet[1] = nodes[self.pos.x][self.pos.y]
-
-		local closedSet = {}
-
-		while true do
-			if #openSet >= 1 then
-				local currentIndex = 1
-				for i = 1, #openSet do
-					if openSet[i].f[self.id] and openSet[currentIndex].f[self.id] then
-						if openSet[i].f[self.id] < openSet[currentIndex].f[self.id] then
-							currentIndex = i
-						end
-					end
-				end
-				local furthestNode = openSet[currentIndex]
-
-				-- Found a solution.
-				local targetEntity = entities[self.targetEntityId]
-				local targetNode = nodes[targetEntity.pos.x][targetEntity.pos.y]
-				if furthestNode == targetNode then
-					return
-				end
-
-				self:removeFromTable(openSet, furthestNode)
-				closedSet[#closedSet + 1] = furthestNode
-
-				for _, neighborNode in pairs(furthestNode.neighborNodes) do
-					if not self:tableContains(closedSet, neighborNode) then
-						local heur = self:heuristic(neighborNode, furthestNode)
-						
-						-- If the 'g' property exists, add it. Keep it at 0 otherwise.
-						local tempG
-						if furthestNode.g[self.id] then
-							tempG = furthestNode.g[self.id] + heur
-						else
-							tempG = heur
-						end
-
-						local newPath = false
-						if self:tableContains(openSet, neighborNode) then
-							if tempG < neighborNode.g[self.id] then
-								neighborNode.g[self.id] = tempG
-								newPath = true
-							end
-						else
-							neighborNode.g[self.id] = tempG
-							openSet[#openSet + 1] = neighborNode
-							newPath = true
-						end
-
-						if newPath then
-							neighborNode.h[self.id] = self:heuristic(neighborNode, targetNode)
-							neighborNode.f[self.id] = neighborNode.g[self.id] + neighborNode.h[self.id]
-							neighborNode.parentNode[self.id] = furthestNode
-						end
-					end
-				end
-			else
-				print("ERROR: A path couldn't be found.")
-				sleep(100)
-				return
-			end
-		end
-	end,
-
-	removeFromTable = function(self, tab, element)
-		for i = #tab, 1, -1 do
-			if tab[i] == element then
-				table.remove(tab, i)
-			end
-		end
-	end,
-
-	tableContains = function(self, table, element)
-		for _, value in pairs(table) do
-			if value == element then
-				return true
-			end
-		end
-		return false
-	end,
-
-	heuristic = function(self, a, b)
-		return cf.dist(a, b)
-	end,
-
-	setPath = function(self)
-		-- Sets a path from itself to the target.
-		local targetEntity = entities[self.targetEntityId]
-		local targetNode = nodes[targetEntity.pos.x][targetEntity.pos.y]
-		local childNode = targetNode
-		
-		local pathFromTargetEntity = {}
-		pathFromTargetEntity[#pathFromTargetEntity + 1] = childNode
-
-		while childNode.parentNode[self.id] do
-			local parentNode = childNode.parentNode[self.id]
-			pathFromTargetEntity[#pathFromTargetEntity + 1] = parentNode
-			childNode = parentNode
-		end
-
-		self.path = cf.reverseTable(pathFromTargetEntity)
-
-		if noOccupyingTargetNode then
-			self:removeFromTable(self.path, self.path[#self.path])
-		end
-	end,
-
-	showPath = function(self)
-		for _, pathNode in pairs(self.path) do
-			shape.point(pathNode.pos, self.pathIcon)
-		end
-	end,
-
-	move = function(self)
-		-- self.pathStep starts at 2, because self.pathStep 1 is where it's already standing.
-		if #self.path >= self.pathStep then
-			self:unshow()
-
-			local nextNode = self.path[self.pathStep]
-			self.pos.x = nextNode.pos.x
-			self.pos.y = nextNode.pos.y
-			nextNode.parentNode[self.id] = nil
-
-			-- !!!!! Example code of die() being called. !!!!!
-			if noOccupyingTargetNode then
-				if self.pathStep == #self.path then
-					self:unshow()
-					self:die()
-				end
-			end
-
-			self.pathStep = self.pathStep + 1
-		end
-	end,
-
-	unshow = function(self)
-		shape.point(self.pos, " ")
-	end,
-
-	die = function(self)
-		for _, pathNode in pairs(self.path) do
-			pathNode.parentNode[self.id] = nil
-		end
-		table.remove(entities, self.id)
-	end
-
-}
-
-
-Node = {
-
-	new = function(self, x, y, diagonalMoving, movingThroughDiagonalWalls)
-		local startingValues = {
-			pos = vector.new(x, y),
-			diagonalMoving = diagonalMoving,
-			movingThroughDiagonalWalls = movingThroughDiagonalWalls,
-
-			neighborNodes = {},
-			parentNode = {},
-			f = {}, -- g + h.
-			g = {}, -- Cost from the start.
-			h = {} -- Minimum cost to the end.
-		}
-		setmetatable(startingValues, {__index = self})
-		return startingValues
-	end,
-
-	setNeighborNodes = function(self)
-		local notTopBorder = self.pos.y > 1
-		local notLeftBorder = self.pos.x > 1
-		local notBottomBorder = self.pos.y < h
-		local notRightBorder = self.pos.x < w
-
-		-- Top.
-		if notTopBorder then
-			local neighbor = nodes[self.pos.x][self.pos.y - 1]
-			if neighbor then
-				self.neighborNodes[#self.neighborNodes + 1] = neighbor
-			end
-		end
-
-		-- Left.
-		if notLeftBorder then
-			local neighbor = nodes[self.pos.x - 1][self.pos.y]
-			if neighbor then
-				self.neighborNodes[#self.neighborNodes + 1] = neighbor
-			end
-		end
-
-		-- Bottom.
-		if notBottomBorder then
-			local neighbor = nodes[self.pos.x][self.pos.y + 1]
-			if neighbor then
-				self.neighborNodes[#self.neighborNodes + 1] = neighbor
-			end
-		end
-
-		-- Right.
-		if notRightBorder then
-			local neighbor = nodes[self.pos.x + 1][self.pos.y]
-			if neighbor then
-				self.neighborNodes[#self.neighborNodes + 1] = neighbor
-			end
-		end
-
-		if self.diagonalMoving then
-			-- Prevents the path from going diagonally through two walls.
-			local neighborTopIsWall, neighborLeftIsWall, neighborBottomIsWall, neighborRightIsWall
-
-			if notTopBorder then
-				neighborTopIsWall = not nodes[self.pos.x][self.pos.y - 1]
-			end
-
-			if notLeftBorder then
-				neighborLeftIsWall = not nodes[self.pos.x - 1][self.pos.y]
-			end
-
-			if notBottomBorder then
-				neighborBottomIsWall = not nodes[self.pos.x][self.pos.y + 1]
-			end
-
-			if notRightBorder then
-				neighborRightIsWall = not nodes[self.pos.x + 1][self.pos.y]
-			end
-
-
-			-- Top-left.
-			if notTopBorder and notLeftBorder then
-				-- Prevents the path from going diagonally through two walls.
-				if not (neighborTopIsWall and neighborLeftIsWall) or self.movingThroughDiagonalWalls then
-					self.neighborNodes[#self.neighborNodes + 1] = nodes[self.pos.x - 1][self.pos.y - 1]
-				end
-			end
-
-			-- Bottom-left.
-			if notBottomBorder and notLeftBorder then
-				-- Prevents the path from going diagonally through two walls.
-				if not (neighborBottomIsWall and neighborLeftIsWall) or self.movingThroughDiagonalWalls then
-					self.neighborNodes[#self.neighborNodes + 1] = nodes[self.pos.x - 1][self.pos.y + 1]
-				end
-			end
-
-			-- Bottom-right.
-			if notBottomBorder and notRightBorder then
-				-- Prevents the path from going diagonally through two walls.
-				if not (neighborBottomIsWall and neighborRightIsWall) or self.movingThroughDiagonalWalls then
-					self.neighborNodes[#self.neighborNodes + 1] = nodes[self.pos.x + 1][self.pos.y + 1]
-				end
-			end
-
-			-- Top-right.
-			if notTopBorder and notRightBorder then
-				-- Prevents the path from going diagonally through two walls.
-				if not (neighborTopIsWall and neighborRightIsWall) or self.movingThroughDiagonalWalls then
-					self.neighborNodes[#self.neighborNodes + 1] = nodes[self.pos.x + 1][self.pos.y - 1]
-				end
-			end
-		end
-	end
-
-}
 
 
 
 -- FUNCTIONS --------------------------------------------------------
 
-function createNodes()
-	for x = 1, w do
-		nodes[x] = {}
-		for y = 1, h do
-			local wall = math.random() < wallChance
-			if not wall then
-				nodes[x][y] = Node:new(x, y, diagonalMoving, movingThroughDiagonalWalls)
-			elseif showWalls then
-				shape.point(vector.new(x, y), wallIcon)
-			end
-		end
-		cf.yield()
-	end
-
-	for x, _ in pairs(nodes) do
-		for _, node in pairs(nodes[x]) do
-			node:setNeighborNodes()
+function reachedTarget(entity)
+	if noOccupyingTargetNode then
+		if entity.pathStep == #entity.path then
+			entity:die()
 		end
 	end
-end
-
-function createEntities()
-	for id = 1, entityCount do
-		local x = math.random(w)
-		local y = math.random(h)
-
-		-- Makes sure the entity doesn't spawn inside a wall.
-		while nodes[x][y] == nil do
-			x = math.random(w)
-			y = math.random(h)
-		end
-		
-		-- !!! This code should also check if the entity doesn't spawn inside another entity !!!
-		entities[id] = Entity:new(id, x, y, entityIcon, entityPathIcon, noOccupyingTargetNode)
-	end
-end
-
-function debugShowNodesNeighbors()
-	for x, _ in pairs(nodes) do
-		for y, node in pairs(nodes[x]) do
-			if node then
-				shape.point(vector.new(x, y), #node.neighborNodes)
-			end
-		end
-	end
-	term.setCursorPos(1, 1)
 end
 
 
@@ -417,6 +83,9 @@ end
 -- CODE EXECUTION --------------------------------------------------------
 
 function setup()
+	importAPIs()
+	shell.run("apis/aStar")
+
 	term.clear()
 	
 	createNodes()
@@ -446,9 +115,9 @@ function main()
 	end
 
 	while true do
-		for id, _ in pairs(entities) do
-			local entity = entities[id]
+		for _, entity in pairs(entities) do
 			if entity.targetEntityId then
+				reachedTarget(entity)
 				entity:move()
 			end
 			entity:show()
