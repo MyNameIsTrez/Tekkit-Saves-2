@@ -47,8 +47,8 @@ movingThroughDiagonalWalls = false -- Default is false.
 noOccupyingTargetNode = true -- Default is true.
 showPath = true -- Default is true.
 showWalls = true -- Default is true.
-wallChance = 0.25 -- Where 0 is 0% and 1 is 100%. Default is 0.25.
-showClosedSet = true -- Shows the nodes that have been explored by the pathing algorithm that aren't part of the final path. Default is false.
+wallChance = 0.35 -- Where 0 is 0% and 1 is 100%. Default is 0.25.
+showClosedSet = true -- Shows the nodes that have been explored by the pathing algorithm that aren't part of the final path. Default is true.
 
 turboSpeed = false -- If turboSpeed is true, sleepTime is ignored. Default is false.
 sleepTime = 0.15 -- 0 is the same as 0.05, which is the minimum. Default is 0.15.
@@ -58,8 +58,8 @@ setupSleepTime = 5 -- Default is 5.
 
 entityIcon = "e" -- Default is "e".
 entityPathIcon = "." -- Default is ".".
-wallIcon = "#" -- Default is "#".
-closedSetIcon = "x" -- Default is "x".
+wallIcon = "O" -- Default is "O".
+closedSetIcon = "|" -- Default is "|".
 
 
 
@@ -96,10 +96,13 @@ function setup()
 	entities[1].targetEntityId = 2
 
 	-- debugShowNodesNeighbors()
+
+	for _, entity in pairs(entities) do
+		entity:show()
+	end
 	
 	-- Prevents the enemy:pathfind() from being one move behind entity.move() in main().
 	for _, entity in pairs(entities) do
-		entity:show()
 		if entity.targetEntityId then
 			entity:pathfind()
 			entity:setPath()
