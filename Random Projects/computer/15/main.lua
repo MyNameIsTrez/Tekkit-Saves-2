@@ -72,6 +72,54 @@ w = w - 1
 
 -- FUNCTIONS --------------------------------------------------------
 
+function createNodes()
+	for x = 1, w do
+		nodes[x] = {}
+		for y = 1, h do
+			local wall = math.random() < wallChance
+			if not wall then
+				nodes[x][y] = Node:new(x, y, diagonalMoving, movingThroughDiagonalWalls)
+			elseif showWalls then
+				shape.point(vector.new(x, y), wallIcon)
+			end
+		end
+		cf.yield()
+	end
+
+	for x, _ in pairs(nodes) do
+		for _, node in pairs(nodes[x]) do
+			node:setNeighborNodes()
+		end
+	end
+end
+
+function createEntities()
+	for id = 1, entityCount do
+		local x = math.random(w)
+		local y = math.random(h)
+
+		-- Makes sure the entity doesn't spawn inside a wall.
+		while nodes[x][y] == nil do
+			x = math.random(w)
+			y = math.random(h)
+		end
+		
+		-- !!! This code should also check if the entity doesn't spawn inside another entity !!!
+		entities[id] = Entity:new(id, x, y, entityIcon, entityPathIcon, noOccupyingTargetNode)
+	end
+end
+
+function debugShowNodesNeighbors()
+	for x, _ in pairs(nodes) do
+		for y, node in pairs(nodes[x]) do
+			if node then
+				shape.point(vector.new(x, y), #node.neighborNodes)
+			end
+		end
+	end
+	term.setCursorPos(1, 1)
+end
+
 function reachedTarget(entity)
 	if noOccupyingTargetNode then
 		if entity.pathStep == #entity.path then
