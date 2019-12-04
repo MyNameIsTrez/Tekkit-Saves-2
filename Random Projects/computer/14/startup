@@ -1,0 +1,7 @@
+a=1
+
+function test()
+  print(a)
+end
+
+test()

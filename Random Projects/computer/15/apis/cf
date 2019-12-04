@@ -44,9 +44,9 @@ function magSq(vector)
 end
 
 function dist(a, b)
-  local xDiff = b.pos.x - a.pos.x
-  local yDiff = b.pos.y - a.pos.y
-  return math.sqrt(xDiff^2 + yDiff^2)
+  local dx = b.pos.x - a.pos.x
+  local dy = b.pos.y - a.pos.y
+  return math.sqrt(dx^2 + dy^2)
 end
 
 function reverseTable(tab)

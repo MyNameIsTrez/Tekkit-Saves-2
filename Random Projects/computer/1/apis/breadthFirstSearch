@@ -1,4 +1,5 @@
 -- README --------------------------------------------------------
+-- COPIED A* PATHING CODE FOR NOW; STILL NEED TO REWRITE INTO BREADTH FIRST SEARCH!
 
 
 
@@ -6,7 +7,6 @@
 
 entities = {}
 nodes = {}
-local sqrt2 = math.sqrt(2)
 
 
 
@@ -183,125 +183,141 @@ Entity = {
 	end,
 
 	die = function(self)
-		for _, pathNode in pairs(self.path) do
-			pathNode.parentNode[self.id] = nil
-		end
 		self:unshow()
 		table.remove(entities, self.id)
 	end
 
 }
 
-
 Node = {
-
-	new = function(self, x, y, diagonalMoving, movingThroughDiagonalWalls)
-		local startingValues = {
-			pos = vector.new(x, y),
-			diagonalMoving = diagonalMoving,
-			movingThroughDiagonalWalls = movingThroughDiagonalWalls,
-
-			neighborNodes = {},
-			parentNode = {},
-			f = {}, -- g + h.
-			g = {}, -- Cost from the start.
-			h = {} -- Minimum cost to the end.
-		}
-		setmetatable(startingValues, {__index = self})
-		return startingValues
-	end,
-
-	setNeighborNodes = function(self)
-		local notTopBorder = self.pos.y > 1
-		local notLeftBorder = self.pos.x > 1
-		local notBottomBorder = self.pos.y < h
-		local notRightBorder = self.pos.x < w
-
-		-- Top.
-		if notTopBorder then
-			local neighbor = nodes[self.pos.x][self.pos.y - 1]
-			if neighbor then
-				self.neighborNodes[#self.neighborNodes + 1] = neighbor
-			end
-		end
-
-		-- Left.
-		if notLeftBorder then
-			local neighbor = nodes[self.pos.x - 1][self.pos.y]
-			if neighbor then
-				self.neighborNodes[#self.neighborNodes + 1] = neighbor
-			end
-		end
-
-		-- Bottom.
-		if notBottomBorder then
-			local neighbor = nodes[self.pos.x][self.pos.y + 1]
-			if neighbor then
-				self.neighborNodes[#self.neighborNodes + 1] = neighbor
-			end
-		end
-
-		-- Right.
-		if notRightBorder then
-			local neighbor = nodes[self.pos.x + 1][self.pos.y]
-			if neighbor then
-				self.neighborNodes[#self.neighborNodes + 1] = neighbor
-			end
-		end
-
-		if self.diagonalMoving then
-			-- Prevents the path from going diagonally through two walls.
-			local neighborTopIsWall, neighborLeftIsWall, neighborBottomIsWall, neighborRightIsWall
-
-			if notTopBorder then
-				neighborTopIsWall = not nodes[self.pos.x][self.pos.y - 1]
-			end
-
-			if notLeftBorder then
-				neighborLeftIsWall = not nodes[self.pos.x - 1][self.pos.y]
-			end
-
-			if notBottomBorder then
-				neighborBottomIsWall = not nodes[self.pos.x][self.pos.y + 1]
-			end
-
-			if notRightBorder then
-				neighborRightIsWall = not nodes[self.pos.x + 1][self.pos.y]
-			end
-
-
-			-- Top-left.
-			if notTopBorder and notLeftBorder then
-				-- Prevents the path from going diagonally through two walls.
-				if not (neighborTopIsWall and neighborLeftIsWall) or self.movingThroughDiagonalWalls then
-					self.neighborNodes[#self.neighborNodes + 1] = nodes[self.pos.x - 1][self.pos.y - 1]
-				end
-			end
-
-			-- Bottom-left.
-			if notBottomBorder and notLeftBorder then
-				-- Prevents the path from going diagonally through two walls.
-				if not (neighborBottomIsWall and neighborLeftIsWall) or self.movingThroughDiagonalWalls then
-					self.neighborNodes[#self.neighborNodes + 1] = nodes[self.pos.x - 1][self.pos.y + 1]
-				end
-			end
-
-			-- Bottom-right.
-			if notBottomBorder and notRightBorder then
-				-- Prevents the path from going diagonally through two walls.
-				if not (neighborBottomIsWall and neighborRightIsWall) or self.movingThroughDiagonalWalls then
-					self.neighborNodes[#self.neighborNodes + 1] = nodes[self.pos.x + 1][self.pos.y + 1]
-				end
-			end
-
-			-- Top-right.
-			if notTopBorder and notRightBorder then
-				-- Prevents the path from going diagonally through two walls.
-				if not (neighborTopIsWall and neighborRightIsWall) or self.movingThroughDiagonalWalls then
-					self.neighborNodes[#self.neighborNodes + 1] = nodes[self.pos.x + 1][self.pos.y - 1]
-				end
-			end
-		end
-	end
-
+ 
+    new = function(self, x, y, diagonalMoving, movingThroughDiagonalWalls)
+        local startingValues = {
+            pos = vector.new(x, y),
+            diagonalMoving = diagonalMoving,
+            movingThroughDiagonalWalls = movingThroughDiagonalWalls,
+ 
+            neighborNodes = {},
+            parentNode = {},
+            f = {}, -- g + h.
+            g = {}, -- Cost from the start.
+            h = {} -- Minimum cost to the end.
+        }
+        setmetatable(startingValues, {__index = self})
+        return startingValues
+    end,
+ 
+    setNeighborNodes = function(self)
+        local notTopBorder = self.pos.y > 1
+        local notLeftBorder = self.pos.x > 1
+        local notBottomBorder = self.pos.y < h
+        local notRightBorder = self.pos.x < w
+ 
+        -- Top.
+        if notTopBorder then
+            local neighbor = nodes[self.pos.x][self.pos.y - 1]
+            if neighbor then
+                self.neighborNodes[#self.neighborNodes + 1] = neighbor
+            end
+        end
+ 
+        -- Left.
+        if notLeftBorder then
+            local neighbor = nodes[self.pos.x - 1][self.pos.y]
+            if neighbor then
+                self.neighborNodes[#self.neighborNodes + 1] = neighbor
+            end
+        end
+ 
+        -- Bottom.
+        if notBottomBorder then
+            local neighbor = nodes[self.pos.x][self.pos.y + 1]
+            if neighbor then
+                self.neighborNodes[#self.neighborNodes + 1] = neighbor
+            end
+        end
+ 
+        -- Right.
+        if notRightBorder then
+            local neighbor = nodes[self.pos.x + 1][self.pos.y]
+            if neighbor then
+                self.neighborNodes[#self.neighborNodes + 1] = neighbor
+            end
+        end
+ 
+        if self.diagonalMoving then
+            -- Prevents the path from going diagonally through two walls.
+            local neighborTopIsWall, neighborLeftIsWall, neighborBottomIsWall, neighborRightIsWall
+ 
+            if notTopBorder then
+                neighborTopIsWall = not nodes[self.pos.x][self.pos.y - 1]
+            end
+ 
+            if notLeftBorder then
+                neighborLeftIsWall = not nodes[self.pos.x - 1][self.pos.y]
+            end
+ 
+            if notBottomBorder then
+                neighborBottomIsWall = not nodes[self.pos.x][self.pos.y + 1]
+            end
+ 
+            if notRightBorder then
+                neighborRightIsWall = not nodes[self.pos.x + 1][self.pos.y]
+            end
+ 
+ 
+            -- Top-left.
+            if notTopBorder and notLeftBorder then
+                -- Prevents the path from going diagonally through two walls.
+                if not (neighborTopIsWall and neighborLeftIsWall) or self.movingThroughDiagonalWalls then
+                    self.neighborNodes[#self.neighborNodes + 1] = nodes[self.pos.x - 1][self.pos.y - 1]
+                end
+            end
+ 
+            -- Bottom-left.
+            if notBottomBorder and notLeftBorder then
+                -- Prevents the path from going diagonally through two walls.
+                if not (neighborBottomIsWall and neighborLeftIsWall) or self.movingThroughDiagonalWalls then
+                    self.neighborNodes[#self.neighborNodes + 1] = nodes[self.pos.x - 1][self.pos.y + 1]
+                end
+            end
+ 
+            -- Bottom-right.
+            if notBottomBorder and notRightBorder then
+                -- Prevents the path from going diagonally through two walls.
+                if not (neighborBottomIsWall and neighborRightIsWall) or self.movingThroughDiagonalWalls then
+                    self.neighborNodes[#self.neighborNodes + 1] = nodes[self.pos.x + 1][self.pos.y + 1]
+                end
+            end
+ 
+            -- Top-right.
+            if notTopBorder and notRightBorder then
+                -- Prevents the path from going diagonally through two walls.
+                if not (neighborTopIsWall and neighborRightIsWall) or self.movingThroughDiagonalWalls then
+                    self.neighborNodes[#self.neighborNodes + 1] = nodes[self.pos.x + 1][self.pos.y - 1]
+                end
+            end
+        end
+    end
+ 
 }
+
+
+
+-- FUNCTIONS --------------------------------------------------------
+
+function createEntities()
+	for id = 1, entityCount do
+		local x = math.random(w)
+		local y = math.random(h)
+
+		-- Makes sure the entity doesn't spawn inside a wall.
+		while nodes[x][y] == nil do
+			x = math.random(w)
+			y = math.random(h)
+		end
+		
+		-- !!! This code should also check if the entity doesn't spawn inside another entity !!!
+		entities[id] = Entity:new(id, x, y, entityIcon, entityPathIcon, noOccupyingTargetNode)
+	end
+end

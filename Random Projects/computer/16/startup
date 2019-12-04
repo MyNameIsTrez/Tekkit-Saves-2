@@ -1,0 +1,6 @@
+--hallo = {"a", "b", "c"}
+hallo = "asd"
+
+for i = 1, #hallo do
+  print(hallo:sub(i, i))
+end
