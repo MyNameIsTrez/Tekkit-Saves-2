@@ -18,7 +18,7 @@
 function importAPIs()
 	-- Makes a table of the IDs and names of the APIs to load.
 	local APIs = {
-		-- {id = "BEmdjsuJ", name = "bezier"},
+		{id = "BEmdjsuJ", name = "bezier"},
 		{id = "drESpUSP", name = "shape"},
 		{id = "p9tSSWcB", name = "cf"}
 	}
@@ -51,129 +51,13 @@ local anchorPoints = {
 
 -- UNEDITABLE VARIABLES --------------------------------------------------------
 
-w, h = term.getSize()
+local w, h = term.getSize()
 w = w - 1
 
 
 
 -- FUNCTIONS --------------------------------------------------------
 
-function createRandomAnchorPoints(anchorCount, w, h)
-    local anchorPoints = {}
-    for i = 1, anchorCount do
-        anchorPoints[i] = vector.new(math.random(w), math.random(h))
-    end
-    return anchorPoints
-end
-
-function bezierShow(points, lineIcon)
-    for i = 1, #points - 1 do
-        shape.line(points[i], points[i + 1], lineIcon)
-    end
-end
-
-function getPointBetween(p1, p2, t)
-    local diff = p2:sub(p1)
-    local offset = diff:mul(t)
-    return p1:add(offset)
-end
-
-function getPointsBetween(points, t)
-    local newPoints = {}
-    for i = 1, #points - 1 do
-        newPoints[i] = getPointBetween(points[i], points[i + 1], t)
-    end
-    return newPoints
-end
-
-function showPoint(point, icon)
-    shape.point(point, icon)
-end
-
-function getBezierPoints(args)
-    local turboSpeed = args.turboSpeed
-    local sleepTime = args.sleepTime
-    local anchorPoints = args.anchorPoints
-    local pointAmount = args.pointAmount
-    local showCurvePointsBool = args.showCurvePointsBool
-    local pointIcon = args.pointIcon
-    local t = args.t
-    local tStep = args.tStep
-
-    local points
-    local curvePoints = {}
-    local counter = 1
-
-    while counter <= pointAmount do
-        counter = counter + 1
-
-        points = anchorPoints -- Reset the points table to anchorPoints.
-
-        -- Get a curve point and put it in curvePoints.
-        while #points > 1 do
-            points = getPointsBetween(points, t)
-        end
-
-        local curvePoint = points[1]:round() -- Rounding the points, because they get floored when shown.
-        curvePoints[#curvePoints + 1] = curvePoint
-
-        if showCurvePointsBool then
-            showPoint(curvePoint, pointIcon)
-        end
-
-        t = t + tStep
-		
-		if turboSpeed then
-			cf.yield()
-		else
-			sleep(sleepTime)
-		end
-    end
-    return curvePoints
-end
-
-function showAnchorPoints(anchorPoints, anchorIcon)
-    for i = 1, #anchorPoints do
-        showPoint(anchorPoints[i], anchorIcon)
-    end
-end
-
-function bezier(args)
-    local turboSpeed = args.turbospeed or true -- If turboSpeed is true, sleepTime is ignored. Default is false.
-    local sleepTime = args.sleeptime or 0.2 -- 0 is the same as 0.05, which is the minimum. Default is 0.15.
-    local anchorCount = args.anchorcount or 3
-    local pointAmount = args.pointAmount or 10
-    
-    local showBezierBool = args.showBezierBool or false
-    local showAnchorPointsBool = args.showAnchorPointsBool or true
-    local showCurvePointsBool = args.showCurvePointsBool or true
-    
-    local anchorIcon = args.anchorIcon or "a" -- Default is "a".
-    local pointIcon = args.pointIcon or "p" -- Default is "p".
-    local lineIcon = args.lineIcon or "*" -- Default is "*".
-
-    local t = 0
-    local tStep = 1/(pointAmount - 1)
-
-    local anchorPoints = givenAnchorPoints or createRandomAnchorPoints(anchorCount, w, h)
-    if showAnchorPointsBool then
-        showAnchorPoints(anchorPoints, anchorIcon)
-    end
-
-    local points = getBezierPoints({
-        turboSpeed = turboSpeed,
-        sleepTime = sleepTime,
-        anchorPoints = anchorPoints,
-        pointAmount = pointAmount,
-        showCurvePointsBool = showCurvePointsBool,
-        pointIcon = pointIcon,
-        t = t,
-        tStep = tStep
-    })
-    if showBezierBool then
-        bezierShow(points, lineIcon)
-    end
-end
 
 
 -- CODE EXECUTION --------------------------------------------------------
@@ -185,11 +69,20 @@ end
 
 
 function main()
-    bezier({
-        w = w,
-        h = h
-    })
-    term.setCursorPos(w, h)
+	local points = bezier.bezierCurve({
+		-- anchorPoints = anchorPoints,
+		minY = 5,
+		maxX = w,
+		maxY = h,
+		getAnchorPointsBool = true,
+		getCurvePointsBool = true,
+		-- anchorPointCount = 10,
+		-- showBezierCurveBool = false,
+		-- showAnchorPointsBool = true,
+		-- showCurvePointsBool = true,
+	})
+	term.setCursorPos(1, 1)
+	print(textutils.serialize(points))
 end
 
 setup()
