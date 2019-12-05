@@ -20,7 +20,8 @@ function importAPIs()
 	local APIs = {
 		{id = "BEmdjsuJ", name = "bezier"},
 		{id = "drESpUSP", name = "shape"},
-		{id = "p9tSSWcB", name = "cf"}
+        {id = "p9tSSWcB", name = "cf"},
+        {id = "sSjBVjgc", name = "keys"},
 	}
 
 	for _, API in pairs(APIs) do
@@ -42,9 +43,12 @@ end
 -- EDITABLE VARIABLES --------------------------------------------------------
 
 local anchorPoints = {
-    vector.new(5, 5),
-    vector.new(15, 35),
-    vector.new(55, 45)
+    vector.new(10, 10),
+    vector.new(90, 10),
+    vector.new(50, 50),
+    vector.new(90, 50),
+    -- vector.new(130, 10),
+    -- vector.new(160, 95),
 }
 
 
@@ -69,21 +73,36 @@ end
 
 
 function main()
-	local points = bezier.bezierCurve({
-		-- anchorPoints = anchorPoints,
-		minY = 5,
-		maxX = w,
-		maxY = h,
-		getAnchorPointsBool = true,
-		getCurvePointsBool = true,
-		-- anchorPointCount = 10,
-		-- showBezierCurveBool = false,
-		-- showAnchorPointsBool = true,
-		-- showCurvePointsBool = true,
-	})
-	term.setCursorPos(1, 1)
-	print(textutils.serialize(points))
+    while true do
+        local points = bezier.bezierCurve({
+            -- anchorPoints = anchorPoints,
+            minY = 5,
+            maxX = w,
+            maxY = h,
+            -- getAnchorPointsBool = true,
+            -- getCurvePointsBool = true,
+            -- anchorPointCount = 10,
+            -- showBezierCurveBool = false,
+            -- showAnchorPointsBool = true,
+            -- showCurvePointsBool = true,
+        })
+        sleep(1)
+    end
+    
+    -- term.setCursorPos(1, 1)
+	-- write(textutils.serialize(points))
+end
+
+function onKey(key)
+    term.setCursorPos(1, 1)
+    write("     ")
+    term.setCursorPos(1, 1)
+    if (key == "w") then
+        write("w")
+    else
+        write("not w")
+    end
 end
 
 setup()
-main()
+keys.startKeyHandling(main, onKey)
