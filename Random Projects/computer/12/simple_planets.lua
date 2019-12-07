@@ -16,6 +16,15 @@ function loadAPIs()
 end
 loadAPIs()
 
+
+
+-- EDITABLE VARIABLES --------------------------------------------------------
+local leverSide = "right"
+
+
+
+-- CLASSES --------------------------------------------------------
+
 Particle = {
 	new = function(self, x, y, w, h, velMult)
 		local starting_values = {
@@ -89,6 +98,10 @@ Attractor = {
 	end
 }
 
+
+
+-- FUNCTIONS --------------------------------------------------------
+
 function createParticles(n, x, y, w, h, velMult)
 	local particles = {}
 	for id = 1, n do
@@ -104,33 +117,47 @@ function createAttractors(n, w, h)
 	return attractors
 end
 
+
+
+-- CODE EXECUTION --------------------------------------------------------
+
 function main()
-	local G = 1
-	local constraint = 0.1
-	local fps = 75
-	local particleCount = 100
-	local velMult = 1
-
-	local w, h = term.getSize()
-	local dt = 1/fps
-	local particles = createParticles(particleCount, w/4, h/4, w, h, velMult)
-	-- local particles = createParticles(particleCount, w-1, h-1, w, h, velMult)
-	local attractors = createAttractors(5, w/2, h/2)
-
 	while true do
-		cf.clearTerm()
-		for i = 1, #particles do
-			particle = particles[i]
-			for j = 1, #attractors do
-				attractor = attractors[j]
-				particle:attracted(attractor, G, constraint)
+		if not rs.getInput(leverSide) then
+			local G = 1
+			local constraint = 0.1
+			local fps = 75
+			local particleCount = 100
+			local velMult = 1
+
+			local w, h = term.getSize()
+			local dt = 1/fps
+			local particles = createParticles(particleCount, w/4, h/4, w, h, velMult)
+			-- local particles = createParticles(particleCount, w-1, h-1, w, h, velMult)
+			local attractors = createAttractors(5, w/2, h/2)
+
+			while true do
+				if not rs.getInput(leverSide) then
+					cf.clearTerm()
+					for i = 1, #particles do
+						particle = particles[i]
+						for j = 1, #attractors do
+							attractor = attractors[j]
+							particle:attracted(attractor, G, constraint)
+						end
+						particle:update()
+						particle:show()
+						particle.acc = particle.acc:mul(0) -- reset the acceleration
+					end
+					attractors[1]:show()
+					sleep(dt)
+				else
+					sleep(1)
+				end
 			end
-			particle:update()
-			particle:show()
-			particle.acc = particle.acc:mul(0) -- reset the acceleration
+		else
+			sleep(1)
 		end
-		attractors[1]:show()
-		sleep(dt)
 	end
 end
 main()

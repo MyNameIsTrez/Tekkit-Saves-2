@@ -61,6 +61,8 @@ entityPathIcon = "." -- Default is ".".
 wallIcon = "O" -- Default is "O".
 closedSetIcon = "|" -- Default is "|".
 
+local leverSide = "right"
+
 
 
 -- UNEDITABLE VARIABLES --------------------------------------------------------
@@ -133,30 +135,38 @@ end
 -- CODE EXECUTION --------------------------------------------------------
 
 function setup()
-	importAPIs()
-	shell.run("apis/aStar") -- No clue why this needs to be here when os.loadAPI() has already been called.
+	while true do
+		if not rs.getInput(leverSide) then
+			importAPIs()
+			shell.run("apis/aStar") -- No clue why this needs to be here when os.loadAPI() has already been called.
 
-	term.clear()
-	
-	createNodes()
+			term.clear()
+			
+			createNodes()
 
-	createEntities()
-	entities[1].targetEntityId = 2
+			createEntities()
+			entities[1].targetEntityId = 2
 
-	-- debugShowNodesNeighbors()
+			-- debugShowNodesNeighbors()
 
-	for _, entity in pairs(entities) do
-		entity:show()
-	end
-	
-	-- Prevents the enemy:pathfind() from being one move behind entity.move() in main().
-	for _, entity in pairs(entities) do
-		if entity.targetEntityId then
-			entity:pathfind()
-			entity:setPath()
-			if showPath then
-				entity:showPath()
+			for _, entity in pairs(entities) do
+				entity:show()
 			end
+			
+			-- Prevents the enemy:pathfind() from being one move behind entity.move() in main().
+			for _, entity in pairs(entities) do
+				if entity.targetEntityId then
+					entity:pathfind()
+					entity:setPath()
+					if showPath then
+						entity:showPath()
+					end
+				end
+			end
+
+			break
+		else
+			sleep(1)
 		end
 	end
 end
@@ -168,18 +178,24 @@ function main()
 	end
 
 	while true do
-		for _, entity in pairs(entities) do
-			if entity.targetEntityId then
-				reachedTarget(entity)
-				entity:move()
+		print(tostring(not rs.getInput(leverSide)))
+		sleep(5)
+		if not rs.getInput(leverSide) then
+			for _, entity in pairs(entities) do
+				if entity.targetEntityId then
+					reachedTarget(entity)
+					entity:move()
+				end
+				entity:show()
 			end
-			entity:show()
-		end
-		
-		if turboSpeed then
-			cf.yield()
+			
+			if turboSpeed then
+				cf.yield()
+			else
+				sleep(sleepTime)
+			end
 		else
-			sleep(sleepTime)
+			sleep(1)
 		end
 	end
 end

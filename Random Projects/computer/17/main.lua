@@ -34,7 +34,7 @@ end
 -- EDITABLE VARIABLES --------------------------------------------------------
 local maxIterations = 100
 local zoomX = -1.740062382579339905220844167065825638296641720436171866879862418461182919644153056054840718339483225743450008259172138785492983677893366503417299549623738838303346465461290768441055486136870719850559269507357211790243666940134793753068611574745943820712885258222629105433648695946003865
-
+local leverSide = "right"
 
 -- UNEDITABLE VARIABLES --------------------------------------------------------
 
@@ -116,9 +116,13 @@ end
 function main()
 	local zoom = 3
 	while true do
-		mandelbrot(width, height, maxIterations, zoom)
-		zoom = zoom * 0.99
-		cf.yield()
+		if not rs.getInput(leverSide) then
+			mandelbrot(width, height, maxIterations, zoom)
+			zoom = zoom * 0.99
+			cf.yield()
+		else
+			sleep(1)
+		end
 	end
 	term.setCursorPos(width, height)
 end
