@@ -1,7 +1,6 @@
 -- README --------------------------------------------------------
 
 -- The default terminal ratio is 25:9, which is absolutely tiny.
-
 -- To get the terminal to fill the entire screen, use these widths and heights:
 	-- My 31.5" monitor:
 		-- 426:153 in windowed mode.
