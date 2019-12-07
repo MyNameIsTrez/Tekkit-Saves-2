@@ -1,3 +1,10 @@
+-- README --------------------------------------------------------
+-- Collection of LUA functions I commonly use.
+
+
+ 
+-- FUNCTIONS --------------------------------------------------------
+
 function clamp(n, min, max)
 	if (n < min) then
 		return min
@@ -59,8 +66,10 @@ end
 
 function tableRemove(t, e)
 	for i = 1, #t do
-		print(t[i])
-		if t[i] == e then table.remove(t, i) end
+		if t[i] == e then
+			table.remove(t, i)
+			break -- Breaking is necessary, because the loop's #t max iterations has changed because t changed.
+		end
 	end
 	return t
 end

@@ -16,7 +16,6 @@
 -- IMPORTING --------------------------------------------------------
 
 function importAPIs()
-	-- Makes a table of the IDs and names of the APIs to load.
 	local APIs = {
 		{id = "BEmdjsuJ", name = "bezier"},
 		{id = "drESpUSP", name = "shape"},
@@ -24,15 +23,10 @@ function importAPIs()
         {id = "sSjBVjgc", name = "keys"},
 	}
 
+	fs.delete("apis") -- Deletes folder.
+	fs.makeDir("apis") -- Creates folder.
+
 	for _, API in pairs(APIs) do
-		-- Deletes the old API file, to replace it with the more up-to-date version of the API.
-		-- This call doesn't cause any problems when the API didn't exist on the computer.
-		fs.delete("apis/"..API.name)
-
-		-- Creates a folder, causes no problem if the folder already exists.
-		fs.makeDir("apis")
-
-		-- Saving as "apis/"..API.name works, because the API is still referred to without the "apis/" part in the code.
 		shell.run("pastebin", "get", API.id, "apis/"..API.name)
 		os.loadAPI("apis/"..API.name)
 	end
@@ -54,6 +48,7 @@ local anchorPoints = {
 local grabKey = "space"
 local newAnchorKey = "n"
 local removeAnchorKey = "backspace"
+local saveAnchorsKey = "i"
 
 
 
@@ -64,6 +59,7 @@ w = w - 1
 local cursor = vector.new(1, 1)
 local grabbedAnchor
 local key
+local anchorPointsData
 
 
 
@@ -109,8 +105,7 @@ function main()
 	while true do
 		term.clear()
 		
-		term.setCursorPos(cursor.x, cursor.y)
-		write(" ")
+		shape.point(vector.new(cursor.x, cursor.y), " ")
 		
 		if (key == "w" or key == "up") and cursor.y > 1 then
 			cursor.y = cursor.y - 1
@@ -146,18 +141,39 @@ function main()
 			if grabbedAnchor then
 				grabbedAnchor = nil
 			end
+		elseif key == saveAnchorsKey then
+			if anchorPointsData then
+				-- Creates folder if it doesn't exist already.
+				local saves
+				if not fs.exists("saves") then
+					fs.makeDir("saves")
+				else
+					saves = fs.list("saves")
+				end
+
+				-- Creates a save file in write mode.
+				local save
+				if saves then
+					save = fs.open("saves/"..#saves + 1, "w")
+				else
+					save = fs.open("saves/"..1, "w")
+				end
+
+				local string = textutils.serialize(anchorPointsData)
+				save.write(string)
+				save.close()
+			end
 		end
 		
-		term.setCursorPos(cursor.x, cursor.y)
-		write("x")
+		shape.point(vector.new(cursor.x, cursor.y), "x")
 
 		if #anchorPoints > 0 then -- Prevents the bezier API from creating random anchor points.
-			bezier.bezierCurve({
+			anchorPointsData = bezier.bezierCurve({
 				anchorPoints = anchorPoints,
 				minY = 5,
 				maxX = w,
 				maxY = h,
-				-- getAnchorPointsBool = true,
+				getAnchorPointsBool = true,
 				-- getCurvePointsBool = true,
 				-- anchorPointCount = 10,
 				-- showBezierCurveBool = false,
