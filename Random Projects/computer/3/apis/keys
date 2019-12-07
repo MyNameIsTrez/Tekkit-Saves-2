@@ -68,7 +68,6 @@ function getName( _nKey )
 end
 
 function handleKeys()
-	local prevEvent
     while true do
         local event, keyNum = os.pullEvent()
 		if (event == "key") then
@@ -78,6 +77,6 @@ function handleKeys()
 end
 
 function startKeyHandling(fn, onKeyFn)
-	onKey = onKeyFn
+	onKey = onKeyFn -- You can't use onKeyFn = onKeyFn!
 	parallel.waitForAny(fn, handleKeys)
 end
