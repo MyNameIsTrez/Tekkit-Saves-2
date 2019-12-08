@@ -44,6 +44,7 @@ width = width - 1
 
 
 -- FUNCTIONS --------------------------------------------------------
+
 function mandelbrot(width, height, maxIterations, zoom)
 	for x = 1, width do
 		for y = 1, height do

@@ -57,6 +57,7 @@ local savesFolder = "saves"
 
 local w, h = term.getSize()
 w = w - 1
+
 local cursor = vector.new(1, 1)
 local grabbedAnchor
 local key
@@ -65,6 +66,7 @@ local anchorPointsData
 
 
 -- FUNCTIONS --------------------------------------------------------
+
 function cursorGrabAnchor()
 	-- Go through each anchor point.
 	for i = 1, #anchorPoints do
@@ -100,7 +102,6 @@ end
 function setup()
 	importAPIs()
 end
-
 
 function main()
 	while true do
