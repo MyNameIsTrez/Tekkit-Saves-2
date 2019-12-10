@@ -72,7 +72,7 @@ local function main()
 			end
 			cf.yield()
 		end
-		
+
 		-- for n = 0, 24 do
 		-- 	print(dithering.getClosestChar(n/24))
 		-- end
