@@ -14,11 +14,11 @@
 
 -- IMPORTING --------------------------------------------------------
 
-function importAPIs()
+local function importAPIs()
 	local APIs = {
 		{id = "cegB4RwE", name = "dithering"},
+        {id = "p9tSSWcB", name = "cf"},
 		-- {id = "drESpUSP", name = "shape"},
-        -- {id = "p9tSSWcB", name = "cf"},
 	}
 
 	fs.delete("apis") -- Deletes folder.
@@ -38,23 +38,46 @@ local leverSide = "right"
 
 local width, height = term.getSize()
 width = width - 1
+local maxDist = math.sqrt((width / 2)^2 + (height / 2)^2)
 
 -- FUNCTIONS --------------------------------------------------------
 
+local function getDistToCenter(x, y)
+	local a = x - width / 2
+	local b = y - height / 2
+	return math.sqrt(a^2 + b^2)
+end
+
+local function mapDist(dist)
+	return dist / maxDist
+end
+
 -- CODE EXECUTION --------------------------------------------------------
 
-function setup()
+local function setup()
 	importAPIs()
 	term.clear()
 	term.setCursorPos(1, 1)
 end
 
-function main()
+local function main()
 	if not rs.getInput(leverSide) then
-		for n = 0, 24 do
-			print(dithering.getClosestChar(n/24))
+		for x = 1, width do
+			for y = 1, height do
+				local dist = getDistToCenter(x, y)
+				local mappedDist = mapDist(dist)
+				local char = dithering.getClosestChar(mappedDist)
+				term.setCursorPos(x, y)
+				write(char)
+			end
+			cf.yield()
 		end
+		
+		-- for n = 0, 24 do
+		-- 	print(dithering.getClosestChar(n/24))
+		-- end
 	end
+	term.setCursorPos(width, height)
 end
 
 setup()
