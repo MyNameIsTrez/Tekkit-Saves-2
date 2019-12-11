@@ -18,7 +18,7 @@ local function importAPIs()
 	local APIs = {
 		{id = "cegB4RwE", name = "dithering"},
         {id = "p9tSSWcB", name = "cf"},
-		-- {id = "drESpUSP", name = "shape"},
+        {id = "QERUp0Fc", name = "LibDeflate"},
 	}
 
 	fs.delete("apis") -- Deletes folder.
@@ -30,26 +30,28 @@ local function importAPIs()
 	end
 end
 
-local function importFrames()
-	local APIs = {
-		{id = "cegB4RwE", name = "dithering"},
-        {id = "p9tSSWcB", name = "cf"},
-		-- {id = "drESpUSP", name = "shape"},
-	}
+-- local function importFrames()
+-- 	local APIs = {
+-- 		{id = "cegB4RwE", name = "dithering"},
+--         {id = "p9tSSWcB", name = "cf"},
+-- 		-- {id = "drESpUSP", name = "shape"},
+-- 	}
 
-	fs.delete("apis") -- Deletes folder.
-	fs.makeDir("apis") -- Creates folder.
+-- 	fs.delete("apis") -- Deletes folder.
+-- 	fs.makeDir("apis") -- Creates folder.
 
-	for _, API in pairs(APIs) do
-		shell.run("pastebin", "get", API.id, "apis/"..API.name)
-		os.loadAPI("apis/"..API.name)
-	end
-end
+-- 	for _, API in pairs(APIs) do
+-- 		shell.run("pastebin", "get", API.id, "apis/"..API.name)
+-- 		os.loadAPI("apis/"..API.name)
+-- 	end
+-- end
 
 -- EDITABLE VARIABLES --------------------------------------------------------
 
-local fileName = "police"
+local fileName = "banana lol"
 local loop = true
+
+local decompression = false
 
 local leverSide = "right"
 
@@ -72,6 +74,11 @@ local function showImage(img)
         for y = 1, imgHeight do
             local brightness = img[x][y]
             if brightness ~= -1 then
+                if brightness < 0 or brightness > 1 then
+                    term.setCursorPos(1, height - 5)
+                    print("brightness: "..brightness)
+                    sleep(3)
+                end
                 local char = dithering.getClosestChar(brightness)
 
                 term.setCursorPos(x, y)
@@ -93,8 +100,25 @@ end
 
 local function getSelectedFrames()
     local file = fs.open("input/"..fileName..".txt", "r")
-    local string = file.readAll()
+    local stringFile = file.readAll()
     file.close()
+
+    local string
+    if decompression then
+        shell.run("apis/LibDeflate")
+        print("a")
+        for index, value in pairs(LibDeflate) do
+            print(index, ", ", value)
+        end
+        print("b")
+        sleep(5)
+        string = LibDeflate:DecompressDeflate(stringFile)
+        print(string)
+        sleep(5)
+    else
+        string = stringFile
+    end
+
     frames = textutils.unserialize(string)
 end
 
@@ -102,7 +126,7 @@ end
 
 local function setup()
     importAPIs()
-    importFrames()
+    -- importFrames()
     getSelectedFrames()
 
 	term.clear()
