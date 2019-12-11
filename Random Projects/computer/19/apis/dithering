@@ -2,6 +2,8 @@
 
 -- This file contains two public tables, which contain each character in Tekkit Classic's 1.33 ComputerCraft character set. The tables also contain the number of cyan 3x3 pixels they are drawn with, which I dubbed 'blocks', for each character.
 
+-- Artifact removal inspiration: https://news.ycombinator.com/item?id=15546769
+
 -- UNEDITABLE VARIABLES --------------------------------------------------------
 
 local charsSorted = {

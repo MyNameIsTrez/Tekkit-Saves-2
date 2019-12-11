@@ -33,51 +33,71 @@ end
 -- EDITABLE VARIABLES --------------------------------------------------------
 
 local leverSide = "right"
+local folder = "police"
 
 -- UNEDITABLE VARIABLES --------------------------------------------------------
 
 local width, height = term.getSize()
 width = width - 1
-local maxDist = math.sqrt((width / 2)^2 + (height / 2)^2)
+
+local files = {}
+
+local previousClock = 0
 
 -- FUNCTIONS --------------------------------------------------------
 
-local function getDistToCenter(x, y)
-	local a = x - width / 2
-	local b = y - height / 2
-	return math.sqrt(a^2 + b^2)
+local function showImage(img)
+    local imgWidth = #img
+    local imgHeight = #img[1]
+
+    for x = 1, imgWidth do
+        for y = 1, imgHeight do
+            local brightness = img[x][y]
+            if brightness ~= -1 then
+                local char = dithering.getClosestChar(brightness)
+
+                term.setCursorPos(x, y)
+                write(char)
+            end
+        end
+    end
+    
+    term.setCursorPos(width, height)
 end
 
-local function mapDist(dist)
-	return dist / maxDist
+function tryYield()
+    local currentClock = os.clock()
+    if currentClock - previousClock > 4 then
+        previousClock = currentClock
+        cf.yield()
+    end
 end
 
 -- CODE EXECUTION --------------------------------------------------------
 
 local function setup()
-	importAPIs()
+    importAPIs()
 	term.clear()
-	term.setCursorPos(1, 1)
+    term.setCursorPos(1, 1)
+    
+    local filesInFolder = fs.list(folder)
+    for i = 1, #filesInFolder do
+        local file = fs.open(folder.."/"..i..".txt", "r")
+        -- print(files)
+        files[#files + 1] = textutils.unserialize(file.readAll())
+        file.close()
+    end
 end
 
 local function main()
-	if not rs.getInput(leverSide) then
-		for x = 1, width do
-			for y = 1, height do
-				local dist = getDistToCenter(x, y)
-				local mappedDist = mapDist(dist)
-				local char = dithering.getClosestChar(mappedDist)
-				term.setCursorPos(x, y)
-				write(char)
-			end
-			cf.yield()
-		end
-
-		-- for n = 0, 24 do
-		-- 	print(dithering.getClosestChar(n/24))
-		-- end
+    if not rs.getInput(leverSide) then
+        while true do
+            for _, file in ipairs(files) do
+                showImage(file)
+                tryYield()
+            end
+        end
 	end
-	term.setCursorPos(width, height)
 end
 
 setup()

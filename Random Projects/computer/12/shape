@@ -12,8 +12,7 @@ end
 
 function circle(center, radius)
   -- Using radians. -------------------------------------------------------
-  -- Because the text height is about 1.5 times its width,
-  -- we need this multiplier to make a circle shape.
+  -- Because the text size is 6x9 (multiplied by the GUI Scale), we need this multiplier to make a circular shape.
   local x_fix = 1.5
 
   for i = 0, 2 * math.pi, math.pi / 180 do
