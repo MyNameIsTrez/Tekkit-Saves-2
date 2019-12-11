@@ -30,17 +30,35 @@ local function importAPIs()
 	end
 end
 
+local function importFrames()
+	local APIs = {
+		{id = "cegB4RwE", name = "dithering"},
+        {id = "p9tSSWcB", name = "cf"},
+		-- {id = "drESpUSP", name = "shape"},
+	}
+
+	fs.delete("apis") -- Deletes folder.
+	fs.makeDir("apis") -- Creates folder.
+
+	for _, API in pairs(APIs) do
+		shell.run("pastebin", "get", API.id, "apis/"..API.name)
+		os.loadAPI("apis/"..API.name)
+	end
+end
+
 -- EDITABLE VARIABLES --------------------------------------------------------
 
+local fileName = "police"
+local loop = true
+
 local leverSide = "right"
-local folder = "police"
 
 -- UNEDITABLE VARIABLES --------------------------------------------------------
 
 local width, height = term.getSize()
 width = width - 1
 
-local files = {}
+local frames
 
 local previousClock = 0
 
@@ -65,7 +83,7 @@ local function showImage(img)
     term.setCursorPos(width, height)
 end
 
-function tryYield()
+local function tryYield()
     local currentClock = os.clock()
     if currentClock - previousClock > 4 then
         previousClock = currentClock
@@ -73,29 +91,47 @@ function tryYield()
     end
 end
 
+local function getSelectedFrames()
+    local file = fs.open("input/"..fileName..".txt", "r")
+    local string = file.readAll()
+    file.close()
+    frames = textutils.unserialize(string)
+end
+
 -- CODE EXECUTION --------------------------------------------------------
 
 local function setup()
     importAPIs()
+    importFrames()
+    getSelectedFrames()
+
 	term.clear()
     term.setCursorPos(1, 1)
-    
-    local filesInFolder = fs.list(folder)
-    for i = 1, #filesInFolder do
-        local file = fs.open(folder.."/"..i..".txt", "r")
-        -- print(files)
-        files[#files + 1] = textutils.unserialize(file.readAll())
-        file.close()
-    end
 end
 
 local function main()
     if not rs.getInput(leverSide) then
-        while true do
-            for _, file in ipairs(files) do
-                showImage(file)
-                tryYield()
+        if #frames > 1 then
+            if loop then
+                while true do
+                    for frameIndex = 1, #frames do
+                        frame = frames[frameIndex]
+                        showImage(frame)
+                        tryYield()
+                    end
+                end
+            else
+                for frameIndex = 1, #frames do
+                    frame = frames[frameIndex]
+                    showImage(frame)
+                    tryYield()
+                end
+                term.setCursorPos(width, height)
             end
+        else
+            frame = frames[1]
+            showImage(frame)
+            term.setCursorPos(width, height)
         end
 	end
 end
