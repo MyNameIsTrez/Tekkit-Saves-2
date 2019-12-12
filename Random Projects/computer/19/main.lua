@@ -16,9 +16,8 @@
 
 local function importAPIs()
 	local APIs = {
-		{id = "cegB4RwE", name = "dithering"},
         {id = "p9tSSWcB", name = "cf"},
-        {id = "QERUp0Fc", name = "LibDeflate"},
+        -- {id = "QERUp0Fc", name = "LibDeflate"},
 	}
 
 	fs.delete("apis") -- Deletes folder.
@@ -30,20 +29,7 @@ local function importAPIs()
 	end
 end
 
--- local function importFrames()
--- 	local APIs = {
--- 		{id = "cegB4RwE", name = "dithering"},
---         {id = "p9tSSWcB", name = "cf"},
--- 		-- {id = "drESpUSP", name = "shape"},
--- 	}
-
--- 	fs.delete("apis") -- Deletes folder.
--- 	fs.makeDir("apis") -- Creates folder.
-
--- 	for _, API in pairs(APIs) do
--- 		shell.run("pastebin", "get", API.id, "apis/"..API.name)
--- 		os.loadAPI("apis/"..API.name)
--- 	end
+-- local function importAnimation()
 -- end
 
 -- EDITABLE VARIABLES --------------------------------------------------------
@@ -55,39 +41,75 @@ local decompression = false
 
 local leverSide = "right"
 
+local slow = true
+local slowTime = 0.2
+
 -- UNEDITABLE VARIABLES --------------------------------------------------------
 
 local width, height = term.getSize()
 width = width - 1
 
-local frames
+local frameWidth
+local frameHeight
+local frameCount
+local initialFrameString
+local optimizedFramesString
+local initialFrame
+local optimizedFrames
 
 local previousClock = 0
 
 -- FUNCTIONS --------------------------------------------------------
 
-local function showImage(img)
-    local imgWidth = #img
-    local imgHeight = #img[1]
+local function getSelectedAnimationData()
+    local file = fs.open("input/"..fileName..".txt", "r")
+    local string = file.readAll()
+    file.close()
 
-    for x = 1, imgWidth do
-        for y = 1, imgHeight do
-            local brightness = img[x][y]
-            if brightness ~= -1 then
-                if brightness < 0 or brightness > 1 then
-                    term.setCursorPos(1, height - 5)
-                    print("brightness: "..brightness)
-                    sleep(3)
-                end
-                local char = dithering.getClosestChar(brightness)
+    tab = textutils.unserialize(string)
 
+    frameWidth = tab.width
+    frameHeight = tab.height
+    frameCount = tab.frame_count
+    initialFrameString = tab.initial_frame
+    optimizedFramesString = tab.optimized_frames
+end
+
+local function convertDataToFrames()
+    initialFrame = {}
+    for x = 1, frameWidth do
+        table.insert(initialFrame, {})
+        for y = 1, frameHeight do
+            local index = y + (x - 1) * frameHeight
+            local char = initialFrameString:sub(index, index)
+            initialFrame[x][y] = char
+        end
+    end
+
+    optimizedFrames = {}
+    for f = 1, frameCount do
+        table.insert(optimizedFrames, {})
+        for x = 1, frameWidth do
+            table.insert(optimizedFrames[f], {})
+            for y = 1, frameHeight do
+                local index = y + (x - 1) * frameHeight + f * frameWidth * frameHeight
+                local char = optimizedFramesString:sub(index, index)
+                optimizedFrames[f][x][y] = char
+            end
+        end
+    end
+end
+
+local function showImage(frame)
+    for x = 1, frameWidth do
+        for y = 1, frameHeight do
+            local char = frame[x][y]
+            if char ~= "t" then -- "t" is a reserved character
                 term.setCursorPos(x, y)
                 write(char)
             end
         end
     end
-    
-    term.setCursorPos(width, height)
 end
 
 local function tryYield()
@@ -98,36 +120,13 @@ local function tryYield()
     end
 end
 
-local function getSelectedFrames()
-    local file = fs.open("input/"..fileName..".txt", "r")
-    local stringFile = file.readAll()
-    file.close()
-
-    local string
-    if decompression then
-        shell.run("apis/LibDeflate")
-        print("a")
-        for index, value in pairs(LibDeflate) do
-            print(index, ", ", value)
-        end
-        print("b")
-        sleep(5)
-        string = LibDeflate:DecompressDeflate(stringFile)
-        print(string)
-        sleep(5)
-    else
-        string = stringFile
-    end
-
-    frames = textutils.unserialize(string)
-end
-
 -- CODE EXECUTION --------------------------------------------------------
 
 local function setup()
     importAPIs()
-    -- importFrames()
-    getSelectedFrames()
+    -- importAnimation()
+    getSelectedAnimationData()
+    convertDataToFrames()
 
 	term.clear()
     term.setCursorPos(1, 1)
@@ -135,25 +134,35 @@ end
 
 local function main()
     if not rs.getInput(leverSide) then
-        if #frames > 1 then
+        showImage(initialFrame)
+        tryYield()
+
+        if frameCount > 1 then
             if loop then
+                i = 0
                 while true do
-                    for frameIndex = 1, #frames do
-                        frame = frames[frameIndex]
+                    for frameIndex = 1, frameCount do
+                        frame = optimizedFrames[frameIndex]
                         showImage(frame)
                         tryYield()
+                        term.setCursorPos(1, height - 5)
+                        write(i)
+                        i = i + 1
+                        if slow then
+                            sleep(slowTime)
+                        end
                     end
                 end
             else
-                for frameIndex = 1, #frames do
-                    frame = frames[frameIndex]
+                for frameIndex = 1, frameCount do
+                    frame = optimizedFrames[frameIndex]
                     showImage(frame)
                     tryYield()
                 end
                 term.setCursorPos(width, height)
             end
         else
-            frame = frames[1]
+            frame = optimizedFrames[1]
             showImage(frame)
             term.setCursorPos(width, height)
         end
