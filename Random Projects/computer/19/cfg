@@ -1,7 +1,7 @@
 -- EDITABLE VARIABLES --------------------------------------------------------
 
-fileName = "finding dory" -- The name of the animation to load, without '.txt' at the end.
-fileFolder = "desktop inputs" -- What folder to search the fileName animation in.
+fileName = "homer bushes" -- The name of the animation to load, without '.txt' at the end.
+fileFolder = "laptop inputs" -- What folder to search the fileName animation in.
 showFrameCounter = false -- Whether the program displays the frame count.
 slow = false -- If this is true, the program sleeps by 'slowTime' seconds. If this is false, the program doesn't sleep.
 slowTime = 0.2 -- If 'slow' is set to true, this is the time slept between drawn frames in seconds.
