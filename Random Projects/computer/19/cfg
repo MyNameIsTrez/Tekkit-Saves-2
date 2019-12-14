@@ -1,6 +1,6 @@
 -- EDITABLE VARIABLES --------------------------------------------------------
 
-fileFolder = "laptop input"
+fileFolder = "desktop input"
 fileName = "finding dory"
 showFrameCounter = false
 slow = false

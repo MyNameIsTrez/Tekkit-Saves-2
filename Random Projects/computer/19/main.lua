@@ -15,7 +15,7 @@
 -- IMPORTING --------------------------------------------------------
 
 local function importConfig()
-    print(os.loadAPI("cfg"))
+    os.loadAPI("cfg")
 end
 
 local function importAPIs()
@@ -91,6 +91,14 @@ local function convertDataToFrames()
 	end
 end
 
+local function tryYield()
+	local currentClock = os.clock()
+	if currentClock - previousClock > 4 then
+		previousClock = currentClock
+		cf.yield()
+	end
+end
+
 local function showImage(frame)
 	for x = 1, frameWidth do
 		for y = 1, frameHeight do
@@ -100,14 +108,11 @@ local function showImage(frame)
 				write(char)
 			end
 		end
-	end
-end
 
-local function tryYield()
-	local currentClock = os.clock()
-	if currentClock - previousClock > 4 then
-		previousClock = currentClock
-		cf.yield()
+		-- Try to yield after every 100 vertically drawn lines.
+		if x % 100 == 0 then
+			tryYield()
+		end
 	end
 end
 
@@ -151,6 +156,7 @@ local function main()
 					for frameIndex = 1, frameCount do
 						frame = optimizedFrames[frameIndex]
 						showImage(frame)
+						
                         if cfg.showFrameCounter then
                             term.setCursorPos(1, height - 5)
                             write("frame: "..i.."/"..frameCount)
