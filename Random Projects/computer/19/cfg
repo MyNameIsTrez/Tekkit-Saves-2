@@ -1,11 +1,12 @@
 -- EDITABLE VARIABLES --------------------------------------------------------
 
-fileFolder = "desktop input"
-fileName = "finding dory"
-showFrameCounter = false
-slow = false
-slowTime = 0.2
-loop = true
+fileName = "finding dory" -- The name of the animation to load, without '.txt' at the end.
+fileFolder = "desktop input" -- What folder to search the fileName animation in.
+showFrameCounter = false -- Whether the program displays the frame count.
+slow = false -- If this is true, the program sleeps by 'slowTime' seconds. If this is false, the program doesn't sleep.
+slowTime = 0.2 -- If 'slow' is set to true, this is the time slept between drawn frames in seconds.
+loop = true -- Whether the program loops the animation. 
 
 -- Less important variables.
-leverSide = "right"
+leverSide = "right" -- Lever can be pulled to turn off the program.
+drawnColumnsYield = 100 -- Try to yield after every 100 vertically drawn lines.

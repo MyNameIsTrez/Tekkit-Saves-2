@@ -109,8 +109,7 @@ local function showImage(frame)
 			end
 		end
 
-		-- Try to yield after every 100 vertically drawn lines.
-		if x % 100 == 0 then
+		if x % cfg.drawnColumnsYield == 0 then
 			tryYield()
 		end
 	end
