@@ -53,7 +53,11 @@ local previousClock = 0
 -- FUNCTIONS --------------------------------------------------------
 
 local function getSelectedAnimationData()
-	local file = fs.open(cfg.fileFolder.."/"..cfg.fileName..".txt", "r")
+	if cfg.computerType ~= "laptop" and cfg.computerType ~= "desktop" then
+		error("You didn't enter a valid 'computerType' name in the cfg file!")
+	end
+	print("Loading animation...")
+	local file = fs.open(cfg.computerType.." inputs/"..cfg.fileName..".txt", "r")
 	local string = file.readAll()
 	file.close()
 
@@ -67,6 +71,7 @@ local function getSelectedAnimationData()
 end
 
 local function convertDataToFrames()
+	print("Converting data to the initial frame...")
 	initialFrame = {}
 	for x = 1, frameWidth do
 		table.insert(initialFrame, {})
@@ -77,6 +82,7 @@ local function convertDataToFrames()
 		end
 	end
 
+	print("Converting data to the optimized frames...")
 	optimizedFrames = {}
 	for f = 1, frameCount do
 		table.insert(optimizedFrames, {})
