@@ -14,14 +14,17 @@
 
 -- IMPORTING --------------------------------------------------------
 
+local function importConfig()
+    print(os.loadAPI("cfg"))
+end
+
 local function importAPIs()
 	local APIs = {
 		{id = "p9tSSWcB", name = "cf"},
-		-- {id = "QERUp0Fc", name = "LibDeflate"},
 	}
 
-	fs.delete("apis") -- Deletes folder.
-	fs.makeDir("apis") -- Creates folder.
+	fs.delete("apis") -- Deletes the folder, with every API file in it.
+	fs.makeDir("apis") -- Recreates the folder.
 
 	for _, API in pairs(APIs) do
 		shell.run("pastebin", "get", API.id, "apis/"..API.name)
@@ -32,19 +35,7 @@ end
 -- local function importAnimation()
 -- end
 
--- EDITABLE VARIABLES --------------------------------------------------------
-
-local fileName = "police"
-local loop = true
-
-local decompression = false
-
-local leverSide = "right"
-
-local slow = true
-local slowTime = 1
-
--- UNEDITABLE VARIABLES --------------------------------------------------------
+-- NOT USER EDITABLE VARIABLES --------------------------------------------------------
 
 local width, height = term.getSize()
 width = width - 1
@@ -62,7 +53,7 @@ local previousClock = 0
 -- FUNCTIONS --------------------------------------------------------
 
 local function getSelectedAnimationData()
-	local file = fs.open("input/"..fileName..".txt", "r")
+	local file = fs.open(cfg.fileFolder.."/"..cfg.fileName..".txt", "r")
 	local string = file.readAll()
 	file.close()
 
@@ -104,7 +95,7 @@ local function showImage(frame)
 	for x = 1, frameWidth do
 		for y = 1, frameHeight do
 			local char = frame[x][y]
-			if char ~= "t" then -- "t" is a reserved character
+			if char ~= "t" then -- "t" is a reserved character.
 				term.setCursorPos(x, y)
 				write(char)
 			end
@@ -123,6 +114,7 @@ end
 -- CODE EXECUTION --------------------------------------------------------
 
 local function setup()
+    importConfig()
 	importAPIs()
 	-- importAnimation()
 	getSelectedAnimationData()
@@ -133,35 +125,61 @@ local function setup()
 end
 
 local function main()
-	if not rs.getInput(leverSide) then
-		showImage(initialFrame)
-		term.setCursorPos(1, height - 5)
-		-- write("frame: initial frame")
-		-- tryYield()
-		-- if slow then
-		-- 	sleep(slowTime)
-		-- end
-		-- term.setCursorPos(1, height - 5)
-		-- write("                    ")
+	if not rs.getInput(cfg.leverSide) then
+        showImage(initialFrame)
+        if cfg.showFrameCounter then
+            term.setCursorPos(1, height - 5)
+            write("frame: initial frame")
+        end
+
+		tryYield()
+		if cfg.slow then
+			sleep(cfg.slowTime)
+        end
+        
+        if cfg.showFrameCounter then
+            term.setCursorPos(1, height - 5)
+            write("                    ")
+        end
 
 		if frameCount > 1 then
-			if loop then
-				while true do
-					-- i = 1
+			if cfg.loop then
+                while true do
+                    if cfg.showFrameCounter then
+                        i = 1
+                    end
 					for frameIndex = 1, frameCount do
 						frame = optimizedFrames[frameIndex]
 						showImage(frame)
-						term.setCursorPos(1, height - 5)
-						-- write("frame: "..i.."/"..frameCount)
+                        if cfg.showFrameCounter then
+                            term.setCursorPos(1, height - 5)
+                            write("frame: "..i.."/"..frameCount)
+                            i = i + 1
+                        end
+
 						tryYield()
-						-- i = i + 1
-						-- if slow then
-						-- 	sleep(slowTime)
-						-- end
+						if cfg.slow then
+							sleep(cfg.slowTime)
+						end
 					end
-					-- TEMPORARY!!!!!
-					showImage(initialFrame)
+                    -- ALL BELOW SHOULD BE TEMPORARY!!!!!
+                    -- THIS IS HERE, BECAUSE THERE ARE MANY ARTIFACTS LEFT AFTER EACH LOOP
+                    showImage(initialFrame)
+                    
+                    if cfg.showFrameCounter then
+                        term.setCursorPos(1, height - 5)
+                        write("frame: initial frame")
+                    end
+
 					tryYield()
+                    if cfg.slow then
+                        sleep(cfg.slowTime)
+                    end
+                    
+                    if cfg.showFrameCounter then
+                        term.setCursorPos(1, height - 5)
+                        write("                    ")
+                    end
 				end
 			else
 				for frameIndex = 1, frameCount do

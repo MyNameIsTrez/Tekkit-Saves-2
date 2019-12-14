@@ -1,0 +1,11 @@
+-- EDITABLE VARIABLES --------------------------------------------------------
+
+fileFolder = "laptop input"
+fileName = "finding dory"
+showFrameCounter = false
+slow = false
+slowTime = 0.2
+loop = true
+
+-- Less important variables.
+leverSide = "right"
