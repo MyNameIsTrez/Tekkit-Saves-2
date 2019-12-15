@@ -1,6 +1,6 @@
 -- EDITABLE VARIABLES --------------------------------------------------------
 
-fileName = "finding dory" -- The name of the animation to load, without '.txt' at the end.
+fileName = "never gonna give you up" -- The name of the animation to load, without '.txt' at the end.
 computerType = "desktop" -- "desktop" or "laptop".
 showFrameCounter = false -- Whether the program displays the frame count.
 slow = false -- If this is true, the program sleeps by 'slowTime' seconds. If this is false, the program doesn't sleep.

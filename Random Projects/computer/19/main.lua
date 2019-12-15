@@ -70,6 +70,14 @@ local function getSelectedAnimationData()
 	optimizedFramesString = tab.optimized_frames
 end
 
+local function tryYield()
+	local currentClock = os.clock()
+	if currentClock - previousClock > 4 then
+		previousClock = currentClock
+		cf.yield()
+	end
+end
+
 local function convertDataToFrames()
 	print("Converting data to the initial frame...")
 	initialFrame = {}
@@ -81,6 +89,7 @@ local function convertDataToFrames()
 			initialFrame[x][y] = char
 		end
 	end
+	tryYield()
 
 	print("Converting data to the optimized frames...")
 	optimizedFrames = {}
@@ -94,14 +103,7 @@ local function convertDataToFrames()
 				optimizedFrames[f][x][y] = char
 			end
 		end
-	end
-end
-
-local function tryYield()
-	local currentClock = os.clock()
-	if currentClock - previousClock > 4 then
-		previousClock = currentClock
-		cf.yield()
+		tryYield()
 	end
 end
 
@@ -125,13 +127,15 @@ end
 
 local function setup()
     importConfig()
-	importAPIs()
-	-- importAnimation()
-	getSelectedAnimationData()
-	convertDataToFrames()
+	if not rs.getInput(cfg.leverSide) then
+		importAPIs()
+		-- importAnimation()
+		getSelectedAnimationData()
+		convertDataToFrames()
 
-	term.clear()
-	term.setCursorPos(1, 1)
+		term.clear()
+		term.setCursorPos(1, 1)
+	end
 end
 
 local function main()
@@ -159,18 +163,20 @@ local function main()
                         i = 1
                     end
 					for frameIndex = 1, frameCount do
-						frame = optimizedFrames[frameIndex]
-						showImage(frame)
-						
-                        if cfg.showFrameCounter then
-                            term.setCursorPos(1, height - 5)
-                            write("frame: "..i.."/"..frameCount)
-                            i = i + 1
-                        end
+						if not rs.getInput(cfg.leverSide) then
+							frame = optimizedFrames[frameIndex]
+							showImage(frame)
+							
+							if cfg.showFrameCounter then
+								term.setCursorPos(1, height - 5)
+								write("frame: "..i.."/"..frameCount)
+								i = i + 1
+							end
 
-						tryYield()
-						if cfg.slow then
-							sleep(cfg.slowTime)
+							tryYield()
+							if cfg.slow then
+								sleep(cfg.slowTime)
+							end
 						end
 					end
                     -- ALL BELOW SHOULD BE TEMPORARY!!!!!
@@ -194,9 +200,11 @@ local function main()
 				end
 			else
 				for frameIndex = 1, frameCount do
-					frame = optimizedFrames[frameIndex]
-					showImage(frame)
-					tryYield()
+					if not rs.getInput(cfg.leverSide) then
+						frame = optimizedFrames[frameIndex]
+						showImage(frame)
+						tryYield()
+					end
 				end
 				term.setCursorPos(width, height)
 			end
