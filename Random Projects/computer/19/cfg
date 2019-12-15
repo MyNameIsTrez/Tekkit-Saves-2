@@ -1,7 +1,7 @@
 -- EDITABLE VARIABLES --------------------------------------------------------
 
-fileName = "never gonna give you up" -- The name of the animation to load, without '.txt' at the end.
-computerType = "desktop" -- "desktop" or "laptop".
+fileName = "bouncing ball" -- The name of the animation to load, without '.txt' at the end.
+computerType = "laptop" -- "desktop" or "laptop".
 showFrameCounter = false -- Whether the program displays the frame count.
 slow = false -- If this is true, the program sleeps by 'slowTime' seconds. If this is false, the program doesn't sleep.
 slowTime = 0.2 -- If 'slow' is set to true, this is the time slept between drawn frames in seconds.
