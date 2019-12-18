@@ -43,6 +43,8 @@ width = width - 1
 local frameWidth
 local frameHeight
 local frameCount
+local frameSleep
+
 local optimizedFramesString
 local optimizedFrames
 
@@ -63,7 +65,9 @@ local function getSelectedAnimationData()
 
 	frameWidth = tab.width
 	frameHeight = tab.height
-	frameCount = tab.frame_count
+    frameCount = tab.frame_count
+    frameSleep = tab.frame_sleep
+    
     optimizedFramesString = tab.optimized_frames
 end
 
@@ -95,8 +99,16 @@ local function dataToGeneratedCode()
             '")'..
             'os.queueEvent("r")\n'..
             'os.pullEvent("r")'
+
+            if cfg.frameSleeping and frameSleep ~= -1 then
+                a = a..'sleep('..tostring(frameSleep)..')'
+            end
             
             handle:write(a)
+
+            if f % cfg.drawnColumnsYield == 0 then
+                tryYield()
+            end
         end
     else
         error("couldn't create/open the generatedCode file")
