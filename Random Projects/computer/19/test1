@@ -1,0 +1,6 @@
+for x = 1, 226 do
+  for y = 1, 85 do
+    term.setCursorPos(x, y)
+    write(1)
+  end
+end

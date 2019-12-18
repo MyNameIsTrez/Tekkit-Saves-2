@@ -64,7 +64,7 @@ local function getSelectedAnimationData()
 	frameWidth = tab.width
 	frameHeight = tab.height
 	frameCount = tab.frame_count
-	optimizedFramesString = tab.optimized_frames
+    optimizedFramesString = tab.optimized_frames
 end
 
 local function tryYield()
@@ -77,14 +77,16 @@ end
 
 local function convertDataToFrames()
 	print("Converting data to the optimized frames...")
-	optimizedFrames = {}
-	for f = 1, frameCount do
+    optimizedFrames = {}
+    frameSize = frameWidth * frameHeight
+    for f = 1, frameCount do
 		table.insert(optimizedFrames, {})
 		for x = 1, frameWidth do
 			table.insert(optimizedFrames[f], {})
 			for y = 1, frameHeight do
-				local index = y + (x - 1) * frameHeight + f * frameWidth * frameHeight
-				local char = optimizedFramesString:sub(index, index)
+                -- print(y)
+				local index = y + (x - 1) * frameHeight + (f - 1) * frameSize -- (1,1), (1,2), (2,1), (2,2) etc.
+                local char = optimizedFramesString:sub(index, index)
                 if char == "t" then -- "t" is a reserved character.
                     optimizedFrames[f][x][y] = nil
                 else
@@ -94,6 +96,9 @@ local function convertDataToFrames()
 		end
 		tryYield()
 	end
+    -- print(2)
+    -- print('frame count: '..frameCount)
+    -- print(textutils.serialize(optimizedFrames))
 end
 
 local function showImage(frame)
@@ -118,12 +123,12 @@ local function setup()
     importConfig()
 	if not rs.getInput(cfg.leverSide) then
 		importAPIs()
-		-- importAnimation()
+        -- importAnimation()
 		getSelectedAnimationData()
 		convertDataToFrames()
 
-		term.clear()
-		term.setCursorPos(1, 1)
+		-- term.clear()
+		-- term.setCursorPos(1, 1)
 	end
 end
 
