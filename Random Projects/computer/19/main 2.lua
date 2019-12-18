@@ -75,46 +75,34 @@ local function tryYield()
 	end
 end
 
-local function convertDataToFrames()
+local function dataToGeneratedCode()
 	print("Converting data to the optimized frames...")
     optimizedFrames = {}
     frameSize = frameWidth * frameHeight
-    for f = 1, frameCount do
-		table.insert(optimizedFrames, {})
-		for x = 1, frameWidth do
-			table.insert(optimizedFrames[f], {})
-			for y = 1, frameHeight do
-                -- print(y)
-				local index = y + (x - 1) * frameHeight + (f - 1) * frameSize -- (1,1), (1,2), (2,1), (2,2) etc.
-                local char = optimizedFramesString:sub(index, index)
-                if char == "t" then -- "t" is a reserved character.
-                    optimizedFrames[f][x][y] = nil
-                else
-                    optimizedFrames[f][x][y] = char
-                end
-			end
-		end
-		tryYield()
-	end
-    -- print(2)
-    -- print('frame count: '..frameCount)
-    -- print(textutils.serialize(optimizedFrames))
-end
 
-local function showImage(frame)
-	for x = 1, frameWidth do
-		for y = 1, frameHeight do
-			local char = frame[x][y]
-			if char then
-				term.setCursorPos(x, y)
-				write(char)
-			end
-		end
+    local handle = io.open("generatedCode", "w")
 
-		if x % cfg.drawnColumnsYield == 0 then
-			tryYield()
-		end
-	end
+    if handle then
+        for f = 1, frameCount do
+            index1 = (f - 1) * frameSize + 1
+            index2 = f * frameSize
+            frameString = optimizedFramesString:sub(index1, index2)
+        
+            local a =
+            '    term.setCursorPos(1,1)\n'..
+            '    write("'..
+            frameString..
+            '")'..
+            'os.queueEvent("r")\n'..
+            'os.pullEvent("r")'
+            
+            handle:write(a)
+        end
+    else
+        error("couldn't create/open the generatedCode file")
+    end
+    
+    handle:close()
 end
 
 -- CODE EXECUTION --------------------------------------------------------
@@ -125,53 +113,26 @@ local function setup()
 		importAPIs()
         -- importAnimation()
 		getSelectedAnimationData()
-		convertDataToFrames()
-
-		-- term.clear()
-		-- term.setCursorPos(1, 1)
-	end
+		dataToGeneratedCode()
+		tryYield()
+		term.clear()
+		term.setCursorPos(1, 1)
+        -- sleep(2)
+    end
 end
 
 local function main()
 	if not rs.getInput(cfg.leverSide) then
-		if frameCount > 1 then
-			if cfg.loop then
-                while true do
-                    if cfg.showFrameCounter then
-                        i = 1
-                    end
-					for frameIndex = 1, frameCount do
-						if not rs.getInput(cfg.leverSide) then
-							frame = optimizedFrames[frameIndex]
-							showImage(frame)
-							
-							if cfg.showFrameCounter then
-								term.setCursorPos(1, height - 5)
-								write("frame: "..i.."/"..frameCount)
-								i = i + 1
-							end
-
-							tryYield()
-							if cfg.slow then
-								sleep(cfg.slowTime)
-							end
-						end
-					end
-				end
-			else
-				for frameIndex = 1, frameCount do
-					if not rs.getInput(cfg.leverSide) then
-						frame = optimizedFrames[frameIndex]
-						showImage(frame)
-						tryYield()
-					end
-				end
-				term.setCursorPos(width, height)
-			end
-		else
-			frame = optimizedFrames[1]
-			showImage(frame)
-			term.setCursorPos(width, height)
+		if frameCount > 1 and cfg.loop then
+            while true do
+                shell.run("generatedCode")
+                if cfg.slow then
+                    sleep(cfg.slowTime)
+                end
+            end
+        else
+            shell.run("generatedCode")
+            term.setCursorPos(width, height)
 		end
 	end
 end

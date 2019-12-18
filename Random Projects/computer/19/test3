@@ -1,0 +1,3 @@
+write("|"..string.rep(" ", 1000).."|")
+write("|"..string.rep(" ", 1000).."|")
+write("|"..string.rep(" ", 1000).."|")
