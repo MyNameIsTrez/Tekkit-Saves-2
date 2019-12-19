@@ -178,8 +178,6 @@ function main()
 	end
 
 	while true do
-		print(tostring(not rs.getInput(leverSide)))
-		sleep(5)
 		if not rs.getInput(leverSide) then
 			for _, entity in pairs(entities) do
 				if entity.targetEntityId then
