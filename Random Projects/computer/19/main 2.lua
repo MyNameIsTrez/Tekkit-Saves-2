@@ -43,7 +43,6 @@ width = width - 1
 local frameWidth
 local frameHeight
 local frameCount
-local frameSleep
 
 local optimizedFramesString
 local optimizedFrames
@@ -66,7 +65,12 @@ local function getSelectedAnimationData()
 	frameWidth = tab.width
 	frameHeight = tab.height
     frameCount = tab.frame_count
-    frameSleep = tab.frame_sleep
+    print(1)
+    for key, value in pairs(tab) do
+        print(key)
+    end
+    -- print(string)
+    print(2)
     
     optimizedFramesString = tab.optimized_frames
 end
@@ -100,8 +104,8 @@ local function dataToGeneratedCode()
             'os.queueEvent("r")\n'..
             'os.pullEvent("r")'
 
-            if cfg.frameSleeping and frameSleep ~= -1 then
-                a = a..'sleep('..tostring(frameSleep)..')'
+            if cfg.frameSleeping and cfg.frameSleep ~= -1 then
+                a = a..'sleep('..tostring(cfg.frameSleep)..')'
             end
             
             handle:write(a)
