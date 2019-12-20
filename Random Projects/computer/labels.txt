@@ -1,12 +1,13 @@
 0 LogicGates
 1 breadth_first_search
-17 mandelbrot
 2 explorer
-18 animation
 3 bezier
-19 dithering
+4 cellular_automata
 7 Slave Requestor 1
 8 Master Requestor
 9 Slave Requestor 2
 12 simple_planets
 15 a_star
+17 mandelbrot
+18 animation
+19 dithering
