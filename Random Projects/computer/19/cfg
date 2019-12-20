@@ -1,6 +1,6 @@
 -- EDITABLE VARIABLES --------------------------------------------------------
 
-fileName = "bouncing ball" -- The name of the animation to load, without '.txt' at the end.
+fileName = "deez nuts got eem" -- The name of the animation to load, without '.txt' at the end.
 computerType = "laptop" -- "desktop" or "laptop".
 showFrameCounter = true -- Whether the program displays the frame count.
 loop = true -- Whether the program loops the animation.
