@@ -162,9 +162,7 @@ local function dataToGeneratedCode()
             
             handle:write(string)
 
-            if f % cfg.drawnColumnsYield == 0 then
-                tryYield()
-            end
+            tryYield()
         end
                 
         if whileLoop then

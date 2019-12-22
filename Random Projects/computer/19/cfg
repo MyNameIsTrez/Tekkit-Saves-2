@@ -9,8 +9,7 @@ slow = false -- If this is true, the program sleeps by 'slowTime' seconds. If th
 slowTime = 2 -- If 'slow' is set to true, this is the time slept between drawn frames in seconds.
 
 frameSleeping = true -- Whether the program sleeps between drawing each frame, by frameSleep number of seconds.
-frameSleep = 0.1 -- seconds of sleeping between frames, -1 is no sleeping
+frameSleep = 0.05 -- seconds of sleeping between frames, -1 is no sleeping
 
 -- Less important variables.
 leverSide = "right" -- Lever can be pulled to turn off the program.
-drawnColumnsYield = 100 -- Try to yield after every 100 vertically drawn lines.
