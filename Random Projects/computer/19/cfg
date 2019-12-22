@@ -1,6 +1,6 @@
 -- EDITABLE VARIABLES --------------------------------------------------------
 
-fileName = "never gonna give you up" -- The name of the animation to load, without '.txt' at the end.
+fileName = "flowers" -- The name of the animation to load, without '.txt' at the end.
 computerType = "desktop" -- "desktop" or "laptop".
 showFrameCounter = true -- Whether the program displays the frame count.
 loop = true -- Whether the program loops the animation.
