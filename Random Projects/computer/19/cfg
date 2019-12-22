@@ -1,15 +1,16 @@
 -- EDITABLE VARIABLES --------------------------------------------------------
 
 fileName = "never gonna give you up" -- The name of the animation to load, without '.txt' at the end.
-computerType = "laptop" -- "desktop" or "laptop".
+computerType = "desktop" -- "desktop" or "laptop".
 showFrameCounter = true -- Whether the program displays the frame count.
 loop = true -- Whether the program loops the animation.
+generateOptimizedCode = true -- Whether the program will generate an optimized file containing all instructions. Takes time and system memory to create, but executes the drawing way faster.
 
 slow = false -- If this is true, the program sleeps by 'slowTime' seconds. If this is false, the program doesn't sleep.
 slowTime = 2 -- If 'slow' is set to true, this is the time slept between drawn frames in seconds.
 
-frameSleeping = true -- Whether the program sleeps between drawing each frame, by frameSleep number of seconds.
-frameSleep = 0.05 -- seconds of sleeping between frames, -1 is no sleeping
+frameSleeping = false -- Whether the program sleeps between drawing each frame, by frameSleep number of seconds.
+frameSleep = 0.1 -- seconds of sleeping between frames, -1 is no sleeping
 
 -- Less important variables.
 leverSide = "right" -- Lever can be pulled to turn off the program.

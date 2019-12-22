@@ -27,11 +27,12 @@ local function importAPIs()
 	fs.makeDir("apis") -- Recreates the folder.
 
 	for _, API in pairs(APIs) do
-		shell.run("pastebin", "get", API.id, "apis/"..API.name)
-		os.loadAPI("apis/"..API.name)
+		shell.run("pastebin", "get", API.id, "apis/" .. API.name)
+		os.loadAPI("apis/" .. API.name)
 	end
 end
 
+-- Request animation using http calls.
 -- local function importAnimation()
 -- end
 
@@ -60,12 +61,32 @@ end
 
 local function unpackOptimizedFrames(optimizedFrames)
     print('Unpacking optimized frames...')
-    
+	
+	startTime = os.clock()
     cursorX, cursorY = term.getCursorPos()
-    for f = 1, frameCount do
-        if f % 10 == 0 then
-            term.setCursorPos(cursorX, cursorY) -- Used so the next 'Creating frame' print statement can overwrite itself in its for loop.
-            print('Creating frame '..tostring(f)..'/'..tostring(frameCount)..'.')
+	for f = 1, frameCount do
+		-- Print speed statistics.
+		if f % 10 == 0 then
+			-- Progress.
+			progress = 'Creating frame ' .. tostring(f) .. '/' .. tostring(frameCount)
+
+			-- Speed.
+			elapsed = (os.clock() - startTime) / 10
+			processedFps = 1 / elapsed
+			speed = string.format('%d frames/s', processedFps)
+			
+			-- ETA.
+			framesLeft = frameCount - f
+			etaMinutes = math.floor(elapsed * framesLeft / 60)
+			etaSeconds = math.floor(elapsed * framesLeft) % 60
+			eta = string.format('%dm, %ds left', etaMinutes, etaSeconds)
+			
+			-- Clear.
+			clear = '		'
+
+			term.setCursorPos(cursorX, cursorY) -- Used so the next 'Creating frame' print statement can overwrite itself in its for loop.
+            print(progress .. ', ' .. speed .. ', ' .. eta .. clear)
+			startTime = os.clock()
         end
 
         local unoptimizedString = ''
@@ -107,9 +128,7 @@ local function unpackOptimizedFrames(optimizedFrames)
 
         table.insert(unpackedOptimizedFrames, unoptimizedString)
 
-        if f % 10 == 0 then
-            tryYield()
-        end
+		tryYield()
     end
 end
 
@@ -118,7 +137,7 @@ local function getSelectedAnimationData()
 		error("You didn't enter a valid 'computerType' name in the cfg file!")
 	end
 	print("Loading animation data...")
-	local file = fs.open(cfg.computerType.." inputs/"..cfg.fileName..".txt", "r")
+	local file = fs.open(cfg.computerType .. " inputs/" .. cfg.fileName .. ".txt", "r")
 	local string = file.readAll()
 	file.close()
     
@@ -133,31 +152,28 @@ local function getSelectedAnimationData()
 end
 
 local function dataToGeneratedCode()
-	print("Generating executable code...")
-    frameSize = frameWidth * frameHeight
-
-    local handle = io.open("generated code", "w")
+    local handle = io.open("generatedCode", "w")
 
     if handle then
         whileLoop = frameCount > 1 and cfg.loop
 
         if whileLoop then
-            local string =
+			local string =
             'while true do'..
-            '\n    if not rs.getInput("'..cfg.leverSide..'") then'
+            '\n    if not rs.getInput("' .. cfg.leverSide .. '") then'
             handle:write(string)
         end
 
         for f = 1, frameCount do
             local string =
             '\n        term.setCursorPos(1,1)'..
-            '\n        write("'..unpackedOptimizedFrames[f]..'")'..
+            '\n        write("' .. unpackedOptimizedFrames[f] .. '")'..
             '\n        os.queueEvent("r")'..
             '\n        os.pullEvent("r")'
 
             if cfg.frameSleeping and cfg.frameSleep ~= -1 then
                 string = string..
-                '\n        sleep('..tostring(cfg.frameSleep)..')'
+                '\n        sleep(' .. tostring(cfg.frameSleep) .. ')'
             end
             
             handle:write(string)
@@ -174,10 +190,23 @@ local function dataToGeneratedCode()
             handle:write(string)
         end
     else
-        error("couldn't create/open the generated code file")
+        error("couldn't create/open the optimized code file")
     end
     
-    handle:close()
+	handle:close()
+	
+	tryYield()
+end
+
+local function executeRegularCode()
+	for f = 1, frameCount do
+		term.setCursorPos(1,1)
+		write(unpackedOptimizedFrames[f])
+		if cfg.frameSleeping and cfg.frameSleep ~= -1 then
+			sleep(cfg.frameSleep)
+		end
+		tryYield()
+	end
 end
 
 -- CODE EXECUTION --------------------------------------------------------
@@ -186,11 +215,15 @@ local function setup()
     importConfig()
 	if not rs.getInput(cfg.leverSide) then
 		importAPIs()
-        -- importAnimation()
+		-- importAnimation() -- Request animation using http calls.
         getSelectedAnimationData()
-        cf.yield()
-        dataToGeneratedCode()
-		tryYield()
+		cf.yield()
+
+		if cfg.generateOptimizedCode then
+			print("Generating optimized code...")
+			dataToGeneratedCode()
+		end
+		
 		term.clear()
 		term.setCursorPos(1, 1)
     end
@@ -198,7 +231,21 @@ end
 
 local function main()
 	if not rs.getInput(cfg.leverSide) then
-        shell.run("generated code")
+		if cfg.generateOptimizedCode then
+			print("Executing optimized code...")
+			shell.run("generatedCode")
+		else
+			print("Executing regular code...")
+
+			whileLoop = frameCount > 1 and cfg.loop
+			if whileLoop then
+				while true do
+					executeRegularCode()
+				end
+			else
+				executeRegularCode()
+			end
+		end
         term.setCursorPos(width, height)
 	end
 end
