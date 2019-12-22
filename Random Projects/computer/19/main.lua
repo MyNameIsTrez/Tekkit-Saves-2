@@ -87,27 +87,18 @@ local function unpackOptimizedFrames(optimizedFrames)
             end
             
             if char == ']' then
-                -- More efficient to look at 'optimizedFrame' once like this, because we need it multiple times.
-                local searchedString = optimizedFrame:sub(openBracketIndex, currentIndex)
-                
-                print('searchedString: '..searchedString)
-                print('#searchedString: '..tostring(#searchedString))
-                print('openBracketIndex: '..tostring(openBracketIndex))
-                local delimiterIndex = searchedString:find(';')
-                
-                -- Get the number of times to repeat the group of characters.
-                local repetition = tonumber(searchedString:sub(2, delimiterIndex - openBracketIndex))
-                -- print('repetition: '..tostring(repetition))
+                -- More efficient to look at 'optimizedFrame' once like this, because we 'sub:' it twice later.
+                local closedBrackedIndex = currentIndex
+                local searchedString = optimizedFrame:sub(openBracketIndex, closedBrackedIndex)
                 
                 -- Get the repeated characters.
-                local searchedStringLen = currentIndex - delimiterIndex - 1 -- Because 5 - 3 - 1 -> 1.
-                print('searchedStringLen: '..tostring(searchedStringLen))
-                local repeatedChars = searchedString:sub(delimiterIndex + 1 - openBracketIndex, currentIndex - 1 - openBracketIndex)
-                print('delimiterIndex: '..tostring(delimiterIndex))
-                print('currentIndex: '..currentIndex)
-                print('repeatedChars: '..tostring(repeatedChars))
+                local delimiterIndex = searchedString:find(';')
+                local searchedDelimiterIndex = delimiterIndex + 2 - openBracketIndex
+                local searchedClosedBracketIndex = closedBrackedIndex - openBracketIndex
+                local repeatedChars = searchedString:sub(searchedDelimiterIndex, searchedClosedBracketIndex)
                 
                 -- Add the repeated characters.
+                local repetition = tonumber(searchedString:sub(2, delimiterIndex - openBracketIndex))
                 unoptimizedString = unoptimizedString .. repeatedChars:rep(repetition)
                 
                 openBracketIndex = nil
