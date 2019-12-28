@@ -1,0 +1,17 @@
+-- EDITABLE VARIABLES --------------------------------------------------------
+
+spawnerParticleCount = 100
+sleepTime = 0.05
+
+-- Need to be integers.
+minLifeTime = 20
+maxLifeTime = 100
+
+minVelocity = 0.1
+maxVelocity = 7.5
+
+minDirection = 0
+maxDirection = 2 * math.pi
+
+-- Less important variables.
+leverSide = "right" -- Lever can be pulled to turn off the program.

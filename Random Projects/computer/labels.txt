@@ -11,3 +11,5 @@
 17 mandelbrot
 18 animation
 19 dithering
+20 shape_showcase
+21 particles

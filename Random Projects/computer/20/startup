@@ -1,0 +1,17 @@
+local function importAPIs()
+	local APIs = {
+		{id = "drESpUSP", name = "shape"},
+	}
+
+	fs.delete("apis") -- Deletes the folder, with every API file in it.
+	fs.makeDir("apis") -- Recreates the folder.
+
+	for _, API in pairs(APIs) do
+		shell.run("pastebin", "get", API.id, "apis/" .. API.name)
+		os.loadAPI("apis/" .. API.name)
+	end
+end
+
+importAPIs()
+
+shape.line(vector.new(5, 5), vector.new(15, 15), '#')
