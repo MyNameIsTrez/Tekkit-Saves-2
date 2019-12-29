@@ -18,6 +18,7 @@ function importAPIs()
 	local APIs = {
 		{id = "drESpUSP", name = "shape"},
         {id = "p9tSSWcB", name = "cf"},
+        {id = "cegB4RwE", name = "dithering"},
 	}
 
 	fs.delete("apis") -- Deletes folder.
@@ -33,8 +34,11 @@ end
 
 -- EDITABLE VARIABLES --------------------------------------------------------
 local maxIterations = 100
-local zoomX = -1.740062382579339905220844167065825638296641720436171866879862418461182919644153056054840718339483225743450008259172138785492983677893366503417299549623738838303346465461290768441055486136870719850559269507357211790243666940134793753068611574745943820712885258222629105433648695946003865
+local zoomMultiplier = 0.6
+
 local leverSide = "right"
+
+local zoomX = -1.740062382579339905220844167065825638296641720436171866879862418461182919644153056054840718339483225743450008259172138785492983677893366503417299549623738838303346465461290768441055486136870719850559269507357211790243666940134793753068611574745943820712885258222629105433648695946003865
 
 -- UNEDITABLE VARIABLES --------------------------------------------------------
 
@@ -67,40 +71,17 @@ function mandelbrot(width, height, maxIterations, zoom)
 			end
 
 			local brightness = cf.map(n, 0, maxIterations, 0, 1)
-			brightness = cf.map(math.sqrt(brightness), 0, 1, 0, 255)
+			brightness = cf.map(math.sqrt(brightness), 0, 1, 0, 1)
 
 			if n == maxIterations then
 				brightness = 0
 			end
 
-			local letter
-			if brightness == 0 then
-				letter = " "
-			elseif brightness < 255 / 10 then
-				sleep(5)
-				letter = "."
-			elseif brightness < 255 / 10 * 2 then
-				letter = ","
-			elseif brightness < 255 / 10 * 3 then
-				letter = "|"
-			elseif brightness < 255 / 10 * 4 then
-				letter = "!"
-			elseif brightness < 255 / 10 * 5 then
-				letter = "*"
-			elseif brightness < 255 / 10 * 6 then
-				letter = "+"
-			elseif brightness < 255 / 10 * 7 then
-				letter = "%"
-			elseif brightness < 255 / 10 * 8 then
-				letter = "$"
-			elseif brightness < 255 / 10 * 9 then
-				letter = "#"
-			elseif brightness < 255 then
-				letter = "@"
-			end
+			local char = dithering.getClosestChar(brightness)
 			
-			shape.point(vector.new(x, y), letter)
+			shape.point(vector.new(x, y), char)
 		end
+		cf.yield()
 	end
 end
 
@@ -119,7 +100,7 @@ function main()
 	while true do
 		if not rs.getInput(leverSide) then
 			mandelbrot(width, height, maxIterations, zoom)
-			zoom = zoom * 0.99
+			zoom = zoom * zoomMultiplier
 			cf.yield()
 		else
 			sleep(1)
