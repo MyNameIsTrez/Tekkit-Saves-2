@@ -208,7 +208,7 @@ local function main()
 			term.clear()
 
 			-- Create a new spawner every second.
-			if os.clock() - previousTime >= 1 then
+			if os.clock() - previousTime >= cfg.createSpawnerTime then
 				createSpawner()
 				previousTime = os.clock()
 			end
