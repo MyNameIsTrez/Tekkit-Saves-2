@@ -52,7 +52,7 @@ width = width - 1
 function mandelbrot(width, height, maxIterations, zoom)
 	for x = 1, width do
 		for y = 1, height do
-			local a = cf.map(x, 1, width, zoomX - zoom, zoomX + zoom)
+			local a = cf.map(x * 1.5, 1, width, zoomX - zoom, zoomX + zoom)
 			local b = cf.map(y, 1, height, -zoom, zoom)
 
 			local ca = a

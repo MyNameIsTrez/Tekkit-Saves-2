@@ -125,3 +125,46 @@ function moveCursor(cursor, key, width, height, cursorIcon)
 	
 	shape.point(vector.new(cursor.x, cursor.y), cursorIcon)
 end
+
+function printTable(tab, recursive, depth)
+	recursive = not (recursive == false) -- True by default.
+	depth = depth or 0 -- The depth starts at one. Don't enter the depth when calling this function, please.
+	
+	-- Getting the longest key, so all printed values will line up.
+	local longestKey = 1
+	for key, _ in pairs(tab) do
+		local keyLength = #tostring(key)
+		if keyLength > longestKey then
+			longestKey = keyLength
+		end
+	end
+	
+	if depth == 0 then
+		print()
+	end
+	
+	-- Print the keys and values, with extra spaces so the values line up.
+	for key, value in pairs(tab) do
+		yield() -- Need to yield, as the next bit of code can be recursive.
+		
+		local spacingCount = longestKey - #tostring(key) + 1 -- How many spaces are added between the key and value.
+		print(
+			string.rep('  ', depth).. -- Shift tables that are deep inside the original table.
+			'key: '..
+			tostring(key)..
+			string.rep(' ', spacingCount)..
+			'| value: '..
+			tostring(value)
+		)
+		
+		local isTable = type(value) == 'table'
+		local valueIsTable = (tab == value)
+		if recursive and isTable and not valueIsTable then
+			printTable(value, recursive, depth + 1) -- Go into the table.
+		end
+	end
+	
+	if depth == 0 then
+		print()
+	end
+end
