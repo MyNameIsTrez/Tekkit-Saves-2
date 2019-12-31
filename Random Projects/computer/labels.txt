@@ -1,15 +1,17 @@
 0 LogicGates
-1 breadth_first_search
+1 breadthFirstSearch
 2 explorer
 3 bezier
-4 cellular_automata
+4 wireworld
 7 Slave Requestor 1
 8 Master Requestor
 9 Slave Requestor 2
-12 simple_planets
-15 a_star
+12 simplePlanets
+15 aStar
 17 mandelbrot
 18 animation
 19 dithering
-20 shape_showcase
+20 shapeShowcase
 21 particles
+22 writingSpeedTest
+23 perlinNoise
