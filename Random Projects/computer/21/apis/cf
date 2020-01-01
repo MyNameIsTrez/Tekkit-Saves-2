@@ -128,7 +128,7 @@ end
 
 function printTable(tab, recursive, depth)
 	recursive = not (recursive == false) -- True by default.
-	depth = depth or 0 -- The depth starts at one. Don't enter the depth when calling this function, please.
+	depth = depth or 0 -- The depth starts at 0. Don't enter the depth when calling this function, please.
 	
 	-- Getting the longest key, so all printed values will line up.
 	local longestKey = 1
@@ -167,4 +167,10 @@ function printTable(tab, recursive, depth)
 	if depth == 0 then
 		print()
 	end
+end
+
+function lerp(val1, val2, val3)
+  local difference = val2 - val1
+  local extra = val3 * difference
+  return val1 + extra
 end

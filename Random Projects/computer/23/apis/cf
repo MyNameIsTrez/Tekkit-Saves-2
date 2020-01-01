@@ -168,3 +168,9 @@ function printTable(tab, recursive, depth)
 		print()
 	end
 end
+
+function lerp(val1, val2, val3)
+  local difference = val2 - val1
+  local extra = val3 * difference
+  return val1 + extra
+end

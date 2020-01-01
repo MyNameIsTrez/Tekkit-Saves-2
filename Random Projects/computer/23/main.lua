@@ -32,7 +32,7 @@ end
 
 -- EDITABLE VARIABLES --------------------------------------------------------
 
-local noiseZoom = 10
+local noiseZoom = 15
 
 local leverSide = "right"
 
@@ -60,9 +60,11 @@ function setup()
 end
 
 function main()
+	-- print(perlinNoise.perlin:noise(0.123213, 122))-- Return range: [-1, 1]
 	local t1 = os.clock()
+
 	if not rs.getInput(leverSide) then
-		local noiseTable = {}
+		local characterMap = {}
 
 		for y = 1, height do
 			local progress = y / height * 100
@@ -75,11 +77,22 @@ function main()
 			for x = 1, width do
 				local xNormalized = x / width * noiseZoom
 				local yNormalized = y / height * noiseZoom
+
 				local unmappedValue = perlinNoise.perlin:noise(xNormalized, yNormalized)-- Return range: [-1, 1]
 				local value = cf.map(unmappedValue, -1, 1, 0, 1)
+
+				-- local char
+				-- if value < 1/3 then
+				-- 	char = 'w'
+				-- elseif value < 2/3 then
+				-- 	char = 'b'
+				-- elseif value < 1 then
+				-- 	char = 'c'
+				-- end
+
 				local char = dithering.getClosestChar(value)
 
-				table.insert(noiseTable, char)
+				table.insert(characterMap, char)
 
 				-- Writing every individual character one by one is incredibly slow,
 				-- as it took 90 (+- 1) seconds to draw one frame.
@@ -91,20 +104,20 @@ function main()
 			end
 		end
 
-		local noiseString = table.concat(noiseTable)
+		local noiseString = table.concat(characterMap)
 
 		term.setCursorPos(1, 1)
 		write(noiseString)
 	end
 
 	-- Measures the time it took for the program to run.
-	-- local t2 = os.clock()
-	-- local elapsedTime = t2 - t1
-	-- local roundedTime = math.floor(elapsedTime * 100 + 0.5) / 100
-	-- local clear = ' '
+	local t2 = os.clock()
+	local elapsedTime = t2 - t1
+	local roundedTime = math.floor(elapsedTime * 100 + 0.5) / 100
+	local clear = ' '
 
 	term.setCursorPos(1, 1)
-	-- write('Elapsed time: '..tostring(roundedTime)..'s'..clear)
+	write('Elapsed time: '..tostring(roundedTime)..'s'..clear)
 end
 
 setup()

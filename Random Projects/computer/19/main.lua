@@ -41,8 +41,6 @@ end
 local width, height = term.getSize()
 width = width - 1
 
-local frameWidth
-local frameHeight
 local frameCount
 
 local unpackedOptimizedFrames = {}
@@ -63,7 +61,7 @@ local function unpackOptimizedFrames(optimizedFrames)
     print('Unpacking optimized frames...')
 	
 	startTime = os.clock()
-    cursorX, cursorY = term.getCursorPos()
+	cursorX, cursorY = term.getCursorPos()
 	for f = 1, frameCount do
 		-- Print speed statistics.
 		if f % 10 == 0 then
@@ -143,12 +141,12 @@ local function getSelectedAnimationData()
     
 	tab = textutils.unserialize(string)
     
-	frameWidth = tab.width
-	frameHeight = tab.height
-    frameCount = tab.frame_count
+	frameCount = tab.frame_count
     
     local optimizedFrames = tab.optimized_frames
-    unpackOptimizedFrames(optimizedFrames)
+	unpackOptimizedFrames(optimizedFrames)
+	
+	-- cf.printTable(unpackedOptimizedFrames)
 end
 
 local function dataToGeneratedCode()
