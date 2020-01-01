@@ -134,10 +134,16 @@ local function getSelectedAnimationData()
 	if cfg.computerType ~= "laptop" and cfg.computerType ~= "desktop" then
 		error("You didn't enter a valid 'computerType' name in the cfg file!")
 	end
+
 	print("Loading animation data...")
+
+	print(1)
 	local file = fs.open(cfg.computerType .. " inputs/" .. cfg.fileName .. ".txt", "r")
+	print(2)
 	local string = file.readAll()
+	print(3)
 	file.close()
+	print(4)
     
 	tab = textutils.unserialize(string)
     
@@ -145,8 +151,6 @@ local function getSelectedAnimationData()
     
     local optimizedFrames = tab.optimized_frames
 	unpackOptimizedFrames(optimizedFrames)
-	
-	-- cf.printTable(unpackedOptimizedFrames)
 end
 
 local function dataToGeneratedCode()
@@ -183,7 +187,9 @@ local function dataToGeneratedCode()
             local string =
             '\n    else'..
             '\n        sleep(1)'..
-            '\n    end'..
+			'\n    end'..
+			'\n    os.queueEvent("r")'..
+			'\n    os.pullEvent("r")'..
             '\nend'
             handle:write(string)
         end

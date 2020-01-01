@@ -1,0 +1,7 @@
+local str = "write('lol'"
+local func, err = loadstring(str)
+if err then
+  print(err)
+else
+  func()
+end
