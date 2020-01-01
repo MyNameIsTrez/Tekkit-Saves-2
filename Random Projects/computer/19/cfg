@@ -1,6 +1,6 @@
 -- EDITABLE VARIABLES --------------------------------------------------------
 
-fileName = "coincidence i think not" -- The name of the animation to load, without '.txt' at the end.
+fileName = "cat falls off wheelchair" -- The name of the animation to load, without '.txt' at the end.
 computerType = "desktop" -- "desktop" or "laptop".
 showFrameCounter = true -- Whether the program displays the frame count.
 loop = true -- Whether the program loops the animation.
@@ -10,7 +10,9 @@ slow = false -- If this is true, the program sleeps by 'slowTime' seconds. If th
 slowTime = 2 -- If 'slow' is set to true, this is the time slept between drawn frames in seconds.
 
 frameSleeping = true -- Whether the program sleeps between drawing each frame, by frameSleep number of seconds.
-frameSleep = -1 -- seconds of sleeping between frames, -1 is no sleeping
+frameSleep = -1 -- Seconds of sleeping between frames, -1 is no sleeping.
+
+maxFramesPerGeneratedCodeFile = 100 -- How many frames can be written to a generated code file in .generatedCodeFiles/ before a new one gets created. 
 
 -- Less important variables.
 leverSide = "right" -- Lever can be pulled to turn off the program.

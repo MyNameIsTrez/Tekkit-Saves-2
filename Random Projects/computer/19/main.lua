@@ -15,20 +15,20 @@
 -- IMPORTING --------------------------------------------------------
 
 local function importConfig()
-    os.loadAPI("cfg")
+    os.loadAPI('cfg')
 end
 
 local function importAPIs()
 	local APIs = {
-		{id = "p9tSSWcB", name = "cf"},
+		{id = 'p9tSSWcB', name = 'cf'},
 	}
 
-	fs.delete("apis") -- Deletes the folder, with every API file in it.
-	fs.makeDir("apis") -- Recreates the folder.
+	fs.delete('apis') -- Deletes the folder, with every API file in it.
+	fs.makeDir('apis') -- Recreates the folder.
 
 	for _, API in pairs(APIs) do
-		shell.run("pastebin", "get", API.id, "apis/" .. API.name)
-		os.loadAPI("apis/" .. API.name)
+		shell.run('pastebin', 'get', API.id, 'apis/' .. API.name)
+		os.loadAPI('apis/' .. API.name)
 	end
 end
 
@@ -42,6 +42,8 @@ local width, height = term.getSize()
 width = width - 1
 
 local frameCount
+
+local compressed
 
 local unpackedOptimizedFrames = {}
 
@@ -92,114 +94,118 @@ local function unpackOptimizedFrames(optimizedFrames)
         
         local openBracketIndex = nil -- Probably not necessary to assign this with 'nil'.
 
-        -- This can probably be done faster using table.concat:
-        -- https://stackoverflow.com/a/1407187
-        for currentIndex = 1, #optimizedFrame do
-            local char = optimizedFrame:sub(currentIndex, currentIndex) -- can't use pairs or ipairs, I think
-            
-            if char == '[' then
-                openBracketIndex = currentIndex
-            end
-            
-            if openBracketIndex == nil then
-                unoptimizedString = unoptimizedString .. char
-            end
-            
-            if char == ']' then
-                -- More efficient to look at 'optimizedFrame' once like this, because we 'sub:' it twice later.
-                local closedBrackedIndex = currentIndex
-                local searchedString = optimizedFrame:sub(openBracketIndex, closedBrackedIndex)
-                
-                -- Get the repeated characters.
-                local delimiterIndex = searchedString:find(';')
-                local searchedDelimiterIndex = delimiterIndex + 2 - openBracketIndex
-                local searchedClosedBracketIndex = closedBrackedIndex - openBracketIndex
-                local repeatedChars = searchedString:sub(searchedDelimiterIndex, searchedClosedBracketIndex)
-                
-                -- Add the repeated characters.
-                local repetition = tonumber(searchedString:sub(2, delimiterIndex - openBracketIndex))
-                unoptimizedString = unoptimizedString .. repeatedChars:rep(repetition)
-                
-                openBracketIndex = nil
-            end
-        end
+		if compressed then
+			-- This can probably be done faster using table.concat:
+			-- https://stackoverflow.com/a/1407187
 
-        table.insert(unpackedOptimizedFrames, unoptimizedString)
+			for currentIndex = 1, #optimizedFrame do
+				local char = optimizedFrame:sub(currentIndex, currentIndex) -- can't use pairs or ipairs, I think
+				
+				if char == '[' then
+					openBracketIndex = currentIndex
+				end
+				
+				if openBracketIndex == nil then
+					unoptimizedString = unoptimizedString .. char
+				end
+				
+				if char == ']' then
+					-- More efficient to look at 'optimizedFrame' once like this, because we 'sub:' it twice later.
+					local closedBrackedIndex = currentIndex
+					local searchedString = optimizedFrame:sub(openBracketIndex, closedBrackedIndex)
+					
+					-- Get the repeated characters.
+					local delimziterIndex = searchedString:find(';')
+					local searchedDelimiterIndex = delimiterIndex + 2 - openBracketIndex
+					local searchedClosedBracketIndex = closedBrackedIndex - openBracketIndex
+					local repeatedChars = searchedString:sub(searchedDelimiterIndex, searchedClosedBracketIndex)
+					
+					-- Add the repeated characters.
+					local repetition = tonumber(searchedString:sub(2, delimiterIndex - openBracketIndex))
+					unoptimizedString = unoptimizedString .. repeatedChars:rep(repetition)
+					
+					openBracketIndex = nil
+				end
+			end
 
-		tryYield()
+			table.insert(unpackedOptimizedFrames, unoptimizedString)
+
+			tryYield()
+		else
+			table.insert(unpackedOptimizedFrames, optimizedFrame)
+		end
     end
 end
 
 local function getSelectedAnimationData()
-	if cfg.computerType ~= "laptop" and cfg.computerType ~= "desktop" then
-		error("You didn't enter a valid 'computerType' name in the cfg file!")
+	if cfg.computerType ~= 'laptop' and cfg.computerType ~= 'desktop' then
+		error('You didn\'t enter a valid \'computerType\' name in the cfg file!')
 	end
 
-	print("Loading animation data...")
+	print('Loading animation data...')
 
-	print(1)
-	local file = fs.open(cfg.computerType .. " inputs/" .. cfg.fileName .. ".txt", "r")
-	print(2)
+	local file = fs.open(cfg.computerType .. ' inputs/' .. cfg.fileName .. '.txt', 'r')
 	local string = file.readAll()
-	print(3)
 	file.close()
-	print(4)
     
 	tab = textutils.unserialize(string)
     
 	frameCount = tab.frame_count
+
+	compressed = tab.compressed
     
     local optimizedFrames = tab.optimized_frames
 	unpackOptimizedFrames(optimizedFrames)
 end
 
-local function dataToGeneratedCode()
-    local handle = io.open("generatedCode", "w")
+local function createGeneratedCodeFolder()
+	if fs.exists('.generatedCodeFiles') then
+		local names = fs.list('.generatedCodeFiles')
 
-    if handle then
-        whileLoop = frameCount > 1 and cfg.loop
+		for _, name in pairs(names) do
+			fs.delete('.generatedCodeFiles/'..tostring(name))
+		end
+	else
+		fs.makeDir('.generatedCodeFiles')
+	end
+end
 
-        if whileLoop then
-			local string =
-            'while true do'..
-            '\n    if not rs.getInput("' .. cfg.leverSide .. '") then'
-            handle:write(string)
-        end
-
-        for f = 1, frameCount do
-            local string =
-            '\n        term.setCursorPos(1,1)'..
-            '\n        write("' .. unpackedOptimizedFrames[f] .. '")'..
-            '\n        os.queueEvent("r")'..
-            '\n        os.pullEvent("r")'
-
-            if cfg.frameSleeping and cfg.frameSleep ~= -1 then
-                string = string..
-                '\n        sleep(' .. tostring(cfg.frameSleep) .. ')'
-            end
-            
-            handle:write(string)
-
-            tryYield()
-        end
-                
-        if whileLoop then
-            local string =
-            '\n    else'..
-            '\n        sleep(1)'..
-			'\n    end'..
-			'\n    os.queueEvent("r")'..
-			'\n    os.pullEvent("r")'..
-            '\nend'
-            handle:write(string)
-        end
-    else
-        error("couldn't create/open the optimized code file")
-    end
-    
-	handle:close()
+local function dataToGeneratedCode()	
+	whileLoop = frameCount > 1 and cfg.loop
 	
-	tryYield()
+	local numberOfNeededFiles = math.ceil(frameCount / cfg.maxFramesPerGeneratedCodeFile)
+
+	for generatedCodeFileIndex = 1, numberOfNeededFiles do
+		local handle = io.open('.generatedCodeFiles/'..generatedCodeFileIndex, 'w')
+
+		local frameOffset = (generatedCodeFileIndex - 1) * cfg.maxFramesPerGeneratedCodeFile
+
+		local frameCountToFile = math.min(frameCount - frameOffset, cfg.maxFramesPerGeneratedCodeFile)
+
+		local minFrames = frameOffset + 1
+		local maxFrames = frameOffset + frameCountToFile
+
+		for f = minFrames, maxFrames do
+			local string =
+			'\nterm.setCursorPos(1,1)'..
+			'\nwrite("' .. unpackedOptimizedFrames[f] .. '")'..
+			'\nos.queueEvent("r")'..
+			'\nos.pullEvent("r")'
+
+			if cfg.frameSleeping and cfg.frameSleep ~= -1 then
+				string = string..
+				'\nsleep(' .. tostring(cfg.frameSleep) .. ')'
+			end
+			
+			handle:write(string)
+
+			tryYield()
+		end
+		
+		handle:close()
+		
+		tryYield()
+	end
 end
 
 local function executeRegularCode()
@@ -224,7 +230,8 @@ local function setup()
 		cf.yield()
 
 		if cfg.generateOptimizedCode then
-			print("Generating optimized code...")
+			print('Generating optimized code...')
+			createGeneratedCodeFolder()
 			dataToGeneratedCode()
 		end
 		
@@ -236,10 +243,32 @@ end
 local function main()
 	if not rs.getInput(cfg.leverSide) then
 		if cfg.generateOptimizedCode then
-			print("Executing optimized code...")
-			shell.run("generatedCode")
+			print('Executing optimized code...')
+
+			local len = #fs.list('.generatedCodeFiles')
+			
+			-- local handles = {}
+			-- for i = 1, len do
+			-- 	local handle = io.open('.generatedCodeFiles/'..i, 'r')
+			-- 	table.insert(handles, handle)
+			-- end
+
+			while true do
+				if not rs.getInput(cfg.leverSide) then
+					for i = 1, len do
+						-- local handle = handles[i]
+
+						-- What goes here?
+
+						shell.run('.generatedCodeFiles/'..tostring(i))
+					end
+				else
+					sleep(1)
+				end
+				tryYield()
+			end
 		else
-			print("Executing regular code...")
+			print('Executing regular code...')
 
 			whileLoop = frameCount > 1 and cfg.loop
 			if whileLoop then
