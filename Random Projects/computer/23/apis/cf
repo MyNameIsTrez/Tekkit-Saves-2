@@ -1,7 +1,10 @@
 -- README --------------------------------------------------------
+
 -- Collection of LUA functions I commonly use.
 
+-- NOT EDITABLE VARIABLES --------------------------------------------------------
 
+local previousClock = 0
  
 -- FUNCTIONS --------------------------------------------------------
 
@@ -77,6 +80,15 @@ end
 function yield()
 	os.queueEvent("randomEvent")
 	os.pullEvent("randomEvent")
+end
+
+-- This functions needs a global previousClock variable set to 0!
+function tryYield()
+    local currentClock = os.clock()
+    if currentClock - previousClock > 4 then
+        previousClock = currentClock
+        yield()
+    end
 end
 
 function map(value, minVar, maxVar, minResult, maxResult)
