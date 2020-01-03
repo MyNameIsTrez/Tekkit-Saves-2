@@ -1,6 +1,9 @@
 -- EDITABLE VARIABLES --------------------------------------------------------
 
-fileName = "never gonna give you up" -- The name of the animation to load, without '.txt' at the end.
+fileName = "nakeyjakey esports [20594]" -- The name of the animation to load, without '.txt' at the end. '[' and ']' are reserved characters for the frame count at the end of the name, like 'dog 1 [5]'.
+--fileName = "never gonna give you up [5302]" -- The name of the animation to load, without '.txt' at the end. '[' and ']' are reserved characters for the frame count at the end of the name, like 'dog 1 [5]'.
+--fileName = "earth dog [72]" -- The name of the animation to load, without '.txt' at the end. '[' and ']' are reserved characters for the frame count at the end of the name, like 'dog 1 [5]'.
+--fileName = "albedo [1]" -- The name of the animation to load, without '.txt' at the end. '[' and ']' are reserved characters for the frame count at the end of the name, like 'dog 1 [5]'.
 computerType = "desktop" -- "desktop" or "laptop".
 showFrameCounter = true -- Whether the program displays the frame count.
 loop = true -- Whether the program loops the animation.
@@ -8,6 +11,9 @@ generateOptimizedCode = true -- Whether the program will generate an optimized f
 
 slow = false -- If this is true, the program sleeps by 'slowTime' seconds. If this is false, the program doesn't sleep.
 slowTime = 2 -- If 'slow' is set to true, this is the time slept between drawn frames in seconds.
+
+x = 1
+y = 1
 
 frameSleeping = true -- Whether the program sleeps between drawing each frame, by frameSleep number of seconds.
 frameSleep = 0.05 -- Seconds of sleeping between frames, -1 is no sleeping.

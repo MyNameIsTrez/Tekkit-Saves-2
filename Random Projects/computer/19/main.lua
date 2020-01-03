@@ -160,9 +160,17 @@ local function getSelectedAnimationData()
 		error('You didn\'t enter a valid \'computerType\' name in the cfg file!')
 	end
 
-	print('1/5 - Opening data file...')
+	print('1/5 - Opening chosen data file...')
 	local file = fs.open(cfg.computerType .. ' inputs/' .. cfg.fileName .. '.txt', 'r')
-	cf.yield()
+	if not file then
+		error('There was an attempt to load a file name that doesn\'t exist; check if the chosen file name in the cfg file and the file name in the input folder match.')
+	end
+	cf.tryYield()
+
+	local startIndex = cf.find(cfg.fileName, '[') + 1
+	local endIndex = cf.find(cfg.fileName, ']') - 1
+	frameCount = tonumber(cfg.fileName:sub(startIndex, endIndex))
+	cf.tryYield()
 
 	local cursorX, cursorY = term.getCursorPos()
 	local stringTab = {}
@@ -170,64 +178,48 @@ local function getSelectedAnimationData()
 	for lineStr in file.readLine do
 		table.insert(stringTab, lineStr)
 
-		if i % 100 == 0 then
+		if i % 100 == 0 or i == frameCount then
 			term.setCursorPos(cursorX, cursorY)
-			print('2/5 - Got '..tostring(i)..'/'..'?'..' data lines...')
+			print('2/5 - Got '..tostring(i)..'/'..tostring(frameCount)..' data lines...')
 		end
 		i = i + 1
 
 		cf.yield()
 	end
+	
+	print('Closing the loaded file...')
 	file:close()
-	cf.yield()
-
-	local string = table.concat(stringTab)
-	cf.yield()
-	
-	function getKeyValue(str, key)
-		local keyLength = #(key..'=')
-		local keyStart = str:find(key..'=')
-		if keyStart == nil then return nil end
-		local indexStart = keyStart + keyLength
-
-		local indexEnd = str:find(',', indexStart)
-		if not indexEnd then
-			-- Last value doesn't have a comma after it.
-			indexEnd = str:find('}', indexStart)
-		end
-		indexEnd = indexEnd - 1
-
-		return str:sub(indexStart, indexEnd)
-	end
-
-	-- Convert number string to number.
-	frameCount = tonumber(getKeyValue(string, 'frame_count'))
 	cf.tryYield()
 
-	-- Convert boolean string to boolean.
-	compressed = getKeyValue(string, 'compressed') == 'true'
+	print('Checking if the file is compressed...')
+	local compressedIndex = stringTab[1]:find('compressed') + 11
+	local compressedIndexComma = stringTab[1]:find(',', compressedIndex) - 1
+	compressed = stringTab[1]:sub(compressedIndex, compressedIndexComma) == 'true'
 	cf.tryYield()
 	
-	function getFrames(str)
+	function getFrames(stringTab)
 		local frames = {}
 		
 		local cursorX, cursorY = term.getCursorPos()
 		local i = 1
-		str:gsub('"(.-)"', function (n)
-			table.insert(frames, n)
+		for _, line in pairs(stringTab) do
+			line:gsub('"(.-)"', function (n)
+				table.insert(frames, n)
 
-			if i % 100 == 0 then
-				term.setCursorPos(cursorX, cursorY)
-				print('3/5 - Got '..tostring(i)..'/'..tostring(frameCount)..' frames...')
-			end
-			i = i + 1
+				if i % 100 == 0 or i == frameCount then
+					term.setCursorPos(cursorX, cursorY)
+					print('3/5 - Got '..tostring(i)..'/'..tostring(frameCount)..' frames...')
+				end
+				i = i + 1
 
-			cf.tryYield()
-		end)
+				cf.tryYield()
+			end)
+		end
 		return frames
 	end
 	
-	local optimizedFrames = getFrames(string)
+	print('Getting frames...')
+	local optimizedFrames = getFrames(stringTab)
 	cf.tryYield()
 
 	if compressed then
@@ -249,7 +241,7 @@ local function createGeneratedCodeFolder()
 	end
 end
 
-local function dataToGeneratedCode()
+local function dataToGeneratedCode(x, y)
 	whileLoop = frameCount > 1 and cfg.loop
 	
 	local numberOfNeededFiles = math.ceil(frameCount / cfg.maxFramesPerGeneratedCodeFile)
@@ -265,14 +257,34 @@ local function dataToGeneratedCode()
 		local frameCountToFile = math.min(frameCount - frameOffset, cfg.maxFramesPerGeneratedCodeFile)
 
 		local minFrames = frameOffset + 1
-		local maxFrames = frameOffset + frameCountToFile
+		local maxFrames = frameOffset + frameCountToFile - 1
 
 		for f = minFrames, maxFrames do
-			local string =
-			'\nterm.setCursorPos(1,1)'..
-			'\nwrite("' .. unpackedOptimizedFrames[f] .. '")'..
-			'\nos.queueEvent("r")'..
-			'\nos.pullEvent("r")'
+			-- print('x: '..tostring(x))
+			-- print('y: '..tostring(y))
+			-- local string =
+			-- '\nterm.setCursorPos('..tostring(x)..','..tostring(y)..')'..
+			-- '\nwrite("' .. unpackedOptimizedFrames[f] .. '")'..
+			-- '\nos.queueEvent("r")'..
+			-- '\nos.pullEvent("r")'
+
+			local string = '\nterm.setCursorPos('..tostring(x)..','..tostring(y)..')'
+
+			if not string then
+				print(tostring(string))
+			end
+
+			string = string .. '\nwrite("' .. unpackedOptimizedFrames[f] .. '")'
+
+
+
+			string = string .. '\nos.queueEvent("r")'
+
+
+
+			string = string .. '\nos.pullEvent("r")'
+
+
 
 			if cfg.frameSleeping and cfg.frameSleep ~= -1 then
 				string = string..
@@ -280,14 +292,14 @@ local function dataToGeneratedCode()
 			end
 			
 			handle:write(string)
-
-			cf.tryYield()
-
-			if i % 100 == 0 then
+			
+			if i % 100 == 0 or i == frameCount then
 				term.setCursorPos(cursorX, cursorY)
 				print('4/5 - Wrote '..tostring(i)..'/'..tostring(frameCount)..' optimized frames...')
 			end
 			i = i + 1
+			
+			cf.tryYield()
 		end
 		
 		handle:close()
@@ -315,11 +327,11 @@ local function setup()
 		importAPIs()
 		-- importAnimation() -- Request animation using http calls.
         getSelectedAnimationData()
-		cf.yield()
+		cf.tryYield()
 
 		if cfg.generateOptimizedCode then
 			createGeneratedCodeFolder()
-			dataToGeneratedCode()
+			dataToGeneratedCode(cfg.x, cfg.y)
 		end
     end
 end

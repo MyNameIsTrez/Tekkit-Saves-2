@@ -40,7 +40,7 @@ function round(number, decimals)
 			return math.floor(number + 0.5)
 		end
 	else
-		print("can't give round() a decimal number smaller than 1")
+		print("can't give cf.round() a decimal number smaller than 1")
 	end
 end
 
@@ -185,4 +185,14 @@ function lerp(val1, val2, val3)
   local difference = val2 - val1
   local extra = val3 * difference
   return val1 + extra
+end
+
+function find(str, searchedStr)
+	local index
+	for i = 1, #str do
+		local char = str:sub(i, i)
+		if char == searchedStr then
+			return i
+		end
+	end
 end
