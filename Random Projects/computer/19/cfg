@@ -18,7 +18,7 @@ y = 1
 frameSleeping = true -- Whether the program sleeps between drawing each frame, by frameSleep number of seconds.
 frameSleep = 0.05 -- Seconds of sleeping between frames, -1 is no sleeping.
 
-maxFramesPerGeneratedCodeFile = 1000 -- How many frames can be written to a generated code file in .generatedCodeFiles/ before a new one gets created. 
+maxFramesPerGeneratedCodeFile = 100 -- How many frames can be written to a generated code file in .generatedCodeFiles/ before a new one gets created. 
 
 -- Less important variables.
 leverSide = "right" -- Lever can be pulled to turn off the program.
