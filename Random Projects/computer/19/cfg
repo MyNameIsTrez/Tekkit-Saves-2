@@ -1,27 +1,46 @@
 -- EDITABLE VARIABLES --------------------------------------------------------
 
---fileName = "nakeyjakey esports [20594]" -- The name of the animation to load, without '.txt' at the end. '[' and ']' are reserved characters for the frame count at the end of the name, like 'dog 1 [5]'.
---fileName = "never gonna give you up [5302]" -- The name of the animation to load, without '.txt' at the end. '[' and ']' are reserved characters for the frame count at the end of the name, like 'dog 1 [5]'.
---fileName = "cat falls off wheelchair [90]" -- The name of the animation to load, without '.txt' at the end. '[' and ']' are reserved characters for the frame count at the end of the name, like 'dog 1 [5]'.
---fileName = "scatmans world [6408]" -- The name of the animation to load, without '.txt' at the end. '[' and ']' are reserved characters for the frame count at the end of the name, like 'dog 1 [5]'.
---fileName = "dog 1 tiny [5]" -- The name of the animation to load, without '.txt' at the end. '[' and ']' are reserved characters for the frame count at the end of the name, like 'dog 1 [5]'.
---fileName = "earth dog tiny [72]" -- The name of the animation to load, without '.txt' at the end. '[' and ']' are reserved characters for the frame count at the end of the name, like 'dog 1 [5]'.
---fileName = "earth dog [72]" -- The name of the animation to load, without '.txt' at the end. '[' and ']' are reserved characters for the frame count at the end of the name, like 'dog 1 [5]'.
-fileName = "albedo [1]" -- The name of the animation to load, without '.txt' at the end. '[' and ']' are reserved characters for the frame count at the end of the name, like 'dog 1 [5]'.
-computerType = "desktop" -- "desktop" or "laptop".
-showFrameCounter = true -- Whether the program displays the frame count.
-loop = true -- Whether the program loops the animation.
-generateOptimizedCode = true -- Whether the program will generate an optimized file containing all instructions. Takes time and system memory to create, but executes the drawing way faster.
+-- The name of the animation to load, without '.txt' at the end. '[' and ']' are reserved characters for the frame count at the end of the name, like 'dog 1 [5]'.
+--fileName = "nakeyjakey esports [20593]"
+--fileName = "never gonna give you up [5301]"
+--fileName = "cat falls off wheelchair [89]"
+--fileName = "scatmans world [6407]"
+--fileName = "scatmans world large [6407]"
+--fileName = "dog 1 [5]"
+fileName = "earth dog [72]"
+--fileName = "albedo [1]"
 
-slow = false -- If this is true, the program sleeps by 'slowTime' seconds. If this is false, the program doesn't sleep.
-slowTime = 2 -- If 'slow' is set to true, this is the time slept between drawn frames in seconds.
+-- "desktop" or "laptop".
+computerType = "desktop"
 
-playArea = { X = 1, Y = 1 } -- The top-left corner where the frames will be drawn from.
+-- Whether the program displays the frame count.
+showFrameCounter = true
 
-frameSleeping = true -- Whether the program sleeps between drawing each frame, by frameSleep number of seconds.
-frameSleep = 0.05 -- Seconds of sleeping between frames, -1 is no sleeping.
+-- Whether the program loops the animation.
+loop = true
 
-maxFramesPerGeneratedCodeFile = 100 -- How many frames can be written to a generated code file in .generatedCodeFiles/ before a new one gets created. 
+-- Whether the program will generate an optimized file containing all instructions. Takes time and system memory to create, but executes the drawing way faster.
+generateOptimizedCode = true
 
--- Less important variables.
-leverSide = "right" -- Lever can be pulled to turn off the program.
+-- The top-left corner where the animation will be drawn from.
+playArea = { X = 1, Y = 1 }
+
+-- Whether the program sleeps between drawing each frame, by frameSleep number of seconds.
+frameSleeping = true
+
+-- Seconds of sleeping between frames, -1 is no sleeping.
+frameSleep = 0.05
+
+-- How many frames are skipped between sleeping.
+-- Setting to 0 or 1 means every frame has a sleep.
+-- If frameSleeping is set to false, there is never any sleeping.
+frameSleepSkipping = 1.245
+
+-- How many frames can be written to a generated code file in .generatedCodeFiles/ before a new generatedCode file gets created.
+maxFramesPerGeneratedCodeFile = 100
+
+-- Whether to start playing the animation by default. Can be used to exit the while loop of generatedCode being ran.
+playAnimationBool = true
+
+-- Lever can be pulled to turn off the animation program.
+leverSide = "right"

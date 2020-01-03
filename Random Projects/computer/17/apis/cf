@@ -31,17 +31,12 @@ function pythagoras(a, b)
 	return math.sqrt(a * a + b * b)
 end
 
-function round(number, decimals)
-	if (decimals == nil or decimals > 0) then
-		if (decimals) then
-			local p = math.pow(10, decimals)
-			return math.floor(number * p) / p
-		else
-			return math.floor(number + 0.5)
-		end
-	else
-		print("can't give cf.round() a decimal number smaller than 1")
-	end
+-- Partially written by Brutal_McLegend.
+function round(_nInput, _nDecimals)
+	_nDecimals = _nDecimals or 0
+	if _nDecimals < 0 then error('cf.round(n, d) doesn\'t take a negative decimal count') end
+	local mult = math.pow(10, _nDecimals)
+    return math.floor(_nInput * mult + 0.5) / mult
 end
 
 function clearTerm()
@@ -197,7 +192,7 @@ function find(str, searchedStr)
 	end
 end
 
--- Made by Brutal_McLegend.
+-- Written by Brutal_McLegend.
 function frameWrite( ... )
     local tmp = { ... };
     local tArgs = {};
