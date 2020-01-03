@@ -243,7 +243,7 @@ local function dataToGeneratedCode()
 		local frameCountToFile = math.min(frameCount - frameOffset, cfg.maxFramesPerGeneratedCodeFile)
 
 		local minFrames = frameOffset + 1
-		local maxFrames = frameOffset + frameCountToFile - 1
+		local maxFrames = frameOffset + frameCountToFile
 
 		for f = minFrames, maxFrames do
 			local string = '\ncf.frameWrite("' .. unpackedOptimizedFrames[f] .. '")'..

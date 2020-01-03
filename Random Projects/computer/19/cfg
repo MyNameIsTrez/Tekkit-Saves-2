@@ -4,9 +4,10 @@
 --fileName = "never gonna give you up [5302]" -- The name of the animation to load, without '.txt' at the end. '[' and ']' are reserved characters for the frame count at the end of the name, like 'dog 1 [5]'.
 --fileName = "cat falls off wheelchair [90]" -- The name of the animation to load, without '.txt' at the end. '[' and ']' are reserved characters for the frame count at the end of the name, like 'dog 1 [5]'.
 --fileName = "scatmans world [6408]" -- The name of the animation to load, without '.txt' at the end. '[' and ']' are reserved characters for the frame count at the end of the name, like 'dog 1 [5]'.
-fileName = "earth dog tiny [72]" -- The name of the animation to load, without '.txt' at the end. '[' and ']' are reserved characters for the frame count at the end of the name, like 'dog 1 [5]'.
+--fileName = "dog 1 tiny [5]" -- The name of the animation to load, without '.txt' at the end. '[' and ']' are reserved characters for the frame count at the end of the name, like 'dog 1 [5]'.
+--fileName = "earth dog tiny [72]" -- The name of the animation to load, without '.txt' at the end. '[' and ']' are reserved characters for the frame count at the end of the name, like 'dog 1 [5]'.
 --fileName = "earth dog [72]" -- The name of the animation to load, without '.txt' at the end. '[' and ']' are reserved characters for the frame count at the end of the name, like 'dog 1 [5]'.
---fileName = "albedo [1]" -- The name of the animation to load, without '.txt' at the end. '[' and ']' are reserved characters for the frame count at the end of the name, like 'dog 1 [5]'.
+fileName = "albedo [1]" -- The name of the animation to load, without '.txt' at the end. '[' and ']' are reserved characters for the frame count at the end of the name, like 'dog 1 [5]'.
 computerType = "desktop" -- "desktop" or "laptop".
 showFrameCounter = true -- Whether the program displays the frame count.
 loop = true -- Whether the program loops the animation.
@@ -15,7 +16,7 @@ generateOptimizedCode = true -- Whether the program will generate an optimized f
 slow = false -- If this is true, the program sleeps by 'slowTime' seconds. If this is false, the program doesn't sleep.
 slowTime = 2 -- If 'slow' is set to true, this is the time slept between drawn frames in seconds.
 
-playArea = { X = 426 - 10, Y = 25 } -- The top-left corner where the frames will be drawn from.
+playArea = { X = 1, Y = 1 } -- The top-left corner where the frames will be drawn from.
 
 frameSleeping = true -- Whether the program sleeps between drawing each frame, by frameSleep number of seconds.
 frameSleep = 0.05 -- Seconds of sleeping between frames, -1 is no sleeping.
