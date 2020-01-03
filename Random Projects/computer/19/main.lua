@@ -227,7 +227,7 @@ local function createGeneratedCodeFolder()
 	end
 end
 
-local function dataToGeneratedCode(x, y)
+local function dataToGeneratedCode()
 	whileLoop = frameCount > 1 and cfg.loop
 	
 	local numberOfNeededFiles = math.ceil(frameCount / cfg.maxFramesPerGeneratedCodeFile)
@@ -246,22 +246,7 @@ local function dataToGeneratedCode(x, y)
 		local maxFrames = frameOffset + frameCountToFile - 1
 
 		for f = minFrames, maxFrames do
-			-- print('x: '..tostring(x))
-			-- print('y: '..tostring(y))
-			-- local string =
-			-- '\nterm.setCursorPos('..tostring(x)..','..tostring(y)..')'..
-			-- '\nwrite("' .. unpackedOptimizedFrames[f] .. '")'..
-			-- '\nos.queueEvent("r")'..
-			-- '\nos.pullEvent("r")'
-
-			local string = '\nterm.setCursorPos('..tostring(x)..','..tostring(y)..')'
-
-			if not string then
-				print(tostring(string))
-			end
-
-			string = string ..
-			'\nwrite("' .. unpackedOptimizedFrames[f] .. '")'..
+			local string = '\ncf.frameWrite("' .. unpackedOptimizedFrames[f] .. '")'..
 			'\nos.queueEvent("r")'..
 			'\nos.pullEvent("r")'
 
@@ -310,7 +295,7 @@ local function setup()
 
 		if cfg.generateOptimizedCode then
 			createGeneratedCodeFolder()
-			dataToGeneratedCode(cfg.x, cfg.y)
+			dataToGeneratedCode()
 		end
     end
 end

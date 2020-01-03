@@ -196,3 +196,31 @@ function find(str, searchedStr)
 		end
 	end
 end
+
+function frameWrite( ... )
+    local tArgs = { ... };
+    local tOffset = nil;
+    if #tArgs > 1 then
+        for i=1, #tArgs do
+            if type(tArgs[i]) == "table" then
+                tOffset = tArgs[i];
+                table.remove(tArgs, i);
+            end
+        end
+    end
+    if not tOffset or tOffset == nil then
+        local x, y = term.getCursorPos();
+        tOffset = {X = x, Y = y};
+    end
+    local sWriteArray = {};
+    local sArgs = table.concat(tArgs);
+    for i in string.gmatch(sArgs, "[^\n]+") do
+        table.insert(sWriteArray, i);
+    end
+    local x, y;
+    for i=1, #sWriteArray do
+        term.setCursorPos(tOffset.X, tOffset.Y);
+        term.write(sWriteArray[i]);
+        tOffset.Y = tOffset.Y + 1;
+    end
+end
