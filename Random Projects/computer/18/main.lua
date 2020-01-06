@@ -1,15 +1,14 @@
 -- README --------------------------------------------------------
--- Program used to create and preview animations/images.
 
--- The default terminal ratio is 25:9, which is absolutely tiny.
--- To get the terminal to fill the entire screen, use these widths and heights:
-	-- My 31.5" monitor:
-		-- 426:153 in windowed mode.
-		-- 426:160 in fullscreen mode.
-		-- 200:70 in windowed mode with GUI Scale: Normal. (for debugging)
-	-- My laptop:
-		-- 227:78 in windowed mode.
-		-- 227:85 in fullscreen mode.
+-- Program used to create and preview animations/images.
+ 
+-- The default terminal ratio is 25:9.
+-- To get the terminal to fill your entire monitor and to get a custom text color:
+-- 1. Open AppData/Roaming/.technic/modpacks/tekkit/config/mod_ComputerCraft.cfg
+-- 2. Divide your monitor's width by 6 and your monitor's height by 9.
+-- 3. Set terminal_width to the calculated width and do the same for terminal_height.
+-- 4. Set the terminal_textColour_r, terminal_textColour_g and terminal_textColour_b
+--    to values between 0 and 255 to get a custom text color.
 
 
 

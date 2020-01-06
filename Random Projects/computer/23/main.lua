@@ -1,16 +1,14 @@
 -- README --------------------------------------------------------
 
--- Perlin Noise program. (possibly OpenSimplexNoise too, later?)
-
--- The default terminal ratio is 25:9, which is absolutely tiny.
--- To get the terminal to fill the entire screen, use these widths and heights:
-	-- My 31.5" monitor:
-		-- 426:153 in windowed mode.
-		-- 426:160 in fullscreen mode.
-		-- 200:70 in windowed mode with GUI Scale: Normal. (for debugging)
-	-- My laptop:
-		-- 227:78 in windowed mode.
-		-- 227:85 in fullscreen mode.
+-- Perlin Noise program.
+ 
+-- The default terminal ratio is 25:9.
+-- To get the terminal to fill your entire monitor and to get a custom text color:
+-- 1. Open AppData/Roaming/.technic/modpacks/tekkit/config/mod_ComputerCraft.cfg
+-- 2. Divide your monitor's width by 6 and your monitor's height by 9.
+-- 3. Set terminal_width to the calculated width and do the same for terminal_height.
+-- 4. Set the terminal_textColour_r, terminal_textColour_g and terminal_textColour_b
+--    to values between 0 and 255 to get a custom text color.
 
 -- IMPORTING --------------------------------------------------------
 
@@ -21,8 +19,8 @@ function importAPIs()
 		{id = "cegB4RwE", name = "dithering"},
 	}
 
-	fs.delete("apis") -- Deletes folder.
-	fs.makeDir("apis") -- Creates folder.
+	fs.delete("apis") -- To delete APIs in the folder.
+	fs.makeDir("apis") -- Recreates the folder.
 
 	for _, API in pairs(APIs) do
 		shell.run("pastebin", "get", API.id, "apis/"..API.name)
@@ -60,7 +58,6 @@ function setup()
 end
 
 function main()
-	-- print(perlinNoise.perlin:noise(0.123213, 122))-- Return range: [-1, 1]
 	local t1 = os.clock()
 
 	if not rs.getInput(leverSide) then
@@ -81,22 +78,11 @@ function main()
 				local unmappedValue = perlinNoise.perlin:noise(xNormalized, yNormalized)-- Return range: [-1, 1]
 				local value = cf.map(unmappedValue, -1, 1, 0, 1)
 
-				-- local char
-				-- if value < 1/3 then
-				-- 	char = 'w'
-				-- elseif value < 2/3 then
-				-- 	char = 'b'
-				-- elseif value < 1 then
-				-- 	char = 'c'
-				-- end
-
 				local char = dithering.getClosestChar(value)
 
 				table.insert(characterMap, char)
 
-				-- Writing every individual character one by one is incredibly slow,
-				-- as it took 90 (+- 1) seconds to draw one frame.
-				-- It took 16 (+- 1) seconds when all characters are written at once, so that's 5.625x faster.
+				-- Writing every individual character one by one is incredibly slow. (measured 5.625x slower)
 				-- term.setCursorPos(x, y)
 				-- write(char)
 

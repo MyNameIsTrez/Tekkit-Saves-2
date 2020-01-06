@@ -2,8 +2,10 @@
 
 -- Program used to create and preview dithered animations/images.
 
--- The default terminal ratio is 25:9.
+-- Other APIs required:
+--     * Common Functions (cf) (https://pastebin.com/p9tSSWcB)
 
+-- The default terminal ratio is 25:9.
 -- To get the terminal to fill your entire monitor and to get a custom text color:
 -- 1. Open AppData/Roaming/.technic/modpacks/tekkit/config/mod_ComputerCraft.cfg
 -- 2. Divide your monitor's width by 6 and your monitor's height by 9. 
