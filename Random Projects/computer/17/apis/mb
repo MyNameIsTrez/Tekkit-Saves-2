@@ -24,6 +24,7 @@ Mandelbrot = {
 		local stringTab = {}
 		for y = self.y1, self.y2 do
 			for x = self.x1, self.x2 do
+				-- x * 1.5 compensates for the 6:9 size ratio of characters.
 				local a = cf.map(x * 1.5, self.x1, self.x2, self.zoomX - self.zoom, self.zoomX + self.zoom)
 				local b = cf.map(y, self.y1, self.y2, -self.zoom, self.zoom)
 
@@ -62,6 +63,8 @@ Mandelbrot = {
 
 	getNextFrame = function(self)
 		self.zoom = self.zoom * self.zoomMultiplier
+		term.setCursorPos(1, 1)
+		write(tostring(self.zoom)..'      ')
 		return self:getCurrentFrame()
 	end,
 

@@ -67,7 +67,7 @@ local function getPerlinMap(hor, ver)
             local unmappedValue = perlinNoise.perlin:noise(xNormalized, yNormalized)-- Return range: [-1, 1]
             local value = cf.map(unmappedValue, -1, 1, 0, 1)
 
-            perlinMap[#perlinMap + 1] = value
+            perlinMap[#perlinMap+1] = value
 
             tryYield()
         end
@@ -79,7 +79,6 @@ end
 
 function setup()
     importAPIs()
-	term.clear()
 end
 
 function main()
