@@ -50,10 +50,35 @@ local function tryYield()
     end
 end
 
+local function getPerlinMap(hor, ver)
+    local perlinMap = {}
+    for y = 1, ver do
+        local progress = y / height * 100
+        local roundedProgress = math.floor(progress + 0.5)
+        local progressString = tostring(roundedProgress)..'%'
+
+        term.setCursorPos(width / 2 - #progressString / 2, height / 2)
+        write(progressString)
+
+        for x = 1, hor do
+            local xNormalized = x / hor * noiseZoom
+            local yNormalized = y / ver * noiseZoom
+
+            local unmappedValue = perlinNoise.perlin:noise(xNormalized, yNormalized)-- Return range: [-1, 1]
+            local value = cf.map(unmappedValue, -1, 1, 0, 1)
+
+            perlinMap[#perlinMap + 1] = value
+
+            tryYield()
+        end
+    end
+    return perlinMap
+end
+
 -- CODE EXECUTION --------------------------------------------------------
 
 function setup()
-	importAPIs()
+    importAPIs()
 	term.clear()
 end
 
@@ -61,36 +86,9 @@ function main()
 	local t1 = os.clock()
 
 	if not rs.getInput(leverSide) then
-		local characterMap = {}
-
-		for y = 1, height do
-			local progress = y / height * 100
-			local roundedProgress = math.floor(progress + 0.5)
-			local progressString = tostring(roundedProgress)..'%'
-
-			term.setCursorPos(width / 2 - #progressString / 2, height / 2)
-			write(progressString)
-
-			for x = 1, width do
-				local xNormalized = x / width * noiseZoom
-				local yNormalized = y / height * noiseZoom
-
-				local unmappedValue = perlinNoise.perlin:noise(xNormalized, yNormalized)-- Return range: [-1, 1]
-				local value = cf.map(unmappedValue, -1, 1, 0, 1)
-
-				local char = dithering.getClosestChar(value)
-
-				table.insert(characterMap, char)
-
-				-- Writing every individual character one by one is incredibly slow. (measured 5.625x slower)
-				-- term.setCursorPos(x, y)
-				-- write(char)
-
-				tryYield()
-			end
-		end
-
-		local noiseString = table.concat(characterMap)
+        local perlinMap = getPerlinMap(width-1, height)
+        local frame = dithering.getFrame(perlinMap, width-1)
+		local noiseString = table.concat(frame)
 
 		term.setCursorPos(1, 1)
 		write(noiseString)

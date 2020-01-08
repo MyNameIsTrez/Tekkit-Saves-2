@@ -184,3 +184,15 @@ function getClosestChar(n)
 	local closestCharTable = charsSortedTables[getClosestIndex(floatIndex)]
 	return closestCharTable[1] -- For now, we always give the first character in the table.
 end
+
+function getFrame(numTab)
+	if not type(numTab) == 'table' then error('getFrame requires a table as an argument', 2)
+	local charTab = {}
+	for x = 1, #numTab do
+		charTab[#charTab + 1] = {}
+		for y = 1, #numTab[x] do
+			charTab[x][y] = getClosestChar(numTab[x][y])
+		end	
+	end
+	return charTab
+end
