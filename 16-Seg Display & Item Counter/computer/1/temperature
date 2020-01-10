@@ -9,3 +9,4 @@ function getTemperature()
   local obj = json.decode(str)
   return obj.liveweer[1].temp
 end
+

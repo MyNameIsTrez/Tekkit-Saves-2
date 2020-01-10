@@ -79,6 +79,7 @@ end
 
 function setup()
     importAPIs()
+    term.clear()
 end
 
 function main()

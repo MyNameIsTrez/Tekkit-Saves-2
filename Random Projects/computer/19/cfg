@@ -5,7 +5,11 @@
 --fileName = "never gonna give you up [5301]"
 --fileName = "cat falls off wheelchair [89]"
 --fileName = "scatmans world [6407]"
-fileName = "finding dory large [13]"
+--fileName = "you just got vectored 2 [1]"
+--fileName = "you just got vectored [1]"
+--fileName = "finding dory [13]"
+--fileName = "finding dory large [13]"
+fileName = "flowers [1]"
 --fileName = "backstroke of the west [251924]"
 --fileName = "scatmans world large [6407]"
 --fileName = "dog 1 [5]"
@@ -13,7 +17,7 @@ fileName = "finding dory large [13]"
 --fileName = "albedo [1]"
 
 -- "desktop" or "laptop".
-computerType = "desktop"
+computerType = "laptop"
 
 -- Whether the program displays the frame count.
 showFrameCounter = true
@@ -33,7 +37,7 @@ frameSleep = 0.05
 -- How many frames are skipped between sleeping.
 -- Setting to 0 or 1 means every frame has a sleep.
 -- If frameSleeping is set to false, there is never any sleeping.
-frameSleepSkipping = 1.245
+frameSleepSkipping = 1.5
 
 -- How many frames can be written to a generated code file in .generatedCodeFiles/ before a new generatedCode file gets created.
 maxFramesPerGeneratedCodeFile = 100

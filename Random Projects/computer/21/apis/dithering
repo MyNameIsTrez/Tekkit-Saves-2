@@ -189,15 +189,17 @@ end
 -- which takes up one character slot at the end of every line.
 -- This means you need to give a numTab with a horizontal size of width - 1
 -- if you want to fill the entire width with characters!
-function getFrame(numTab, hor, ver)
-	if not (type(numTab) == 'table') or not hor then error('getFrame requires a table and a horizontal size as arguments', 2) end
+function getFrame(numTab, hor)
+	if not (type(numTab) == 'table') or not hor then error('getFrame() requires a table and a horizontal size as arguments', 2) end
 	local frame = {}
-	local ver = #numTab / hor
+	local ver = #numTab/hor
 	for y = 1, ver do
 		for x = 1, hor do
-			frame[#frame + 1] = getClosestChar(numTab[x + (y - 1) * hor])
+			frame[#frame+1] = getClosestChar(numTab[x + (y-1)*hor])
 		end
-		frame[#frame + 1] = '\n'
+		if y < ver then
+			frame[#frame+1] = '\n'
+		end
 	end
 	return frame
 end

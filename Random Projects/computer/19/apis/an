@@ -35,10 +35,6 @@ Animation = {
 
 	-- IMPORTING --------------------------------------------------------
 
-	importConfig = function(self)
-		os.loadAPI('cfg')
-	end,
-
 	-- Request animation using http calls.
 	-- importAnimationData = function(self)
 	-- end,
