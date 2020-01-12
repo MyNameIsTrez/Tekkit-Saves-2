@@ -3,9 +3,9 @@
 function importAPIs()
 	local APIs = {
 		{id = 'p9tSSWcB', name = 'cf'}, -- Common Functions.
-		{id = 'LNab4wrv', name = 'an'}, -- Animation.
         {id = "4nRg9CHU", name = "json"}, -- HTTPS needs JSON.
-        {id = "iyBc3BWj", name = "https"}, -- HTTPS.
+        {id = "iyBc3BWj", name = "https"}, -- Animation needs HTTPS.
+		{id = 'LNab4wrv', name = 'an'}, -- Animation.
 	}
 
 	fs.delete('apis') -- Deletes the folder, with every API file in it.
@@ -28,13 +28,12 @@ term.setCursorPos(1, 1)
 
 if not rs.getInput(cfg.leverSide) then
     -- Setup.
-    local animation = an.Animation:new(shell)
+	local animation = an.Animation:new(shell)
     animation:setShell(shell)
-    animation:importConfig()
 
-    -- Main.
-	animation:loadAnimation(cfg.fileName)
-	print('4/4 - Executing code...')
+	-- Main.
+	local outputFolder = 'Animations/size_' .. cfg.animationSize.width .. 'x' .. cfg.animationSize.height
+	animation:loadAnimation(cfg.fileName, cfg.animationSize, outputFolder)
 	animation:playAnimation(cfg.loop)
 	local width, height = term.getSize()
 	term.setCursorPos(width - 1, height)

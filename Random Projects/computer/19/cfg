@@ -1,32 +1,18 @@
 -- EDITABLE VARIABLES --------------------------------------------------------
 
--- The name of the animation to load, without '.txt' at the end. '[' and ']' are reserved characters for the frame count at the end of the name, like 'dog 1 [5]'.
---fileName = "nakeyjakey esports [20593]"
---fileName = "never gonna give you up [5301]"
---fileName = "cat falls off wheelchair [89]"
---fileName = "scatmans world [6407]"
---fileName = "you just got vectored 2 [1]"
---fileName = "you just got vectored [1]"
---fileName = "finding dory [13]"
---fileName = "finding dory large [13]"
-fileName = "flowers [1]"
---fileName = "backstroke of the west [251924]"
---fileName = "scatmans world large [6407]"
---fileName = "dog 1 [5]"
---fileName = "earth dog [72]"
---fileName = "albedo [1]"
-
--- "desktop" or "laptop".
-computerType = "laptop"
-
--- Whether the program displays the frame count.
-showFrameCounter = true
+fileName = 'More than 100 MB/scatmans_world'
+--fileName = 'finding_dory'
 
 -- Whether the program loops the animation.
 loop = true
 
+--animationSize = { width = 30, height = 30 }
+--animationSize = { width = 227, height = 85 }
+animationSize = { width = 426, height = 160 }
+
 -- The top-left corner where the animation will be drawn from.
 playArea = { X = 1, Y = 1 }
+
 
 -- Whether the program sleeps between drawing each frame, by frameSleep number of seconds.
 frameSleeping = true
@@ -37,7 +23,8 @@ frameSleep = 0.05
 -- How many frames are skipped between sleeping.
 -- Setting to 0 or 1 means every frame has a sleep.
 -- If frameSleeping is set to false, there is never any sleeping.
-frameSleepSkipping = 1.5
+frameSleepSkipping = 1
+
 
 -- How many frames can be written to a generated code file in .generatedCodeFiles/ before a new generatedCode file gets created.
 maxFramesPerGeneratedCodeFile = 100
@@ -46,4 +33,4 @@ maxFramesPerGeneratedCodeFile = 100
 playAnimationBool = true
 
 -- Lever can be pulled to turn off the animation program.
-leverSide = "right"
+leverSide = 'right'
