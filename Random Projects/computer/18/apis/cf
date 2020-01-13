@@ -241,3 +241,12 @@ function barshift(n, bits)
 	end
 	return n
 end
+
+function valueInTable(tab, search)
+	for key, val in pairs(tab) do
+		print(val)
+		if type(val) == 'table' and val ~= tab then	return valueInTable(val, search) end
+		if val == search then return true end
+	end
+	return false
+end

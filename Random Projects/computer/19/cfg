@@ -1,7 +1,8 @@
 -- EDITABLE VARIABLES --------------------------------------------------------
 
-fileName = 'More than 100 MB/scatmans_world'
---fileName = 'finding_dory'
+--fileName = 'More than 100 MB/scatmans_world'
+--fileName = 'More than 100 MB/cyclops_cat'
+fileName = 'earth_dog'
 
 -- Whether the program loops the animation.
 loop = true
@@ -9,6 +10,7 @@ loop = true
 --animationSize = { width = 30, height = 30 }
 --animationSize = { width = 227, height = 85 }
 animationSize = { width = 426, height = 160 }
+--animationSize = { width = 640, height = 240 }
 
 -- The top-left corner where the animation will be drawn from.
 playArea = { X = 1, Y = 1 }
@@ -18,7 +20,7 @@ playArea = { X = 1, Y = 1 }
 frameSleeping = true
 
 -- Seconds of sleeping between frames, -1 is no sleeping.
-frameSleep = 0.05
+frameSleep = 0.1
 
 -- How many frames are skipped between sleeping.
 -- Setting to 0 or 1 means every frame has a sleep.

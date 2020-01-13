@@ -1,0 +1,68 @@
+--------------------------------------------------
+-- README
+
+
+--[[
+
+API to draw 3D objects.
+
+REQUIREMENTS
+	* None
+
+]]--
+
+
+--------------------------------------------------
+-- CLASSES
+
+
+ThreeDee = {
+
+	new = function(self, points, connections, fillConnections)
+		local startingValues = {
+			points = points,
+			connections = connections,
+			fillConnections = fillConnections,
+		}
+		
+		setmetatable(startingValues, {__index = self})
+		return startingValues
+	end,
+	
+	draw = function(self)
+		-- Draw connections.
+		for originKey, destinations in ipairs(self.connections) do
+			origin = self.points[originKey]
+			for _, destinationKey in ipairs(destinations) do
+				local destination = self.points[destinationKey]
+				self:line(origin[1], origin[2], destination[1], destination[2])
+			end
+		end
+		
+		-- Draw points.
+		for _, point in ipairs(self.points) do
+			term.setCursorPos(point[1], point[2])
+			write('#')
+		end
+	end,
+	
+	line = function(self, x1, y1, x2, y2)
+  		local x_diff = x2 - x1
+  		local y_diff = y2 - y1
+		
+  		local distance = math.sqrt(x_diff^2 + y_diff^2)
+  		local step_x = x_diff / distance
+  		local step_y = y_diff / distance
+		
+  		for i = 0, distance do
+    		local x = i * step_x
+    		local y = i * step_y
+			term.setCursorPos(math.floor(x1 + x + 0.5), math.floor(y1 + y + 0.5))
+			write('@')
+  		end
+	end,
+
+}
+
+
+--------------------------------------------------
