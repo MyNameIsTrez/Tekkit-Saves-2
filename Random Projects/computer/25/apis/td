@@ -18,21 +18,37 @@ REQUIREMENTS
 
 ThreeDee = {
 
-	new = function(self, points, connections, fillConnections)
+	new = function(self, points, connections, fillConnections, canvasWidth, canvasHeight)
 		local startingValues = {
-			points = points,
 			connections = connections,
 			fillConnections = fillConnections,
+			canvasWidth = canvasWidth,
+			canvasHeight = canvasHeight,
+			canvasCenterX = math.floor(canvasWidth/2),
+			canvasCenterY = math.floor(canvasHeight/2),
+			points = self:getCanvasPoints(points, canvasWidth, canvasHeight),
+			chars = {'@', '#', '0', 'A', '5', '2', '$', '3', 'C', '1', '%', '=', '(', '/', '!', '-', ':', "'", '.'},
 		}
 		
 		setmetatable(startingValues, {__index = self})
 		return startingValues
 	end,
 	
+	getCanvasPoints = function(self, points, canvasWidth, canvasHeight)
+		local canvasPoints = {}
+		for i, point in ipairs(points) do
+			canvasPoints[i] = {}
+			canvasPoints[i][1] = point[1] * canvasWidth
+			canvasPoints[i][2] = point[2] * canvasHeight
+		end
+		return canvasPoints
+	end,
+	
 	draw = function(self)
+		--[[
 		-- Draw connections.
 		for originKey, destinations in ipairs(self.connections) do
-			origin = self.points[originKey]
+			local origin = self.points[originKey]
 			for _, destinationKey in ipairs(destinations) do
 				local destination = self.points[destinationKey]
 				self:line(origin[1], origin[2], destination[1], destination[2])
@@ -42,7 +58,21 @@ ThreeDee = {
 		-- Draw points.
 		for _, point in ipairs(self.points) do
 			term.setCursorPos(point[1], point[2])
-			write('#')
+			self:writeChar(point[1], point[2])
+		end
+		]]--
+		
+		--[[
+		-- Draw filled circle.
+		self:circle(self.canvasWidth/3, self.canvasHeight/2)
+		]]--
+		
+		for y = 1, self.canvasHeight do
+			for x = 1, self.canvasWidth do
+				self:writeChar(x, y)
+				--os.queueEvent('yield')
+				--os.pullEvent('yield')
+			end
 		end
 	end,
 	
@@ -57,9 +87,26 @@ ThreeDee = {
   		for i = 0, distance do
     		local x = i * step_x
     		local y = i * step_y
-			term.setCursorPos(math.floor(x1 + x + 0.5), math.floor(y1 + y + 0.5))
-			write('@')
+			self:writeChar(math.floor(x1 + x + 0.5), math.floor(y1 + y + 0.5))
   		end
+	end,
+
+	writeChar = function(self, x, y)
+		distCenterX = self.canvasCenterX - x
+		distCenterY = self.canvasCenterY - y
+		local dist = math.sqrt(distCenterX*distCenterX + distCenterY*distCenterY)
+    	local char = self.chars[math.ceil(dist < 19 and (dist > 0 and dist or 1) or 19)]
+		term.setCursorPos(x, y)
+		write(char)
+	end,
+	
+	circle = function(self, centerX, centerY, radius)
+  		  local xMult = 1.5 -- Characters are 6x9 pixels in size.
+		  for rad = 0, 2 * math.pi, math.pi / 180 do
+    	      local x = math.cos(rad) * radius * xMult
+    	      local y = math.sin(rad) * radius
+    	      writeChar(centerX + x, centerY + y)
+  		  end
 	end,
 
 }

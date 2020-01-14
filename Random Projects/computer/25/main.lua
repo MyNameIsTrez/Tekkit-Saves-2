@@ -26,25 +26,15 @@ term.setCursorPos(1, 1)
 
 if not rs.getInput(cfg.leverSide) then
 	-- Setup.
-	-- local points = {
-	-- 	{math.random(100),math.random(100),math.random(100)},
-	-- 	{math.random(100),math.random(100),math.random(100)},
-	-- 	{math.random(100),math.random(100),math.random(100)},
-	-- 	{math.random(100),math.random(100),math.random(100)},
-	-- 	{math.random(100),math.random(100),math.random(100)},
-	-- 	{math.random(100),math.random(100),math.random(100)},
-	-- 	{math.random(100),math.random(100),math.random(100)},
-	-- 	{math.random(100),math.random(100),math.random(100)},
-	-- }
 	local points = {
-		{,,},
-		{,,},
-		{,,},
-		{,,},
-		{,,},
-		{,,},
-		{,,},
-		{,,},
+		{2/5,1/5},
+		{4/5,1/5},
+		{1/5,2/5},
+		{3/5,2/5},
+		{2/5,3/5},
+		{4/5,3/5},
+		{1/5,4/5},
+		{3/5,4/5},
 	}
 	local connections = {
 		{2,3,5},
@@ -61,9 +51,11 @@ if not rs.getInput(cfg.leverSide) then
 		{1,3,5,7},
 	}
 
-	threedee = td.ThreeDee:new(points, connections, fillConnections)
+	width, height = term.getSize()
+	width = width - 1
+	threedee = td.ThreeDee:new(points, connections, fillConnections, width, height)
 
 	-- Main.
 	threedee:draw()
-	-- threedee:line(10, 15, 30, 40)
+	term.setCursorPos(width, height)
 end
