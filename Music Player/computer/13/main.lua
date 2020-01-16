@@ -1,7 +1,7 @@
 -- EDITABLE -------------------------------------------
-local playingSleep = 0.05 -- The time slept between played notes.
+local playingSleep = 0.25 -- The time slept between played notes.
 
-local spacing = 5 -- Vertical line that separates the notes.
+local spacing = 5 -- Vertical line that separates the notes. Set to 0 for no spacing.
 
 local modemSide = "back" -- The side of the computer the modem is placed on.
 
@@ -83,10 +83,11 @@ end
 
 -- Spacing.
 function drawSpacingLines()
-	for col = 1, width - 2 do
-		if (col % spacing == 0) then
-			for row = 1, 25 do
-				term.setCursorPos(col + 3 - xOffset, row + 2)
+    local start = 4 + spacing - 1
+	for col = start, width - 2 do
+		if ((col - start) % spacing == 0) then
+			for row = 3, 27 do
+				term.setCursorPos(col - xOffset, row)
 				write(spacingSymbol)
 			end
 		end
@@ -96,9 +97,12 @@ end
 function drawSpacingSeconds()
 	for col = 1, width - 2 do
 		local temp = 1 / playingSleep
-		if (col % temp == 0) then
-			term.setCursorPos(col + 3, 29)
-			write(tostring(col / temp).."s")
+        if (col % temp == 0) then
+            str = tostring(col / temp)
+            if col + #str < width - 2 then
+			    term.setCursorPos(col + 3, 29)
+                write(str)
+            end
 		end
 	end
 end
@@ -357,7 +361,7 @@ function setup()
 
 	loadSong()
 	setMaxColumn()
-	drawSpacingLines()
+	if spacing >= 0 then drawSpacingLines() end
 	drawSpacingSeconds()
 	drawNotes()
 	drawStartingCursorPos()
@@ -371,9 +375,9 @@ function main()
 		local event, value = os.pullEvent()
 
 		-- USEFUL WHEN DEBUGGING ---------------------
-		term.setCursorPos(1, 29)
-		print("xOffset: "..xOffset.."       ")
-		print("cursor.x: "..cursor.x.."       ")
+		-- term.setCursorPos(1, 29)
+		-- print("xOffset: "..xOffset.."       ")
+		-- print("cursor.x: "..cursor.x.."       ")
 
         -- The 'key' event is fired when keys like shift are pressed.
         if (event == "char" or event == "key") then
