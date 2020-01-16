@@ -28,40 +28,24 @@ importConfig()
 
 if not rs.getInput(cfg.leverSide) then
 	-- Setup.
-	local points = {
-		{-10,-10},
-		{10,-10},
-		{-15,-3},
-		{5,-3},
-		{-10,3},
-		{10,3},
-		{-15,10},
-		{5,10},
-	}
-	local connections = {
-		{2,3,5},
-		{1,4,6},
-		{1,4,7},
-		{2,3,8},
-		{1,6,7},
-		{2,5,8},
-		{3,5,8},
-		{4,6,7},
-	}
-	local fillPoints = {
-		{1,2,3,4},
-		-- {1,3,5,7},
+	local cubes = {
+		{
+			x = 0,
+			y = 0,
+			z = 0,
+			scale = 1,
+		},
 	}
 
 	width, height = term.getSize()
     width = width - 1
     framebuffer = fb.FrameBuffer:new(width, height)
     framebuffer:createBuffer()
-    threedee = td.ThreeDee:new(framebuffer, points, connections, fillPoints, width, height, 1)
+    threedee = td.ThreeDee:new(framebuffer, cubes, width, height, 1)
 
     -- Main.
     threedee:draw()
-    -- framebuffer:draw()
+    framebuffer:draw()
 
     while true do
         local event, keyNum = os.pullEvent()
@@ -69,7 +53,7 @@ if not rs.getInput(cfg.leverSide) then
             local char = keys.getName(keyNum)
             threedee:moveCamera(char)
             threedee:draw()
-            -- framebuffer:draw()
+            framebuffer:draw()
         end
     end
 end
