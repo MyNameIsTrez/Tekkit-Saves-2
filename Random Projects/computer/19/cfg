@@ -3,14 +3,26 @@
 --fileName = 'More than 100 MB/scatmans_world'
 --fileName = 'More than 100 MB/cyclops_cat'
 --fileName = 'earth_dog'
-fileName = 'earth_dog_extended'
+--fileName = 'earth_dog_extended'
+--fileName = 'coincidence_i_think_not_extended'
+--fileName = 'finding_dory_extended'
+--fileName = 'bouncing_ball_extended'
+--fileName = 'albedo_extended'
+--fileName = 'where_is_my_super_suit_extended'
+--fileName = 'flowers_extended'
+--fileName = 'you_just_got_vectored_extended'
+--fileName = 'cat_falls_off_wheelchair_extended'
+--fileName = 'caramelldansen_undertale_extended'
+--fileName = 'More than 100 MB/speed_of_kirb_10_extended'
+--fileName = 'More than 100 MB/scatmans_world_extended'
+fileName = 'More than 100 MB/backstroke_of_the_west_extended'
 
 -- Whether the program loops the animation.
 loop = true
 
---animationSize = { width = 30, height = 30 }
+animationSize = { width = 30, height = 30 }
 --animationSize = { width = 227, height = 85 }
-animationSize = { width = 426, height = 160 }
+--animationSize = { width = 426, height = 160 }
 --animationSize = { width = 640, height = 240 }
 
 -- The top-left corner where the animation will be drawn from.
@@ -21,12 +33,15 @@ playArea = { X = 1, Y = 1 }
 frameSleeping = true
 
 -- Seconds of sleeping between frames, -1 is no sleeping.
-frameSleep = 0.1
+frameSleep = 0.05
 
 -- How many frames are skipped between sleeping.
 -- Setting to 0 or 1 means every frame has a sleep.
 -- If frameSleeping is set to false, there is never any sleeping.
-frameSleepSkipping = 1
+
+-- 1.57 for speed of kirby extended, with 426x160 animationSize
+-- 1.57 for scatmans world extended, with 426x160 animationSize
+frameSleepSkipping = 1.57
 
 
 -- How many frames can be written to a generated code file in .generatedCodeFiles/ before a new generatedCode file gets created.
