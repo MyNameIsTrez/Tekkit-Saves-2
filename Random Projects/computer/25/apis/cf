@@ -154,14 +154,13 @@ function printTable(tab, recursive, depth)
 	for key, value in pairs(tab) do
 		yield() -- Need to yield, as the next bit of code can be recursive.
 		
-		local spacingCount = longestKey - #tostring(key) + 1 -- How many spaces are added between the key and value.
+		local spacingCount = longestKey - #tostring(key) -- How many spaces are added between the key and value.
 		print(
-			string.rep('  ', depth).. -- Shift tables that are deep inside the original table.
-			'key: '..
+			string.rep('    ', depth).. -- Shift tables that are deep inside the original table.
 			tostring(key)..
 			string.rep(' ', spacingCount)..
-			'| value: '..
-			tostring(value)
+			', '..
+			tostring(type(value) == 'table' and 'table' or value)
 		)
 		
 		local isTable = type(value) == 'table'
