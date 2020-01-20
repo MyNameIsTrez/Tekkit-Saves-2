@@ -23,6 +23,12 @@ end
 
 importAPIs()
 importConfig()
+
+local monitorSide = 'back'
+local mon = peripheral.wrap(monitorSide)
+term.redirect(mon)
+-- mon.setTextScale(1) -- by default already
+
 term.clear()
 term.setCursorPos(1, 1)
 
@@ -36,5 +42,7 @@ if not rs.getInput(cfg.leverSide) then
 	animation:loadAnimation(cfg.fileName, cfg.animationSize, outputFolder)
 	animation:playAnimation(cfg.loop)
 	local width, height = term.getSize()
-	term.setCursorPos(width - 1, height)
+    term.setCursorPos(width - 1, height)
+
+    term.restore()
 end
