@@ -15,13 +15,15 @@
 --fileName = 'caramelldansen_undertale_extended'
 --fileName = 'More than 100 MB/speed_of_kirb_10_extended'
 --fileName = 'More than 100 MB/scatmans_world_extended'
-fileName = 'More than 100 MB/backstroke_of_the_west_extended'
+--fileName = 'More than 100 MB/backstroke_of_the_west_extended'
+--fileName = 'More than 100 MB/never_gonna_give_you_up_extended'
+fileName = 'More than 100 MB/scatmans_world_extended'
 
 -- Whether the program loops the animation.
 loop = true
 
-animationSize = { width = 30, height = 30 }
---animationSize = { width = 227, height = 85 }
+--animationSize = { width = 30, height = 30 }
+animationSize = { width = 227, height = 85 }
 --animationSize = { width = 426, height = 160 }
 --animationSize = { width = 640, height = 240 }
 
