@@ -1,5 +1,7 @@
 -- EDITABLE VARIABLES --------------------------------------------------------
 
+useMonitor = false
+
 --fileName = 'More than 100 MB/scatmans_world'
 --fileName = 'More than 100 MB/cyclops_cat'
 --fileName = 'earth_dog'
@@ -25,9 +27,9 @@ fileName = 'earth_dog_extended'
 loop = true
 
 --animationSize = { width = 30, height = 30 }
-animationSize = { width = 77, height = 38 } -- max 8x6 monitor size
+--animationSize = { width = 77, height = 38 } -- max 8x6 monitor size
 --animationSize = { width = 227, height = 85 }
---animationSize = { width = 426, height = 160 }
+animationSize = { width = 426, height = 160 }
 --animationSize = { width = 640, height = 240 }
 
 -- The top-left corner where the animation will be drawn from.

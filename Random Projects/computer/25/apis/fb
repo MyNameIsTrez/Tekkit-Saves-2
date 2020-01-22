@@ -19,8 +19,10 @@ REQUIREMENTS
 
 FrameBuffer = {
 
-	new = function(canvasWidth, canvasHeight)
+	new = function(startX, startY, canvasWidth, canvasHeight)
         local self = {
+			startX = startX,
+			startY = startY,
 			canvasWidth = canvasWidth,
 			canvasHeight = canvasHeight,
 			buffer = {},
@@ -54,6 +56,28 @@ FrameBuffer = {
 		self.buffer = bufferCopy
 	end,
 	
+	writeChar = function(self, x, y, char)
+        -- Might need < instead of <= .
+        if y > self.startY and y <= self.canvasHeight + self.startY and x > self.startX and x <= self.canvasWidth + self.startX then
+            self.buffer[y][x] = char
+        end
+    end,
+	
+	writeLine = function(self, x1, y1, x2, y2, char)
+  		local x_diff = x2 - x1
+  		local y_diff = y2 - y1
+		
+  		local distance = math.sqrt(x_diff^2 + y_diff^2)
+  		local step_x = x_diff / distance
+  		local step_y = y_diff / distance
+		
+  		for i = 0, distance do
+    		local x = i * step_x
+    		local y = i * step_y
+			self:writeChar(math.floor(x1 + x + 0.5), math.floor(y1 + y + 0.5), char)
+  		end
+	end,
+	
 	draw = function(self)		
 		-- Draw the current frame.
 		strTab = {}
@@ -61,7 +85,7 @@ FrameBuffer = {
 			strTab[#strTab + 1] = table.concat(self.buffer[y])
 			strTab[#strTab + 1] = '\n' -- Maybe concating above instead is faster?
 		end
-		term.setCursorPos(cfg.playArea.X, cfg.playArea.Y)
+		term.setCursorPos(self.startX, self.startY)
 		write(table.concat(strTab))
 
 		-- Clear the buffer.

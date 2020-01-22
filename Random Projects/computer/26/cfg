@@ -1,0 +1,4 @@
+-- The top-left corner where will be drawn from.
+playArea = { X = 1, Y = 1 }
+
+leverSide = 'right'

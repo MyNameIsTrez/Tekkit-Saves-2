@@ -223,3 +223,11 @@ function valueInTable(tab, search)
 	end
 	return false
 end
+
+function getPeripheralSide()
+	for _, side in ipairs(rs.getSides()) do
+		if peripheral.isPresent(side) then
+			return side
+		end
+	end
+end

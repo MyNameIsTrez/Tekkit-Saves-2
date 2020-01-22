@@ -24,12 +24,11 @@ end
 importAPIs()
 importConfig()
 
-local mon = peripheral.wrap(cf.getPeripheralSide())
-term.redirect(mon)
-mon.setTextScale(1) -- by default already
-
-term.clear()
-term.setCursorPos(1, 1)
+local monitorSide = cf.getPeripheralSide()
+if cfg.useMonitor and monitorSide then
+	local mon = peripheral.wrap(monitorSide)
+	term.redirect(mon)
+end
 
 if not rs.getInput(cfg.leverSide) then
     -- Setup.
@@ -43,5 +42,7 @@ if not rs.getInput(cfg.leverSide) then
 	local width, height = term.getSize()
     term.setCursorPos(width - 1, height)
 
-    term.restore()
+	if cfg.useMonitor and monitorSide then
+		term.restore()
+	end
 end

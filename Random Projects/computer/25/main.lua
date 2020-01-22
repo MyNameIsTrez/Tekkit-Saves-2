@@ -1,5 +1,3 @@
--- CUSTOM CODE --------------------------------------------------------
-
 function importAPIs()
 	local APIs = {
 		{id = 'p9tSSWcB', name = 'cf'}, -- Common Functions.
@@ -49,7 +47,7 @@ if not rs.getInput(cfg.leverSide) then
 	local connectionChar = '@'
 	local pointChar = '+'
 	
-    local framebuffer = fb.FrameBuffer.new(width, height)
+    local framebuffer = fb.FrameBuffer.new(cfg.playArea.X, cfg.playArea.Y, width, height)
     local threedee = td.ThreeDee.new(framebuffer, width, height, cubes, blockDiameter, offsets, connectionChar, pointChar)
 
 	-- Main.
