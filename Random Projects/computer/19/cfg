@@ -44,8 +44,7 @@ frameSleep = 0.05
 -- Setting to 0 or 1 means every frame has a sleep.
 -- If frameSleeping is set to false, there is never any sleeping.
 
--- 1.57 for speed of kirby extended, with 426x160 animationSize
--- 1.57 for scatmans world extended, with 426x160 animationSize
+-- 1.57 for YouTube videos, with 426x160 animationSize
 frameSleepSkipping = 1.57
 
 

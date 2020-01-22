@@ -24,10 +24,9 @@ end
 importAPIs()
 importConfig()
 
-local monitorSide = 'back'
-local mon = peripheral.wrap(monitorSide)
+local mon = peripheral.wrap(cf.getPeripheralSide())
 term.redirect(mon)
--- mon.setTextScale(1) -- by default already
+mon.setTextScale(1) -- by default already
 
 term.clear()
 term.setCursorPos(1, 1)
@@ -35,7 +34,7 @@ term.setCursorPos(1, 1)
 if not rs.getInput(cfg.leverSide) then
     -- Setup.
 	local animation = an.Animation:new(shell)
-    animation:setShell(shell)
+    animation:setShell(shell) -- optional
 
 	-- Main.
 	local outputFolder = 'Animations/size_' .. cfg.animationSize.width .. 'x' .. cfg.animationSize.height

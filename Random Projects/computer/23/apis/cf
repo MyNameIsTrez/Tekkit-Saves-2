@@ -192,8 +192,7 @@ function find(str, searchedStr)
 end
 
 function frameWrite(str)
-	local x, y = cfg.playArea.X, cfg.playArea.Y
-	if x ~= 1 or y ~= 1 then term.setCursorPos(x, y) end
+	term.setCursorPos(cfg.playArea.X, cfg.playArea.Y)
 	write(str)
 end
 
