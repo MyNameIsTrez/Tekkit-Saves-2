@@ -31,8 +31,9 @@ if not rs.getInput(cfg.leverSide) then
 	local firstPersonWidth = width - topDownWidth - 1
 	
 	local framebuffer = fb.FrameBuffer.new(cfg.playArea.X, cfg.playArea.Y, width, height)
-	local boundaryCount, rayCount, fov, rotationSpeed = 5, 45, math.pi/3, math.pi/20
-	local raycasting = rc.RayCasting.new(topDownWidth, height, firstPersonWidth, boundaryCount, rayCount, fov, rotationSpeed, '#', '.', '@', framebuffer)
+	local boundaryCount, rayCount, fov, rotationSpeed, grayscaleBool = 15, 60, math.pi/3, math.pi/45, true
+	local boundaryChar, rayChar, raycasterChar = '#', '.', '~'
+	local raycasting = rc.RayCasting.new(topDownWidth, height, firstPersonWidth, boundaryCount, rayCount, fov, rotationSpeed, grayscaleBool, boundaryChar, rayChar, raycasterChar, framebuffer)
 
 	-- Main.
 	while true do
