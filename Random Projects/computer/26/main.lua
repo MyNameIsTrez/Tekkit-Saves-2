@@ -3,7 +3,7 @@ function importAPIs()
 		{id = 'p9tSSWcB', name = 'cf'}, -- Common Functions.
 		{id = '83q6p4Sp', name = 'fb'}, -- FrameBuffer.
 		{id = 'ENwuVX0P', name = 'rc'}, -- RayCasting.
-		{id = 'nsrVpDY6', name = 'pn'}, -- Perlin Noise.
+		{id = 'sSjBVjgc', name = 'keys'}, -- Gets names of keys.
 	}
 
 	fs.delete('apis') -- Deletes the folder, with every API file in it.
@@ -26,23 +26,32 @@ if not rs.getInput(cfg.leverSide) then
 	-- Setup.
 	local width, height = term.getSize()
 	width = width - 1
+
+	local topDownWidth = width / 2
+	local firstPersonWidth = width - topDownWidth - 1
 	
 	local framebuffer = fb.FrameBuffer.new(cfg.playArea.X, cfg.playArea.Y, width, height)
-	local raycasting = rc.RayCasting.new(width, height, 10, 10, '#', '.', '@', framebuffer)
+	local boundaryCount, rayCount, fov, rotationSpeed = 5, 45, math.pi/3, math.pi/20
+	local raycasting = rc.RayCasting.new(topDownWidth, height, firstPersonWidth, boundaryCount, rayCount, fov, rotationSpeed, '#', '.', '@', framebuffer)
 
 	-- Main.
 	while true do
-		raycasting:moveRayCasters()
-		raycasting:castRays()
-		for _, boundary in ipairs(raycasting.boundaries) do
-			boundary:draw()
+        local event, keyNum = os.pullEvent()
+		if (event == 'key') then
+			local key = keys.getName(keyNum)
+			raycasting:moveRaycasters(key)
+			raycasting:rotateRaycasters(key)
+
+			raycasting:castRays()
+			for _, boundary in ipairs(raycasting.boundaries) do
+				boundary:draw()
+			end
+			for _, rayCaster in ipairs(raycasting.raycasters) do
+				rayCaster:draw()
+			end
+			raycasting:drawFirstPerson()
+			
+			framebuffer:draw()
 		end
-		for _, rayCaster in ipairs(raycasting.rayCasters) do
-			rayCaster:draw()
-		end
-		framebuffer:draw()
-		-- os.queueEvent('yield')
-		-- os.pullEvent('yield')
-		sleep(0.05)
 	end
 end

@@ -18,27 +18,33 @@ REQUIREMENTS
 
 RayCasting = {
 
-	new = function(canvasWidth, canvasHeight, boundaryCount, rayCount, boundaryChar, rayChar, raycasterChar, framebuffer)
+	new = function(canvasWidth, canvasHeight, firstPersonWidth, boundaryCount, rayCount, fov, rotationSpeed, boundaryChar, rayChar, raycasterChar, framebuffer)
         local self = {
 			canvasWidth = canvasWidth,
 			canvasHeight = canvasHeight,
+			firstPersonWidth = firstPersonWidth,
 			boundaryCount = boundaryCount,
 			rayCount = rayCount,
+			fov = fov, -- field of view
+			rotationSpeed = rotationSpeed,
 			boundaryChar = boundaryChar,
 			rayChar = rayChar,
 			raycasterChar = raycasterChar,
 			framebuffer = framebuffer,
 			
 			boundaries = {},
-			rayCasters = {},
+			raycasters = {},
 			noiseX = 0,
 			noiseY = 10000,
+			scene = {},
+            chars = {'@', '#', '0', 'A', '5', '2', '$', '3', 'C', '1', '%', '=', '(', '/', '!', '-', ':', "'", '.'},
+			maxRayLength = math.sqrt(canvasWidth^2 + canvasHeight^2),
 		}
 		
 		setmetatable(self, {__index = RayCasting})
 		
 		self:createBoundaries()
-		self:createRayCasters()
+		self:createRaycasters()
 		
 		return self
     end,
@@ -50,6 +56,7 @@ RayCasting = {
 			self.boundaries[#self.boundaries + 1] = Boundary.new(pos1, pos2, self.boundaryChar, self.framebuffer)
 		end
 		
+		----[[ optional walls on the sides of the top-down view
 		pos1 = vector.new(1, 1)
 		pos2 = vector.new(self.canvasWidth, 1)
 		self.boundaries[#self.boundaries + 1] = Boundary.new(pos1, pos2, self.boundaryChar, self.framebuffer)
@@ -62,16 +69,18 @@ RayCasting = {
 		pos1 = vector.new(1, self.canvasHeight)
 		pos2 = vector.new(1, 1)
 		self.boundaries[#self.boundaries + 1] = Boundary.new(pos1, pos2, self.boundaryChar, self.framebuffer)
+		--]]--
 	end,
 	
-	createRayCasters = function(self)
+	createRaycasters = function(self)
 		local pos = vector.new(math.random(self.canvasWidth), math.random(self.canvasHeight))
-		self.rayCasters[#self.rayCasters + 1] = RayCaster.new(pos, self.rayCount, self.raycasterChar, self.framebuffer)
+		self.raycasters[#self.raycasters + 1] = RayCaster.new(pos, self.rayCount, self.raycasterChar, self.fov, self.framebuffer)
 	end,
 	
 	castRays = function(self)
-		for _, rayCaster in ipairs(self.rayCasters) do
-			for _, ray in ipairs(rayCaster.rays) do
+		for _, rayCaster in ipairs(self.raycasters) do
+			for i = 1, #rayCaster.rays do
+				local ray = rayCaster.rays[i]
 				local shortestDist = math.huge
 				local closestPt
 				for _, boundary in ipairs(self.boundaries) do
@@ -87,18 +96,78 @@ RayCasting = {
 				if closestPt then
 					self.framebuffer:writeLine(rayCaster.pos.x, rayCaster.pos.y, closestPt.x, closestPt.y, self.rayChar)
 				end
+				self.scene[i] = shortestDist
 			end
 		end
 	end,
 	
-	moveRayCasters = function(self)
-		self.noiseX = self.noiseX + 0.05
-		self.noiseY = self.noiseY + 0.05
-		local x = (pn.perlin:noise(self.noiseX)+1)/2 * self.canvasWidth
-		local y = (pn.perlin:noise(self.noiseY)+1)/2 * self.canvasHeight
-		local newPos = vector.new(x, y)
-		self.rayCasters[1].pos = newPos
-		self.rayCasters[1]:moveRays(newPos)
+	moveRaycasters = function(self, key)
+		local raycaster = self.raycasters[1]
+		
+		local stepX, stepY = 0, 0
+    	if (key == 'w' and raycaster.pos.y > 2) then
+        	stepY = -1
+    	elseif (key == 's' and raycaster.pos.y < self.canvasHeight - 1) then
+        	stepY = 1
+		elseif (key == 'a' and raycaster.pos.x > 2) then
+        	stepX = -1
+    	elseif (key == 'd' and raycaster.pos.x < self.canvasWidth - 1) then
+        	stepX = 1
+    	end
+		
+		local newPos = vector.new(raycaster.pos.x + stepX, raycaster.pos.y + stepY)
+		raycaster.pos = newPos
+		raycaster:moveRays(newPos)
+		
+		-- Moves the raycaster with perlin noise.
+		--self.noiseX = self.noiseX + 0.05
+		--self.noiseY = self.noiseY + 0.05
+		--local x = (pn.perlin:noise(self.noiseX)+1)/2 * self.canvasWidth
+		--local y = (pn.perlin:noise(self.noiseY)+1)/2 * self.canvasHeight
+		--local newPos = vector.new(x, y)
+		--self.raycasters[1].pos = newPos
+		--self.raycasters[1]:moveRays(newPos)
+	end,
+	
+	rotateRaycasters = function(self, key)
+		local raycaster = self.raycasters[1]
+    	if (key == 'left') then
+        	raycaster:rotate(-self.rotationSpeed)
+    	elseif (key == 'right') then
+        	raycaster:rotate(self.rotationSpeed)
+    	end
+	end,
+	
+	map = function(self, value, minVar, maxVar, minResult, maxResult)
+    	local a = (value - minVar) / (maxVar - minVar)
+    	return (1 - a) * minResult + a * maxResult;
+	end,
+	
+	drawFirstPerson = function(self)
+		local w = self.firstPersonWidth / #self.scene
+		for i = 1, #self.scene do
+			local h = self:map(self.scene[i], 0, self.maxRayLength, self.canvasHeight/2, 0)
+			
+			local x1 = self.canvasWidth+i*w-w+2
+			local y1 = self.canvasHeight/2 - h + 1
+			local x2 = self.canvasWidth+i*w+2
+			local y2 = self.canvasHeight/2 + h
+			
+			local sceneSq = self.scene[i]^2
+			local firstPersonWidthSq = self.firstPersonWidth^2
+			
+			-- Uses inverse square law to fix the fisheye effect.
+			local b = self:map(sceneSq, 0, firstPersonWidthSq, 1, 19)
+			
+			local char = self.chars[math.floor(b + 0.5)]
+			if math.floor(b + 0.5) > #self.chars then
+				char = ' '
+			elseif not char then -- Maybe not necessary anymore?
+				char = '@'
+			end
+			
+			self.framebuffer:writeRect(x1, y1, x2, y2, char, true)
+		end
 	end,
 	
 }
@@ -126,16 +195,22 @@ Boundary = {
 
 Ray = {
 
-	new = function(pos, dir)
+	new = function(pos, angle)
         local self = {
 			pos = pos,
-			dir = dir,
+			dir,
 		}
 		
 		setmetatable(self, {__index = Ray})
 		
+		self:setDir(angle)
+		
 		return self
     end,
+	
+	setDir = function(self, angle)
+		self.dir = vector.new(math.cos(angle), math.sin(angle))
+	end,
 	
 	cast = function(self, boundary)
 		-- https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
@@ -165,15 +240,16 @@ Ray = {
 
 RayCaster = {
 
-	new = function(pos, rayCount, char, framebuffer)
+	new = function(pos, rayCount, char, fov, framebuffer)
         local self = {
 			pos = pos,
 			rayCount = rayCount,
 			char = char,
+			fov = fov,
 			framebuffer = framebuffer,
 			
-			pi2 = math.pi * 2,
 			rays = {},
+			heading = 0,
 		}
 		
 		setmetatable(self, {__index = RayCaster})
@@ -184,15 +260,23 @@ RayCaster = {
     end,
 	
 	createRays = function(self)
-		for angle = 0, self.pi2, self.pi2 / self.rayCount do
-			local dir = vector.new(math.cos(angle), math.sin(angle))
-			self.rays[#self.rays + 1] = Ray.new(self.pos, dir)
+		for angle = -self.fov/2, self.fov/2, self.fov/self.rayCount do
+			self.rays[#self.rays + 1] = Ray.new(self.pos, angle)
 		end
 	end,
 	
 	moveRays = function(self, pos)
 		for _, ray in ipairs(self.rays) do
 			ray.pos = pos
+		end
+	end,
+	
+	rotate = function(self, angle)
+		self.heading = self.heading + angle
+		local index = 1
+		for angle = -self.fov/2, self.fov/2, self.fov/self.rayCount do
+			self.rays[index]:setDir(angle + self.heading)
+			index = index + 1
 		end
 	end,
 	
