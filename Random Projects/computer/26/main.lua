@@ -21,21 +21,20 @@ end
 importAPIs()
 importConfig()
 
--- term.clear()
--- term.setCursorPos(1, 1)
-
 if not rs.getInput(cfg.leverSide) then
 	-- Setup.
 	local width, height = term.getSize()
 	width = width - 1
 	
 	local framebuffer = fb.FrameBuffer.new(cfg.playArea.X, cfg.playArea.Y, width, height)
-	local boundary = rc.Boundary.new(width/4*3, height/10, width/4*3, height/10*9, '#', framebuffer)
-	local ray = rc.Ray.new(width/4, height/2, 'O', framebuffer)
+	local raycasting = rc.RayCasting.new(width, height, '#', 'O', framebuffer)
 
 	-- Main.
-	boundary:draw()
-	ray:draw()
-	-- framebuffer:writeChar(51, 10, '9')
+	for _, boundary in ipairs(raycasting.boundaries) do
+		boundary:draw()
+	end
+	for _, ray in ipairs(raycasting.rays) do
+		ray:draw()
+	end
     framebuffer:draw()
 end
