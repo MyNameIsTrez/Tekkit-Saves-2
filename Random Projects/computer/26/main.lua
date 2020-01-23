@@ -28,7 +28,7 @@ if not rs.getInput(cfg.leverSide) then
 	width = width - 1
 	
 	local framebuffer = fb.FrameBuffer.new(cfg.playArea.X, cfg.playArea.Y, width, height)
-	local raycasting = rc.RayCasting.new(width, height, 10, 360, '#', '.', framebuffer)
+	local raycasting = rc.RayCasting.new(width, height, 10, 10, '#', '.', '@', framebuffer)
 
 	-- Main.
 	while true do
@@ -36,6 +36,9 @@ if not rs.getInput(cfg.leverSide) then
 		raycasting:castRays()
 		for _, boundary in ipairs(raycasting.boundaries) do
 			boundary:draw()
+		end
+		for _, rayCaster in ipairs(raycasting.rayCasters) do
+			rayCaster:draw()
 		end
 		framebuffer:draw()
 		-- os.queueEvent('yield')
