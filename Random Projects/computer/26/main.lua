@@ -3,6 +3,7 @@ function importAPIs()
 		{id = 'p9tSSWcB', name = 'cf'}, -- Common Functions.
 		{id = '83q6p4Sp', name = 'fb'}, -- FrameBuffer.
 		{id = 'ENwuVX0P', name = 'rc'}, -- RayCasting.
+		{id = 'nsrVpDY6', name = 'pn'}, -- Perlin Noise.
 	}
 
 	fs.delete('apis') -- Deletes the folder, with every API file in it.
@@ -27,14 +28,23 @@ if not rs.getInput(cfg.leverSide) then
 	width = width - 1
 	
 	local framebuffer = fb.FrameBuffer.new(cfg.playArea.X, cfg.playArea.Y, width, height)
-	local raycasting = rc.RayCasting.new(width, height, '#', 'O', framebuffer)
+	local raycasting = rc.RayCasting.new(width, height, 5, 36, '#', '.', framebuffer)
 
 	-- Main.
-	for _, boundary in ipairs(raycasting.boundaries) do
-		boundary:draw()
+	while true do
+		raycasting:moveRayCasters()
+		for _, boundary in ipairs(raycasting.boundaries) do
+			boundary:draw()
+		end
+		for _, rayCaster in ipairs(raycasting.rayCasters) do
+			for _, ray in ipairs(rayCaster.rays) do
+				ray:draw()
+			end
+		end
+		raycasting:castRays()
+		framebuffer:draw()
+		-- os.queueEvent('yield')
+		-- os.pullEvent('yield')
+		sleep(1)
 	end
-	for _, ray in ipairs(raycasting.rays) do
-		ray:draw()
-	end
-    framebuffer:draw()
 end
