@@ -1,10 +1,11 @@
 function importAPIs()
 	local APIs = {
-		{id = 'p9tSSWcB', name = 'cf'}, -- Common Functions.
+		{id = 'p9tSSWcB', name = 'cf'}, -- Common functions.
 		{id = 'BWpkzQYp', name = 'td'}, -- Draw 3D objects.
-		{id = '83q6p4Sp', name = 'fb'}, -- FrameBuffer.
+		{id = '83q6p4Sp', name = 'fb'}, -- Frame buffer.
 		{id = 'sSjBVjgc', name = 'keys'}, -- Detecting keys being pressed.
 		{id = '9g8zvPpX', name = 'matrix'}, -- Matrix math.
+		{id = 'nsrVpDY6', name = 'perlinNoise'}, -- Perlin noise.
 	}
 
 	fs.delete('apis') -- Deletes the folder, with every API file in it.
@@ -33,56 +34,50 @@ if not rs.getInput(cfg.leverSide) then
 	-- Code from this tutorial:
 	-- https://youtu.be/p4Iz0XJY-Qk
 
-	local corners = {}
-	corners[1] = vector.new(-0.5, -0.5, -0.5)
-	corners[2] = vector.new(0.5, -0.5, -0.5)
-	corners[3] = vector.new(0.5, 0.5, -0.5)
-	corners[4] = vector.new(-0.5, 0.5, -0.5)
-
-	corners[5] = vector.new(-0.5, -0.5, 0.5)
-	corners[6] = vector.new(0.5, -0.5, 0.5)
-	corners[7] = vector.new(0.5, 0.5, 0.5)
-	corners[8] = vector.new(-0.5, 0.5, 0.5)
-
 	local distance = 2
+	local rotation = vector.new()
 	local connectionChar, cornerChar = 'l', 'c'
+
+	local cubesCoords = {
+		vector.new(-1,  0),
+		vector.new( 0,  0),
+		vector.new( 1,  0),
+		vector.new( 0, -1),
+	}
+
+	-- local maxHeight = 5
+	-- for y = 0.25, 0.75, 0.25 do
+	-- 	for x = 0.25, 0.75, 0.25 do
+	-- 		print(x, y)
+	-- 		local val = perlinNoise.perlin:noise(x, y) -- Return range: [-1, 1]
+	-- 		print(val)
+	-- 		if val > 0 then
+	-- 			cubesCoords[#cubesCoords + 1] = vector.new(x, y)
+	-- 		end
+	-- 	end
+	-- end
+
+	-- cf.printTable(cubesCoords)
 	
 	local framebuffer = fb.FrameBuffer.new(cfg.playArea.X, cfg.playArea.Y, width, height)
-	local threedee = td.ThreeDee.new(framebuffer, 1, 1, width, height, distance, corners, connectionChar, cornerChar)
+	local threedee = td.ThreeDee.new(framebuffer, 1, 1, width, height, distance, rotation, cubesCoords, connectionChar, cornerChar)
 	
-	local rotation = vector.new()
-
-	local distSinArg = 0
-	
-	while true do
-		threedee.distance = (math.sin(distSinArg) + 1)/2 * 4 + 2
-		threedee:getProjectedCorners(rotation, distance)
-		threedee:drawConnections()
-		threedee:drawCorners()
-
-		framebuffer:draw()
-
-		distSinArg = distSinArg + 0.025
-		rotation.x = rotation.x + 0.025
-		rotation.y = rotation.y + 0.025
-		rotation.z = rotation.z + 0.025
-
-		os.queueEvent('yield')
-		os.pullEvent('yield')
-	end
-	
-
 	-- Main.
+	while true do
+		local event, keyNum = os.pullEvent()
+		if (event == "key") then
+			local char = keys.getName(keyNum)
+			threedee:moveCamera(char)
 
-    -- while true do
-    --     local event, keyNum = os.pullEvent()
-    --     if (event == "key") then
-    --         local char = keys.getName(keyNum)
-	-- 		threedee:moveCamera(char)
-	-- 		threedee:getCubesCorners(threedee.cubesCoords, threedee.blockDiameter)
-	-- 		-- threedee:drawConnections()
-    --         threedee:drawFill()
-    --         framebuffer:draw()
-    --     end
-    -- end
+			-- threedee.distance = (math.sin(distSinArg) + 1)/2 * 4 + 2
+			threedee:setProjectedCorners()
+			threedee:drawConnections()
+			threedee:drawCorners()
+
+			framebuffer:draw()
+
+			-- os.queueEvent('yield')
+			-- os.pullEvent('yield')
+		end
+	end
 end

@@ -64,7 +64,7 @@ local function getPerlinMap(hor, ver)
             local xNormalized = x / hor * noiseZoom
             local yNormalized = y / ver * noiseZoom
 
-            local unmappedValue = perlinNoise.perlin:noise(xNormalized, yNormalized)-- Return range: [-1, 1]
+            local unmappedValue = perlinNoise.perlin:noise(xNormalized, yNormalized) -- Return range: [-1, 1]
             local value = cf.map(unmappedValue, -1, 1, 0, 1)
 
             perlinMap[#perlinMap+1] = value
