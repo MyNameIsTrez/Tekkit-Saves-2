@@ -4,6 +4,7 @@ function importAPIs()
 		{id = 'BWpkzQYp', name = 'td'}, -- Draw 3D objects.
 		{id = '83q6p4Sp', name = 'fb'}, -- FrameBuffer.
 		{id = 'sSjBVjgc', name = 'keys'}, -- Detecting keys being pressed.
+		{id = '9g8zvPpX', name = 'matrix'}, -- Matrix math.
 	}
 
 	fs.delete('apis') -- Deletes the folder, with every API file in it.
@@ -26,50 +27,86 @@ importConfig()
 
 if not rs.getInput(cfg.leverSide) then
 	-- Setup.
-	local cubes = {
-		{0,0,0},
-		-- {2,2,2},
-	}
-
-	-- local cubes = {}
-	-- for i = 1, 5 do
-	-- 	for j = 1, 5 do
-	-- 		cubes[#cubes + 1] = {j, i, 0}
-	-- 	end
-	-- end
-
-	local offsets = { 7, -10 }
-
 	local width, height = term.getSize()
 	width = width - 1
 
-	local blockDiameter = 10
-	local connectionChar = '@'
-	local pointChar = '+'
+	angle = 0
+
+	while true do
+		local rotation = {
+			{ math.cos(angle), -math.sin(angle) },
+			{ math.sin(angle),  math.cos(angle) }
+		}
+
+		local projection = {
+			{1, 0, 0},
+			{0, 1, 0}
+		}
+
+		local points = {}
+		points[1] = vector.new(-50, -50, 0)
+		points[2] = vector.new(50, -50, 0)
+		points[3] = vector.new(50, 50, 0)
+		points[4] = vector.new(-50, 50, 0)
+
+		local framebuffer = fb.FrameBuffer.new(cfg.playArea.X, cfg.playArea.Y, width, height)
+		
+		local centerX, centerY = math.floor(width/2 + 0.5), math.floor(height/2 + 0.5)
+
+		for _, v in ipairs(points) do
+			local m = matrix.vecToMat(v)
+			-- matrix.matPrint(projection)
+			-- matrix.matPrint(m)
+			-- matrix.matPrint(rotated)
+			local projected2d = matrix.matMul(projection, m)
+			local rotated = matrix.matMul(rotation, projected2d)
+			-- matrix.matPrint(rotation)
+			-- matrix.matPrint(projected2d)
+			-- cf.printTable(projected2d)
+			-- local rotated = matrix.matMul(rotation, projected2d)
+
+			-- ideally
+			-- local x, y = centerX + projected2d.x * 1.5, centerY + projected2d.y
+			local _x, _y = rotated[1][1], rotated[2][1]
+			local x, y = centerX + _x * 1.5, centerY + _y
+
+			framebuffer:writeChar(x, y, 'p')
+		end
+
+		framebuffer:draw()
+
+		angle = angle + 0.01
+
+		os.queueEvent('yield')
+		os.pullEvent('yield')
+	end
+
+	-- local cubes = {
+	-- 	{0,0,0},
+	-- }
+
+	-- local blockDiameter = 10
+	-- local connectionChar = '@'
+	-- local pointChar = '+'
 	
-    local framebuffer = fb.FrameBuffer.new(cfg.playArea.X, cfg.playArea.Y, width, height)
-    local threedee = td.ThreeDee.new(framebuffer, width, height, cubes, blockDiameter, offsets, connectionChar, pointChar)
+    -- local threedee = td.ThreeDee.new(framebuffer, width, height, cubes, blockDiameter, connectionChar, pointChar)
 
 	-- Main.
-	-- cf.printTable(threedee.cubesCorners)
-
-	-- threedee:line(0, 0, 20, 20, '8')
-
 	-- threedee:drawConnections()
-	threedee:drawFill()
+	-- threedee:drawFill()
 	-- threedee:fill(threedee.cubesCorners[1][1][1], threedee.cubesCorners[1][1][2], threedee.cubesCorners[1][2][1], threedee.cubesCorners[1][2][2], threedee.cubesCorners[1][4][1], threedee.cubesCorners[1][4][2])
 	-- threedee:fill(threedee.cubesCorners[1][1], threedee.cubesCorners[1][2], threedee.cubesCorners[1][5])
-    framebuffer:draw()
+    -- framebuffer:draw()
 
-    while true do
-        local event, keyNum = os.pullEvent()
-        if (event == "key") then
-            local char = keys.getName(keyNum)
-			threedee:moveCamera(char)
-			threedee:getCubesCorners(threedee.cubesCoords, threedee.blockDiameter)
-			-- threedee:drawConnections()
-            threedee:drawFill()
-            framebuffer:draw()
-        end
-    end
+    -- while true do
+    --     local event, keyNum = os.pullEvent()
+    --     if (event == "key") then
+    --         local char = keys.getName(keyNum)
+	-- 		threedee:moveCamera(char)
+	-- 		threedee:getCubesCorners(threedee.cubesCoords, threedee.blockDiameter)
+	-- 		-- threedee:drawConnections()
+    --         threedee:drawFill()
+    --         framebuffer:draw()
+    --     end
+    -- end
 end

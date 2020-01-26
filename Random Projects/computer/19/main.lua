@@ -24,14 +24,14 @@ end
 importAPIs()
 importConfig()
 
-local monitorSide = cf.getPeripheralSide()
-if cfg.useMonitor and monitorSide then
-	local mon = peripheral.wrap(monitorSide)
-	term.redirect(mon)
-end
-
 if not rs.getInput(cfg.leverSide) then
     -- Setup.
+	local monitorSide = cf.getPeripheralSide()
+	if cfg.useMonitor and monitorSide then
+		local mon = peripheral.wrap(monitorSide)
+		term.redirect(mon)
+	end
+
 	local animation = an.Animation:new(shell)
     animation:setShell(shell) -- optional
 

@@ -18,20 +18,15 @@ REQUIREMENTS
 
 ThreeDee = {
 
-	new = function(framebuffer, canvasWidth, canvasHeight, cubesCoords, blockDiameter, offsets, connectionChar, pointChar)
+	new = function(framebuffer, canvasWidth, canvasHeight, cubesCoords, blockDiameter, connectionChar, pointChar)
         -- Constructor to create Object
         local self = {
             framebuffer = framebuffer,
             canvasWidth = canvasWidth,
             canvasHeight = canvasHeight,
-            cubesCoords = cubesCoords,
-            blockDiameter = blockDiameter,
-            offsets = offsets,
 			connectionChar = connectionChar,
 			pointChar = pointChar,
            	
-            canvasCenterX = canvasWidth/2,
-            canvasCenterY = canvasHeight/2,
             chars = {'@', '#', '0', 'A', '5', '2', '$', '3', 'C', '1', '%', '=', '(', '/', '!', '-', ':', "'", '.'},
             
 			cubesCorners = {},
