@@ -33,10 +33,29 @@ if not rs.getInput(cfg.leverSide) then
 	angle = 0
 
 	while true do
-		local rotation = {
-			{ math.cos(angle), -math.sin(angle) },
-			{ math.sin(angle),  math.cos(angle) }
+		local rotationX = {
+			{ 1, 0, 0 },
+			{ 0, math.cos(angle), -math.sin(angle) },
+			{ 0, math.sin(angle),  math.cos(angle) }
 		}
+
+		local rotationY = {
+			{ math.cos(angle), 0, -math.sin(angle) },
+			{ 0, 1, 0 },
+			{ math.sin(angle), 0, math.cos(angle) }
+		}
+
+		local rotationZ = {
+			{ math.cos(angle), -math.sin(angle), 0 },
+			{ math.sin(angle),  math.cos(angle), 0 },
+			{ 0, 0, 1 }
+		}
+
+		--[[
+			{ 1, 0, 0 },
+			{ 0, 1, 0 },
+			{ 0, 0, 1 }
+		]]--
 
 		local projection = {
 			{1, 0, 0},
@@ -55,15 +74,9 @@ if not rs.getInput(cfg.leverSide) then
 
 		for _, v in ipairs(points) do
 			local m = matrix.vecToMat(v)
-			-- matrix.matPrint(projection)
-			-- matrix.matPrint(m)
-			-- matrix.matPrint(rotated)
 			local projected2d = matrix.matMul(projection, m)
-			local rotated = matrix.matMul(rotation, projected2d)
-			-- matrix.matPrint(rotation)
-			-- matrix.matPrint(projected2d)
-			-- cf.printTable(projected2d)
-			-- local rotated = matrix.matMul(rotation, projected2d)
+			projected2d[3] = { 0 } -- seems to fix error, not sure how this should be properly done
+			local rotated = matrix.matMul(rotationZ, projected2d)
 
 			-- ideally
 			-- local x, y = centerX + projected2d.x * 1.5, centerY + projected2d.y
