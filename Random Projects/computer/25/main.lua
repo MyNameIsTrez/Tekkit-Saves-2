@@ -67,12 +67,15 @@ if not rs.getInput(cfg.leverSide) then
 		points[7] = vector.new(0.5, 0.5, 0.5)
 		points[8] = vector.new(-0.5, 0.5, 0.5)
 
+		local projected = {}
+
 		local framebuffer = fb.FrameBuffer.new(cfg.playArea.X, cfg.playArea.Y, width, height)
 		
 		local centerX, centerY = math.floor(width/2 + 0.5), math.floor(height/2 + 0.5)
 
-		for _, v in ipairs(points) do
-			local m = matrix.vecToMat(v:mul(100))
+		for i = 1, #points do
+			local v = points[i]
+			local m = matrix.vecToMat(v:mul(100)) -- Might need to mul after projection instead.
 			local rotated = matrix.matMul(rotationX, m)
 			rotated = matrix.matMul(rotationY, rotated)
 			rotated = matrix.matMul(rotationZ, rotated)
@@ -80,11 +83,31 @@ if not rs.getInput(cfg.leverSide) then
 
 			-- ideally
 			-- local x, y = centerX + projected2d.x * 1.5, centerY + projected2d.y
-			local _x, _y = rotated[1][1], rotated[2][1]
-			local x, y = centerX + _x * 1.5, centerY + _y
+			
+			-- local _x, _y = projected2d[1][1], projected2d[2][1]
+			-- local x, y = centerX + _x * 1.5, centerY + _y
 
-			framebuffer:writeChar(x, y, 'p')
+			projected[i] = projected2d
+			-- framebuffer:writeChar(x, y, 'p')
 		end
+
+		function connect(i, j)
+			local a, b = projected[i], projected[j]
+
+			-- Translate to the middle of the screen and stretch x by 50%.
+			local _x1, _y1 = a[1][1], a[2][1]
+			local x1, y1 = centerX + _x1 * 1.5, centerY + _y1
+			local _x2, _y2 = b[1][1], b[2][1]
+			local x2, y2 = centerX + _x2 * 1.5, centerY + _y2
+
+			framebuffer:writeLine(x1, y1, x2, y2, 'c')
+		end
+
+		connect(1, 2)
+
+		-- for i = 1, 12 do
+
+		-- end
 
 		framebuffer:draw()
 
