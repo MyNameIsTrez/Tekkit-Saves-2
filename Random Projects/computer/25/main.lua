@@ -51,32 +51,32 @@ if not rs.getInput(cfg.leverSide) then
 			{ 0, 0, 1 }
 		}
 
-		--[[
-			{ 1, 0, 0 },
-			{ 0, 1, 0 },
-			{ 0, 0, 1 }
-		]]--
-
 		local projection = {
 			{1, 0, 0},
 			{0, 1, 0}
 		}
 
 		local points = {}
-		points[1] = vector.new(-50, -50, 0)
-		points[2] = vector.new(50, -50, 0)
-		points[3] = vector.new(50, 50, 0)
-		points[4] = vector.new(-50, 50, 0)
+		points[1] = vector.new(-0.5, -0.5, -0.5)
+		points[2] = vector.new(0.5, -0.5, -0.5)
+		points[3] = vector.new(0.5, 0.5, -0.5)
+		points[4] = vector.new(-0.5, 0.5, -0.5)
+
+		points[5] = vector.new(-0.5, -0.5, 0.5)
+		points[6] = vector.new(0.5, -0.5, 0.5)
+		points[7] = vector.new(0.5, 0.5, 0.5)
+		points[8] = vector.new(-0.5, 0.5, 0.5)
 
 		local framebuffer = fb.FrameBuffer.new(cfg.playArea.X, cfg.playArea.Y, width, height)
 		
 		local centerX, centerY = math.floor(width/2 + 0.5), math.floor(height/2 + 0.5)
 
 		for _, v in ipairs(points) do
-			local m = matrix.vecToMat(v)
-			local projected2d = matrix.matMul(projection, m)
-			projected2d[3] = { 0 } -- seems to fix error, not sure how this should be properly done
-			local rotated = matrix.matMul(rotationZ, projected2d)
+			local m = matrix.vecToMat(v:mul(100))
+			local rotated = matrix.matMul(rotationX, m)
+			rotated = matrix.matMul(rotationY, rotated)
+			rotated = matrix.matMul(rotationZ, rotated)
+			local projected2d = matrix.matMul(projection, rotated)
 
 			-- ideally
 			-- local x, y = centerX + projected2d.x * 1.5, centerY + projected2d.y
