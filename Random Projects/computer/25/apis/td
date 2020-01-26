@@ -7,7 +7,8 @@
 API to draw 3D objects.
 
 REQUIREMENTS
-	* framebuffer: https://pastebin.com/83q6p4Sp -- write() replacement, by drawing the entire screen with one write() call every frame.
+	* matrix: https://pastebin.com/9g8zvPpX -- Matrix multiplications and vector to matrix conversion.
+	* framebuffer: https://pastebin.com/83q6p4Sp -- write() replacement, by drawing the entire screen with only one write() call for every frame.
 
 ]]--
 
@@ -18,7 +19,7 @@ REQUIREMENTS
 
 ThreeDee = {
 
-	new = function(framebuffer, canvasX1, canvasY1, canvasX2, canvasY2, cubesCoords, blockDiameter, connectionChar, cornerChar)
+	new = function(framebuffer, canvasX1, canvasY1, canvasX2, canvasY2, distance, corners, connectionChar, cornerChar)
         -- Constructor to create Object
         local self = {
             framebuffer = framebuffer,
@@ -28,14 +29,19 @@ ThreeDee = {
 			canvasX2 = canvasX2,
 			canvasY2 = canvasY2,
 			
-			cubesCoords = cubesCoords,
+			centerX = math.floor((canvasX2-canvasX1)/2 + 0.5),
+			centerY = math.floor((canvasY2-canvasY1)/2 + 0.5),
 			
-			blockDiameter = blockDiameter,
+			distance = distance,
+			
+			corners = corners,
 			
 			connectionChar = connectionChar,
 			cornerChar = cornerChar,
            	
             chars = {'@', '#', '0', 'A', '5', '2', '$', '3', 'C', '1', '%', '=', '(', '/', '!', '-', ':', "'", '.'},
+			
+			projectedCorners = {},
         }
         
         setmetatable(self, {__index = ThreeDee})
@@ -43,8 +49,62 @@ ThreeDee = {
         return self
     end,
 	
-	drawConnections = function(self)
+	getProjectedCorners = function(self, rotation)
+		local rotationX = {
+			{ 1, 0, 0 },
+			{ 0, math.cos(rotation.x), -math.sin(rotation.x) },
+			{ 0, math.sin(rotation.x),  math.cos(rotation.x) }
+		}
+		local rotationY = {
+			{ math.cos(rotation.y), 0, -math.sin(rotation.y) },
+			{ 0, 1, 0 },
+			{ math.sin(rotation.y), 0, math.cos(rotation.y) }
+		}
+		local rotationZ = {
+			{ math.cos(rotation.z), -math.sin(rotation.z), 0 },
+			{ math.sin(rotation.z),  math.cos(rotation.z), 0 },
+			{ 0, 0, 1 }
+		}
 		
+		for i = 1, #self.corners do
+			local v = self.corners[i]
+			local m = matrix.vecToMat(v)
+			local rotated = matrix.matMul(rotationX, m)
+			rotated = matrix.matMul(rotationY, rotated)
+			rotated = matrix.matMul(rotationZ, rotated)
+			
+			local z = 1 / (self.distance - rotated[3][1])
+			local projection = {
+				{z, 0, 0},
+				{0, z, 0}
+			}
+			
+			local projected2d = matrix.matMul(projection, rotated)
+			projected2d[1][1] = projected2d[1][1] * 100
+			projected2d[2][1] = projected2d[2][1] * 100
+			self.projectedCorners[i] = projected2d
+		end
+	end,
+
+	connect = function(self, i, j)
+		local a, b = self.projectedCorners[i], self.projectedCorners[j]
+
+		-- Translate to the middle of the screen and stretch x by 50%.
+		local _x1, _y1 = a[1][1], a[2][1]
+		local x1, y1 = self.centerX + _x1 * 1.5, self.centerY + _y1
+		local _x2, _y2 = b[1][1], b[2][1]
+		local x2, y2 = self.centerX + _x2 * 1.5, self.centerY + _y2
+
+		self.framebuffer:writeLine(x1, y1, x2, y2, self.connectionChar)
+	end,
+	
+	-- Draw lines between corners.
+	drawConnections = function(self)
+		for i = 1, 4 do
+			self:connect(i, i % 4 + 1) -- Front.
+			self:connect(i, i + 4) -- Middle.
+			self:connect(i + 4, i % 4 + 5) -- Back.
+		end
 	end,
 	
 	drawFill = function(self)
@@ -75,8 +135,12 @@ ThreeDee = {
         end
 	end,
 	
-	drawPoints = function(self)
-		
+	drawCorners = function(self)
+		for _, m in ipairs(self.projectedCorners) do
+			local _x, _y = m[1][1], m[2][1]
+			local x, y = self.centerX + _x * 1.5, self.centerY + _y
+			self.framebuffer:writeChar(x, y, self.cornerChar)
+		end
 	end,
 	
 	moveCamera = function(self, key)
@@ -118,6 +182,3 @@ ThreeDee = {
 	end,
 
 }
-
-
---------------------------------------------------
