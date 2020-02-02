@@ -1,0 +1,40 @@
+-- Filename to load.
+fileName = 'flowers'
+
+-- Lever can be pulled to turn off the animation program.
+leverSide = 'right'
+
+-- Whether the program loops the animation.
+loop = true
+
+-- Whether to display the animation on the monitor, otherwise it'll play the animation on the computer screen.
+useMonitor = true
+
+-- Whether to start playing the animation by default. Can be used to exit the while loop of generatedCode being ran.
+playAnimationBool = true
+
+-- The size of the displayed animation.
+--animationSize = { width = 30, height = 30 }
+animationSize = { width = 77, height = 31 } -- 8x5 monitor size.
+--animationSize = { width = 77, height = 38 } -- 8x6 monitor size. Doesn't always work on servers.
+--animationSize = { width = 227, height = 85 }
+--animationSize = { width = 426, height = 160 }
+--animationSize = { width = 640, height = 240 }
+
+-- The top-left corner where the animation will be drawn from.
+playArea = { X = 1, Y = 1 }
+
+-- Whether the program sleeps between drawing each frame, by frameSleep number of seconds.
+frameSleeping = true
+
+-- Seconds of sleeping between frames, -1 is no sleeping.
+frameSleep = 0.05
+
+-- How many frames are skipped between sleeping.
+-- Setting to 0 or 1 means every frame has a sleep.
+-- If frameSleeping is set to false, there is never any sleeping.
+-- 1.57 for YouTube videos, with 426x160 animationSize.
+frameSleepSkipping = 1.57
+
+-- How many frames can be written to a generated code file in .generatedCodeFiles/ before a new generatedCode file gets created.
+maxFramesPerGeneratedCodeFile = 100

@@ -148,7 +148,7 @@ RayCasting = {
 	
 	map = function(self, value, minVar, maxVar, minResult, maxResult)
     	local a = (value - minVar) / (maxVar - minVar)
-    	return (1 - a) * minResult + a * maxResult;
+    	return (1 - a) * minResult + a * maxResult
 	end,
 	
 	drawFirstPerson = function(self)

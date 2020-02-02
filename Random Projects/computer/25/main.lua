@@ -39,10 +39,10 @@ if not rs.getInput(cfg.leverSide) then
 	local connectionChar, cornerChar = 'l', 'c'
 
 	local cubesCoords = {
-		vector.new(-1,  0),
+		-- vector.new(-1,  0),
 		vector.new( 0,  0),
-		vector.new( 1,  0),
-		vector.new( 0, -1),
+		-- vector.new( 1,  0),
+		-- vector.new( 0, -1),
 	}
 
 	-- local maxHeight = 5
@@ -61,23 +61,32 @@ if not rs.getInput(cfg.leverSide) then
 	
 	local framebuffer = fb.FrameBuffer.new(cfg.playArea.X, cfg.playArea.Y, width, height)
 	local threedee = td.ThreeDee.new(framebuffer, 1, 1, width, height, distance, rotation, cubesCoords, connectionChar, cornerChar)
-	
+
+	local distSinArg = 0
 	-- Main.
 	while true do
-		local event, keyNum = os.pullEvent()
-		if (event == "key") then
-			local char = keys.getName(keyNum)
-			threedee:moveCamera(char)
+		-- local event, keyNum = os.pullEvent()
+		-- if (event == "key") then
+			-- local char = keys.getName(keyNum)
+			-- threedee:moveCamera(char)
 
-			-- threedee.distance = (math.sin(distSinArg) + 1)/2 * 4 + 2
+			threedee.distance = (math.sin(distSinArg) + 1)/2 * 4 + 2
+			distSinArg = distSinArg + 0.01
+
 			threedee:setProjectedCorners()
+			
+			threedee:drawFill()
 			threedee:drawConnections()
 			threedee:drawCorners()
 
+			threedee.rotation.x = rotation.x + 0.01
+			threedee.rotation.y = rotation.y + 0.01
+			threedee.rotation.z = rotation.z + 0.01
+
 			framebuffer:draw()
 
-			-- os.queueEvent('yield')
-			-- os.pullEvent('yield')
-		end
+			os.queueEvent('yield')
+			os.pullEvent('yield')
+		-- end
 	end
 end

@@ -1,0 +1,3 @@
+shell.run('pastebin', 'get', 'R5dQCapF', 'cfg') -- Basic animation config.
+shell.run('pastebin', 'get', 'gs67NwMR', 'startup') -- Basic animation code.
+fs.makeDir('Animations/size_77x31') -- Create folder for storing downloaded animations with an 8x5 monitor size.
