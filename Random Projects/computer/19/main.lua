@@ -25,15 +25,12 @@ importAPIs()
 importConfig()
 
 if not rs.getInput(cfg.leverSide) then
-    -- Setup.
-	local monitorSide = cf.getPeripheralSide()
-	if cfg.useMonitor and monitorSide then
-		local mon = peripheral.wrap(monitorSide)
-		term.redirect(mon)
+    -- Setup.	
+	if cfg.useMonitor then
+		term.redirect(cf.getMonitor())
 	end
 
 	local animation = an.Animation:new(shell)
-    animation:setShell(shell) -- Optional.
 
 	-- Main.
 	local outputFolder = 'Animations/size_' .. cfg.animationSize.width .. 'x' .. cfg.animationSize.height

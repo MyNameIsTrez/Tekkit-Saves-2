@@ -231,3 +231,12 @@ function getPeripheralSide()
 		end
 	end
 end
+
+function getMonitor()
+	local monitorSide = getPeripheralSide()
+	if monitorSide then
+		return peripheral.wrap(monitorSide)
+	else
+		error('No monitor found.')
+	end
+end
