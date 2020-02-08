@@ -62,44 +62,44 @@ if not rs.getInput(cfg.leverSide) then
 	local framebuffer = fb.FrameBuffer.new(cfg.playArea.X, cfg.playArea.Y, width, height)
 	local threedee = td.ThreeDee.new(framebuffer, 1, 1, width, height, distance, rotation, cubesCoords, connectionChar, cornerChar)
 
-	-- local distSinArg = 0
+	local distSinArg = 0
 
 	-- Main.
-	local vertices = {
-		vector.new(-10, -8),
-		vector.new(19, -13),
-		vector.new(-20, 12),
-	}
+	-- local vertices = {
+	-- 	vector.new(-10, -8),
+	-- 	vector.new(19, -13),
+	-- 	vector.new(-20, 12),
+	-- }
 
-	threedee:drawFilledTriangle(vertices)
+	-- threedee:drawFilledTriangle(vertices)
 	-- framebuffer:writeLine(vertices[1].x + width/2, vertices[1].y + height/2, vertices[2].x + width/2, vertices[2].y + height/2, '#')
 	-- framebuffer:writeLine(vertices[2].x + width/2, vertices[2].y + height/2, vertices[3].x + width/2, vertices[3].y + height/2, '#')
 	-- framebuffer:writeLine(vertices[3].x + width/2, vertices[3].y + height/2, vertices[1].x + width/2, vertices[1].y + height/2, '#')
-	framebuffer:draw()
+	-- framebuffer:draw()
 
-	-- while true do
-	-- 	-- local event, keyNum = os.pullEvent()
-	-- 	-- if (event == "key") then
-	-- 		-- local char = keys.getName(keyNum)
-	-- 		-- threedee:moveCamera(char)
+	while true do
+		-- local event, keyNum = os.pullEvent()
+		-- if (event == "key") then
+			-- local char = keys.getName(keyNum)
+			-- threedee:moveCamera(char)
 
-	-- 		threedee.distance = (math.sin(distSinArg) + 1)/2 * 4 + 2
-	-- 		distSinArg = distSinArg + 0.01
+			threedee.distance = (math.sin(distSinArg) + 1)/2 * 4 + 2
+			distSinArg = distSinArg + 0.01
 
-	-- 		threedee:setProjectedCorners()
+			threedee:setProjectedCorners()
 			
-	-- 		threedee:drawFill()
-	-- 		threedee:drawConnections()
-	-- 		threedee:drawCorners()
+			threedee:drawFill()
+			-- threedee:drawConnections()
+			-- threedee:drawCorners()
 
-	-- 		threedee.rotation.x = rotation.x + 0.01
-	-- 		threedee.rotation.y = rotation.y + 0.01
-	-- 		threedee.rotation.z = rotation.z + 0.01
+			threedee.rotation.x = rotation.x + 0.01
+			threedee.rotation.y = rotation.y + 0.01
+			threedee.rotation.z = rotation.z + 0.01
 
-	-- 		framebuffer:draw()
+			framebuffer:draw()
 
-	-- 		os.queueEvent('yield')
-	-- 		os.pullEvent('yield')
-	-- 	-- end
-	-- end
+			os.queueEvent('yield')
+			os.pullEvent('yield')
+		-- end
+	end
 end
