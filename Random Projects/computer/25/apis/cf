@@ -2,6 +2,8 @@
 
 -- Collection of LUA functions I commonly use.
 
+-- pastebin get p9tSSWcB cf
+
 -- NOT EDITABLE VARIABLES --------------------------------------------------------
 
 local previousClock = 0
