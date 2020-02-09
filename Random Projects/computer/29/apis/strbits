@@ -1,6 +1,19 @@
 -- pastebin get VxsRKpDX strbits
 
--- Same speed as the same function name below.
+function strToBits(str)
+	local ret = {}
+	local i = 0
+	for c in str:gmatch(".") do
+		local d = c:byte()
+		for b = 0, 7 do
+			i = i + 1
+			ret[i] = math.floor(d / 2 ^ b) % 2
+		end
+	end
+	return ret
+end
+
+-- Same speed as the same function name above.
 --[[
 function strToBits(str)
     local bitTable = {}
@@ -18,19 +31,6 @@ function strToBits(str)
     return bitTable
 end
 ]]--
-
-function strToBits(str)
-  local ret = {}
-  local i = 0
-  for c in str:gmatch(".") do
-    local d = c:byte()
-    for b = 0, 7 do
-      i = i + 1
-      ret[i] = math.floor(d / 2 ^ b) % 2
-    end
-  end
-  return ret
-end
 
 function bitsToStr(bits)
 	strTab = {}

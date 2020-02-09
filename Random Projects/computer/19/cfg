@@ -10,9 +10,9 @@ useMonitor = false
 --fileName = 'finding_dory_extended'
 --fileName = 'bouncing_ball_extended'
 --fileName = 'albedo_extended'
---fileName = 'where_is_my_super_suit_extended'
+fileName = 'where_is_my_super_suit_extended'
 --fileName = 'flowers_extended'
-fileName = 'flowers'
+--fileName = 'flowers'
 --fileName = 'you_just_got_vectored_extended'
 --fileName = 'cat_falls_off_wheelchair_extended'
 --fileName = 'caramelldansen_undertale_extended'
@@ -50,7 +50,7 @@ frameSleep = 0.05
 -- If frameSleeping is set to false, there is never any sleeping.
 
 -- 1.57 for YouTube videos, with 426x160 animationSize
-frameSleepSkipping = 1.57
+frameSleepSkipping = 4
 
 
 -- How many frames can be written to a generated code file in .generatedCodeFiles/ before a new generatedCode file gets created.
