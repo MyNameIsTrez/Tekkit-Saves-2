@@ -32,11 +32,20 @@ end
 
 local noiseZoom = 15
 
+-- local z = math.random() * 1000000
+local z = 0
+
+local zIncrement = 0.1
+
 local leverSide = "right"
 
 -- UNEDITABLE VARIABLES --------------------------------------------------------
 
 local width, height = term.getSize()
+-- local width, height = 50, 18
+-- local width, height = 100, 36
+-- local width, height = 150, 54
+-- local width, height = width/2, height/2
 
 local previousClock = 0
 
@@ -50,21 +59,35 @@ local function tryYield()
     end
 end
 
-local function getPerlinMap(hor, ver)
-    local perlinMap = {}
-    for y = 1, ver do
-        local progress = y / height * 100
-        local roundedProgress = math.floor(progress + 0.5)
-        local progressString = tostring(roundedProgress)..'%'
+local function printProgress(y)
+	local progress = y / height * 100
+	local roundedProgress = math.floor(progress + 0.5)
+	local progressString = ' '..tostring(roundedProgress)..'% '
+	local emptyString = string.rep(' ', #progressString)
 
-        term.setCursorPos(width / 2 - #progressString / 2, height / 2)
-        write(progressString)
+	local px = width / 2 - #progressString / 2
+	local py = height / 2
+
+	term.setCursorPos(px, py - 1)
+	write(emptyString)
+
+	term.setCursorPos(px, py)
+	write(progressString)
+
+	term.setCursorPos(px, py + 1)
+	write(emptyString)
+end
+
+local function getPerlinMap(hor, ver, z)
+    local perlinMap = {}
+	for y = 1, ver do
+		printProgress(y)
 
         for x = 1, hor do
             local xNormalized = x / hor * noiseZoom
             local yNormalized = y / ver * noiseZoom
 
-            local unmappedValue = perlinNoise.perlin:noise(xNormalized, yNormalized) -- Return range: [-1, 1]
+            local unmappedValue = perlinNoise.perlin:noise(xNormalized, yNormalized, z) -- Return range: [-1, 1]
             local value = cf.map(unmappedValue, -1, 1, 0, 1)
 
             perlinMap[#perlinMap+1] = value
@@ -83,25 +106,35 @@ function setup()
 end
 
 function main()
-	local t1 = os.clock()
-
 	if not rs.getInput(leverSide) then
-        local perlinMap = getPerlinMap(width-1, height)
-        local frame = dithering.getFrame(perlinMap, width-1)
-		local noiseString = table.concat(frame)
+		while true do
+			local t1 = os.clock()
 
-		term.setCursorPos(1, 1)
-		write(noiseString)
+
+			z = z + zIncrement
+
+			local perlinMap = getPerlinMap(width-1, height, z)
+			local frame = dithering.getFrame(perlinMap, width-1)
+			local noiseString = table.concat(frame)
+
+			term.setCursorPos(1, 1)
+			write(noiseString)
+
+			tryYield()
+
+
+			-- Measures the time it took for the program to run.
+			local t2 = os.clock()
+			local elapsedTime = t2 - t1
+			local roundedTime = math.floor(elapsedTime * 100 + 0.5) / 100
+			local clear = ' '
+			local str = 'Elapsed time: '..tostring(roundedTime)..'s'..clear
+		
+			term.setCursorPos(1, 1)
+			print(str)
+			write(string.rep(' ', #str))
+		end
 	end
-
-	-- Measures the time it took for the program to run.
-	local t2 = os.clock()
-	local elapsedTime = t2 - t1
-	local roundedTime = math.floor(elapsedTime * 100 + 0.5) / 100
-	local clear = ' '
-
-	term.setCursorPos(1, 1)
-	write('Elapsed time: '..tostring(roundedTime)..'s'..clear)
 end
 
 setup()

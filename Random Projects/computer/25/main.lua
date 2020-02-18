@@ -17,12 +17,8 @@ function importAPIs()
 	end
 end
 
-function importConfig()
-    os.loadAPI('cfg')
-end
-
 importAPIs()
-importConfig()
+os.loadAPI('cfg')
 -- term.clear()
 -- term.setCursorPos(1, 1)
 
