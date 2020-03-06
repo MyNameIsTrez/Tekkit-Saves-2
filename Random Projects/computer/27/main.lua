@@ -3,6 +3,7 @@ function importAPIs()
 		{id = 'p9tSSWcB', name = 'cf'}, -- Common functions.
 		{id = 'QKixgCbW', name = 'wt'}, -- World time.
 		{id = 'GSRpTU2e', name = 'json'}, -- JSON.
+		{id = 'iyBc3BWj', name = 'https'}, -- HTTPS.
 	}
 
 	fs.delete('apis') -- Deletes the folder, with every API file in it.
