@@ -10,8 +10,8 @@ loop = true
 --animationSize = { width = 30, height = 30 }
 --animationSize = { width = 77, height = 31 } -- 8x5 monitor size
 --animationSize = { width = 77, height = 38 } -- max 8x6 monitor size
-animationSize = { width = 227, height = 85 }
---animationSize = { width = 426, height = 160 }
+--animationSize = { width = 227, height = 85 }
+animationSize = { width = 426, height = 160 }
 --animationSize = { width = 640, height = 240 }
 
 -- The top-left corner where the animation will be drawn from.
@@ -28,9 +28,11 @@ frameSleep = 0.05
 -- Setting to 0 or 1 means every frame has a sleep.
 -- If frameSleeping is set to false, there is never any sleeping.
 
--- 1.57 for YouTube videos, with 426x160 animationSize
-frameSleepSkipping = 4
+-- 1.57 for YouTube videos, with 426x160 animationSize.
+frameSleepSkipping = 1.57
 
+-- How many seconds are counted down before the animation starts playing. Set to 0 for no countdown.
+countDown = 0
 
 -- How many frames can be written to a generated code file in .generatedCodeFiles/ before a new generatedCode file gets created.
 maxFramesPerGeneratedCodeFile = 100

@@ -53,26 +53,52 @@ local randomQuotaUrlEnd = '&format=plain'
 -- Https ----------
 
 
-function get(url)
+function getTable(url)	
 	local handle = http.post(httpToHttpsUrl, '{"url": "' .. url .. '"}' )
-	local string = handle.readAll()
+	os.queueEvent('yield')
+	os.pullEvent('yield')
+	
+	if handle == nil then error('https.get() didn\'t get a response back.') end
+	
+	local strTable = {}
+	local i = 1
+	
+	for line in handle.readLine do
+		strTable[i] = line
+		--if i > 1 then
+		--	strTable[i] = '\n'
+		--	i = i + 1
+		--end
+		i = i + 1
+	end
+	os.queueEvent('yield')
+	os.pullEvent('yield')
+	
 	handle.close()
-	if string == '404: Not Found' then error('404: File not found.') end
-	return string
+	os.queueEvent('yield')
+	os.pullEvent('yield')
+	
+	if strTable[1] == '404: Not Found' then error('https.get() 404: File not found.', 2) end
+	
+	return strTable
+end
+
+function get(url)
+	return table.concat(getTable(url))
 end
 
 function post(url, data)
 	local handle = http.post(httpToHttpsUrl, '{"url": "' .. url .. '", "body": "' .. json.encode(data) .. '"}' )
-	local string = handle.readAll()
+	local str = handle.readAll()
 	handle.close()
-	return string
+	return str
 end
 
 function request(data)
 	local handle = http.post(httpToHttpsUrl, json.encode(data))
-	local string = handle.readAll()
+	local str = handle.readAll()
 	handle.close()
-	return string
+	return str
 end
 
 
@@ -93,10 +119,23 @@ function downloadFile(url, folder, fileName)
 		fs.makeDir(folder)
 	end
 	
+    local strTable = https.getTable(url)
+	os.queueEvent('yield')
+	os.pullEvent('yield')
 	local handle = io.open(folder .. '/' .. fileName .. '.txt', 'w')
-    local str = https.get(url)
-	handle:write(str)
+	os.queueEvent('yield')
+	os.pullEvent('yield')
+	
+	for _, str in ipairs(strTable) do
+		handle:write(str)
+		handle:write('\n')
+	end
+	os.queueEvent('yield')
+	os.pullEvent('yield')
+	
 	handle:close()
+	os.queueEvent('yield')
+	os.pullEvent('yield')
 end
 
 function getStructure()

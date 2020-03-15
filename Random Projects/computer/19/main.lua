@@ -25,6 +25,9 @@ importAPIs()
 importConfig()
 
 if not rs.getInput(cfg.leverSide) then
+	term.clear()
+	term.setCursorPos(1, 1)
+
     -- Setup.	
 	if cfg.useMonitor then
 		term.redirect(cf.getMonitor())
