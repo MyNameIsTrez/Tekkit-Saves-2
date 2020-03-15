@@ -33,8 +33,8 @@ if not rs.getInput(cfg.leverSide) then
 	local animation = an.Animation:new(shell)
 
 	-- Main.
-	local outputFolder = 'Animations/size_' .. cfg.animationSize.width .. 'x' .. cfg.animationSize.height
-	animation:loadAnimation(cfg.fileName, cfg.animationSize, outputFolder)
+	local folder = 'Animations/size_' .. cfg.animationSize.width .. 'x' .. cfg.animationSize.height
+	animation:loadAnimation(cfg.fileName, cfg.animationSize, folder)
 	animation:playAnimation(cfg.loop)
 	
 	local width, height = term.getSize()

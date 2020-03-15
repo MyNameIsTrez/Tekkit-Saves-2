@@ -88,9 +88,13 @@ function unicodify(str)
 	return str
 end
 
-function downloadFile(url, outputLocation, fileName)
+function downloadFile(url, folder, fileName)
+	if not fs.exists(folder) then
+		fs.makeDir(folder)
+	end
+	
+	local handle = io.open(folder .. '/' .. fileName .. '.txt', 'w')
     local str = https.get(url)
-	local handle = io.open(outputLocation .. '/' .. fileName .. '.txt', 'w')
 	handle:write(str)
 	handle:close()
 end
