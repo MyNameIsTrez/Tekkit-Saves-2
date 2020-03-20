@@ -85,8 +85,8 @@ end
 -- Prevents the program from crashing after 5 seconds.
 -- Executes faster than 'sleep(0.05)'.
 function yield()
-	os.queueEvent("randomEvent")
-	os.pullEvent("randomEvent")
+	os.queueEvent('yield')
+	os.pullEvent('yield')
 end
 
 -- Yields when more than t seconds have passed since the last yield. t is 4 by default.

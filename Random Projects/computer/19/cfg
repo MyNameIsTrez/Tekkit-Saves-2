@@ -2,7 +2,8 @@
 
 useMonitor = false
 
-fileName = 'speed_of_kirb_10'
+--fileName = 'speed_of_kirb_10'
+fileName = 'backstroke_of_the_west_extended'
 
 -- Whether the program loops the animation.
 loop = true
