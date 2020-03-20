@@ -1,0 +1,9 @@
+-- BackwardsOS
+
+os.loadAPI('BackwardsOS/cfg')
+
+if cfg.useBackwardsOS then
+	shell.run('BackwardsOS/BackwardsOS.lua')
+end
+
+--------------

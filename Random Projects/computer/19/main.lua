@@ -1,15 +1,13 @@
--- CUSTOM CODE --------------------------------------------------------
-
 function importAPIs()
 	local APIs = {
 		{id = 'p9tSSWcB', name = 'cf'}, -- Common Functions.
-        {id = "4nRg9CHU", name = "json"}, -- HTTPS needs JSON.
-        {id = "iyBc3BWj", name = "https"}, -- Animation needs HTTPS.
+        {id = '4nRg9CHU', name = 'json'}, -- HTTPS needs JSON.
+        {id = 'iyBc3BWj', name = 'https'}, -- Animation needs HTTPS.
 		{id = 'LNab4wrv', name = 'an'}, -- Animation.
 	}
 
-	fs.delete('apis') -- Deletes the folder, with every API file in it.
-	fs.makeDir('apis') -- Recreates the folder.
+	fs.delete('apis') -- Delete the folder, with every API file in it.
+	fs.makeDir('apis') -- Recreate the folder.
 
 	for _, API in pairs(APIs) do
 		shell.run('pastebin', 'get', API.id, 'apis/' .. API.name)
@@ -17,14 +15,11 @@ function importAPIs()
 	end
 end
 
-function importConfig()
-    os.loadAPI('cfg')
-end
-
-importAPIs()
-importConfig()
+os.loadAPI('cfg')
 
 if not rs.getInput(cfg.leverSide) then
+	importAPIs()
+
 	term.clear()
 	term.setCursorPos(1, 1)
 

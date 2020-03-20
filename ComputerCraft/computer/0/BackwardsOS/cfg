@@ -1,0 +1,46 @@
+useBackwardsOS = true
+
+---------------------
+
+useMonitor = false
+
+fileName = 'speed_of_kirb_10'
+--fileName = 'backstroke_of_the_west_extended'
+
+-- Whether the program loops the animation.
+loop = true
+
+--animationSize = { width = 30, height = 30 }
+--animationSize = { width = 77, height = 31 } -- 8x5 monitor size
+--animationSize = { width = 77, height = 38 } -- max 8x6 monitor size
+--animationSize = { width = 227, height = 85 }
+animationSize = { width = 426, height = 160 }
+--animationSize = { width = 640, height = 240 }
+
+-- The top-left corner where the animation will be drawn from.
+playArea = { X = 1, Y = 1 }
+
+-- Whether the program sleeps between drawing each frame, by frameSleep number of seconds.
+frameSleeping = true
+
+-- Seconds of sleeping between frames, -1 is no sleeping.
+frameSleep = 0.05
+
+-- How many frames are skipped between sleeping.
+-- Setting to 0 or 1 means every frame has a sleep.
+-- If frameSleeping is set to false, there is never any sleeping.
+
+-- 1.57 for YouTube videos, with 426x160 animationSize.
+frameSleepSkipping = 1.57
+
+-- How many seconds are counted down before the animation starts playing. Set to 0 for no countdown.
+countDown = 0
+
+-- How many frames can be written to a generated code file in .generatedCodeFiles/ before a new generatedCode file gets created.
+maxFramesPerGeneratedCodeFile = 100
+
+-- Whether to start playing the animation by default. Can be used to exit the while loop of generatedCode being ran.
+playAnimationBool = true
+
+-- Power this side with a redstone signal to disable starting BackwardsOS.lua.
+disableSide = 'right'
