@@ -2,8 +2,10 @@
 local animation = an.Animation:new(shell)
 
 -- Main.
-local folder = 'Animations/size_' .. cfg.animationSize.width .. 'x' .. cfg.animationSize.height
-animation:loadAnimation(cfg.fileName, cfg.animationSize, folder)
+local gitHubFolder = 'Animations/size_' .. cfg.animationSize.width .. 'x' .. cfg.animationSize.height
+local folder = 'BackwardsOS/programs/Animation/'
+
+animation:loadAnimation(cfg.fileName, cfg.animationSize, gitHubFolder, folder)
 animation:playAnimation(cfg.loop)
 
 local width, height = term.getSize()
