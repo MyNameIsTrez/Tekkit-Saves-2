@@ -1,0 +1,1 @@
+shape.line(vector.new(5, 5), vector.new(15, 15), '#')

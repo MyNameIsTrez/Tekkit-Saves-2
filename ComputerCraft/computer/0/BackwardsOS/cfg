@@ -1,6 +1,25 @@
+-- BackwardsOS --------------------
+
 useBackwardsOS = true
 
----------------------
+program = 'Animation'
+
+-- Particles ----------------------
+
+createSpawnerTime = 5 -- Seconds.
+spawnerParticleCount = 750 -- Integer.
+sleepTime = 0.05 -- Seconds.
+
+minLifeTime = 20 -- Integer.
+maxLifeTime = 100 -- Integer.
+
+minVelocity = 0.1 -- Float.
+maxVelocity = 10 -- Float.
+
+minDirection = 0 -- Radians.
+maxDirection = 2 * math.pi -- Radians.
+
+-- Animation ----------------------
 
 useMonitor = false
 
@@ -44,3 +63,13 @@ playAnimationBool = true
 
 -- Power this side with a redstone signal to disable starting BackwardsOS.lua.
 disableSide = 'right'
+
+-- Ray Casting -----------------------
+
+-- The top-left corner where will be drawn from.
+playArea = { X = 1, Y = 1 }
+
+-- ThreeDee -----------------------
+
+-- The top-left corner where will be drawn from.
+playArea = { X = 1, Y = 1 }
