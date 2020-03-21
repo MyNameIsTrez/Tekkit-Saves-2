@@ -19,6 +19,7 @@ function importAPIs()
 		{ id = 'BEmdjsuJ', name = 'bezier' },
 		{ id = 'NqnSq1wK', name = 'tf' }, -- Turtle Functions.
 		{ id = 'RTNpUUfH', name = 'breadthFirstSearch' }, -- Breadth First Search.
+		{ id = 'DQAkFmWQ', name = 'lo' }, -- Lists options the user can choose from.
 	}
 
 	local path = 'BackwardsOS/apis/'
@@ -45,11 +46,17 @@ if not rs.getInput(cfg.disableSide) then
 		term.redirect(cf.getMonitor())
 	end
 
-	local path = 'BackwardsOS/programs/' .. cfg.program .. '/' .. cfg.program .. '.lua'
+	local options = fs.list('BackwardsOS/programs')
+	local program = lo.listOptions(options)
+
+	term.clear()
+	term.setCursorPos(1, 1)
+
+	local path = 'BackwardsOS/programs/' .. program .. '/' ..program .. '.lua'
 
 	if fs.exists(path) then
 		shell.run(path)
 	else
-		error('Program "' .. tostring(cfg.program) .. '" not found.')
+		error('Program "' .. tostring(program) .. '" not found.')
 	end
 end

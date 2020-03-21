@@ -2,8 +2,6 @@
 
 useBackwardsOS = true
 
-program = 'Animation'
-
 -- Particles ----------------------
 
 createSpawnerTime = 5 -- Seconds.
