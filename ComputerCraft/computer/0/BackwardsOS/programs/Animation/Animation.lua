@@ -6,7 +6,7 @@ local gitHubFolder = 'Animations/size_' .. cfg.animationSize.width .. 'x' .. cfg
 local folder = 'BackwardsOS/programs/Animation/'
 
 animation:loadAnimation(cfg.fileName, cfg.animationSize, gitHubFolder, folder)
-animation:playAnimation(cfg.loop)
+animation:playAnimation(cfg.loop, folder)
 
 local width, height = term.getSize()
 term.setCursorPos(width - 1, height)
