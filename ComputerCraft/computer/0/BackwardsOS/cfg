@@ -38,7 +38,7 @@ useMonitor = false
 loop = true
 
 -- The top-left corner where the animation will be drawn from.
-playArea = { X = 10, Y = 10 }
+offset = { x = 10, y = 10 }
 
 folder = 'BackwardsOS/programs/Animation/'
 

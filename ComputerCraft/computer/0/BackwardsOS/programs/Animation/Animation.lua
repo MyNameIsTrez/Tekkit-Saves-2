@@ -12,7 +12,7 @@ local settings = {
 	progressBool = cfg.progressBool,
 	useMonitor = cfg.useMonitor,
 	loop = cfg.loop,
-	playArea = cfg.playArea,
+	offset = cfg.offset,
 	folder = cfg.folder,
 }
 
