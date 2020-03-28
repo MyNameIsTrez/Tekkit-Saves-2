@@ -20,7 +20,9 @@ function importAPIs()
 		{ id = 'NqnSq1wK', name = 'tf' }, -- Turtle Functions.
 		{ id = 'RTNpUUfH', name = 'breadthFirstSearch' }, -- Breadth First Search.
 		{ id = 'DQAkFmWQ', name = 'lo' }, -- Lists options the user can choose from.
-		{ id = 'YBhsJGxY', name = 'cv' }, -- Corona virus statistics.
+		{ id = 'YBhsJGxY', name = 'corona' }, -- Corona virus statistics.
+		{ id = 'DW2AERZD', name = 'tokipona' }, -- Toki Pona Dictionary.
+		{ id = 'rbLsraF4', name = 'convert' }, -- Convert data into other forms/file types.
 	}
 
 	local path = 'BackwardsOS/apis/'

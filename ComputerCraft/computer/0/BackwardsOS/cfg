@@ -19,25 +19,16 @@ maxDirection = 2 * math.pi -- Radians.
 
 -- Animation ----------------------
 
-useMonitor = false
+-- Whether to print the progress of loading a file.
+progressBool = false
 
---fileName = 'chars'
-fileName = 'speed_of_kirb_10'
---fileName = 'backstroke_of_the_west_extended'
+useMonitor = false
 
 -- Whether the program loops the animation.
 loop = true
 
---animationSize = { width = 30, height = 30 }
---animationSize = { width = 77, height = 31 } -- 8x5 monitor size
---animationSize = { width = 77, height = 38 } -- max 8x6 monitor size
---animationSize = { width = 128, height = 128 }
---animationSize = { width = 227, height = 85 }
-animationSize = { width = 426, height = 160 }
---animationSize = { width = 640, height = 240 }
-
 -- The top-left corner where the animation will be drawn from.
-playArea = { X = 1, Y = 1 }
+playArea = { X = 10, Y = 10 }
 
 -- Whether the program sleeps between drawing each frame, by frameSleep number of seconds.
 frameSleeping = true
@@ -67,9 +58,9 @@ disableSide = 'right'
 -- Ray Casting -----------------------
 
 -- The top-left corner where will be drawn from.
-playArea = { X = 1, Y = 1 }
+--playArea = { X = 1, Y = 1 }
 
 -- ThreeDee -----------------------
 
 -- The top-left corner where will be drawn from.
-playArea = { X = 1, Y = 1 }
+--playArea = { X = 1, Y = 1 }
