@@ -1,36 +1,35 @@
-local animation = an.Animation:new(shell)
+-- CREATING AN ANIMATION OBJECT ---------------------------------
 
--- Main.
-local sizeOptions = fs.list('BackwardsOS/programs/Animation/Animations')
-local sizeFolder = lo.listOptions(sizeOptions)
+-- Collect the animation settings from the cfg file.
+local settings = {
+	shell = shell,
+	frameSleeping = cfg.frameSleeping,
+	frameSleep = cfg.frameSleep,
+	frameSleepSkipping = cfg.frameSleepSkipping,
+	countDown = cfg.countDown,
+	playAnimationBool = cfg.playAnimationBool,
+	maxFramesPerGeneratedCodeFile = cfg.maxFramesPerGeneratedCodeFile,
+	progressBool = cfg.progressBool,
+	useMonitor = cfg.useMonitor,
+	loop = cfg.loop,
+	playArea = cfg.playArea,
+	folder = cfg.folder,
+}
 
--- Skips the beginning 'size_' part.
-local sizeStr = cf.split(sizeFolder, '_')[2]
+-- Create an animation object.
+local animation = an.Animation:new(settings)
 
--- Splits the width and height.
-local animationSize_ = cf.split(sizeStr, 'x')
+-- LOAD & PLAY ANIMATION USER FOR ANIMATION TO LOAD ---------------------------------
 
-animationSize = { width = animationSize_[1], height = animationSize_[2] }
+animation:askAnimationFolder()
+animation:askAnimationFile()
+animation:loadAnimation()
+animation:playAnimation()
 
-term.clear()
-term.setCursorPos(1, 1)
-
-local programOptions = fs.list('BackwardsOS/programs/Animation/Animations/' .. sizeFolder)
-fileName = lo.listOptions(programOptions)
-
-term.clear()
-term.setCursorPos(1, 1)
-
-
-local gitHubFolder = 'Animations/size_' .. animationSize.width .. 'x' .. animationSize.height
-local folder = 'BackwardsOS/programs/Animation/'
-
-animation:loadAnimation(fileName, animationSize, gitHubFolder, folder, cfg.progressBool)
-animation:playAnimation(cfg.loop, folder, cfg.progressBool)
-
+-- Hide the cursor by placing it at the bottom-right.
 local width, height = term.getSize()
 term.setCursorPos(width - 1, height)
 
-if cfg.useMonitor and monitorSide then
+if useMonitor and monitorSide then
 	term.restore()
 end

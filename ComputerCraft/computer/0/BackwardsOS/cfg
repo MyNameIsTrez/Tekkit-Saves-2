@@ -2,33 +2,10 @@
 
 useBackwardsOS = true
 
--- Particles ----------------------
-
-createSpawnerTime = 5 -- Seconds.
-spawnerParticleCount = 750 -- Integer.
-sleepTime = 0.05 -- Seconds.
-
-minLifeTime = 20 -- Integer.
-maxLifeTime = 100 -- Integer.
-
-minVelocity = 0.1 -- Float.
-maxVelocity = 10 -- Float.
-
-minDirection = 0 -- Radians.
-maxDirection = 2 * math.pi -- Radians.
+-- Power this side with a redstone signal to disable starting BackwardsOS.lua.
+disableSide = 'right'
 
 -- Animation ----------------------
-
--- Whether to print the progress of loading a file.
-progressBool = false
-
-useMonitor = false
-
--- Whether the program loops the animation.
-loop = true
-
--- The top-left corner where the animation will be drawn from.
-playArea = { X = 10, Y = 10 }
 
 -- Whether the program sleeps between drawing each frame, by frameSleep number of seconds.
 frameSleeping = true
@@ -46,14 +23,39 @@ frameSleepSkipping = 1.57
 -- How many seconds are counted down before the animation starts playing. Set to 0 for no countdown.
 countDown = 0
 
+-- Whether to start playing the animation. Can be used to exit the while loop of generatedCode being run.
+playAnimationBool = true
+
 -- How many frames can be written to a generated code file in .generatedCodeFiles/ before a new generatedCode file gets created.
 maxFramesPerGeneratedCodeFile = 100
 
--- Whether to start playing the animation by default. Can be used to exit the while loop of generatedCode being ran.
-playAnimationBool = true
+-- Whether to print the progress of loading a file.
+progressBool = true
 
--- Power this side with a redstone signal to disable starting BackwardsOS.lua.
-disableSide = 'right'
+useMonitor = false
+
+-- Whether the program loops the animation.
+loop = true
+
+-- The top-left corner where the animation will be drawn from.
+playArea = { X = 10, Y = 10 }
+
+folder = 'BackwardsOS/programs/Animation/'
+
+-- Particles ----------------------
+
+createSpawnerTime = 5 -- Seconds.
+spawnerParticleCount = 750 -- Integer.
+sleepTime = 0.05 -- Seconds.
+
+minLifeTime = 20 -- Integer.
+maxLifeTime = 100 -- Integer.
+
+minVelocity = 0.1 -- Float.
+maxVelocity = 10 -- Float.
+
+minDirection = 0 -- Radians.
+maxDirection = 2 * math.pi -- Radians.
 
 -- Ray Casting -----------------------
 
@@ -62,5 +64,5 @@ disableSide = 'right'
 
 -- ThreeDee -----------------------
 
--- The top-left corner where will be drawn from.
+-- The top-left corner where everything will be drawn from.
 --playArea = { X = 1, Y = 1 }
