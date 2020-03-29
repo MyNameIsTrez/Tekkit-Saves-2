@@ -30,12 +30,12 @@ playAnimationBool = true
 maxFramesPerGeneratedCodeFile = 100
 
 -- Whether to print the progress of loading a file.
-progressBool = true
+progressBool = false
 
 useMonitor = false
 
 -- Whether the program loops the animation.
-loop = true
+loop = false
 
 -- The top-left corner where the animation will be drawn from.
 offset = { x = 1, y = 1 }

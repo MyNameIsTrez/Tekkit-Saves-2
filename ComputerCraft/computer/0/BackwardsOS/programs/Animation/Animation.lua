@@ -1,7 +1,34 @@
+-- -- CREATING AN ANIMATION OBJECT ---------------------------------
+
+-- -- Collect the animation settings from the cfg file.
+-- local settings = {
+-- 	shell = shell,
+-- 	frameSleeping = cfg.frameSleeping,
+-- 	frameSleep = cfg.frameSleep,
+-- 	frameSleepSkipping = cfg.frameSleepSkipping,
+-- 	countDown = cfg.countDown,
+-- 	playAnimationBool = cfg.playAnimationBool,
+-- 	maxFramesPerGeneratedCodeFile = cfg.maxFramesPerGeneratedCodeFile,
+-- 	progressBool = cfg.progressBool,
+-- 	useMonitor = cfg.useMonitor,
+-- 	loop = cfg.loop,
+-- 	folder = cfg.folder,
+-- 	offset = cfg.offset,
+-- }
+
+-- -- Create an animation object.
+-- local animation = an.Animation:new(settings)
+
+-- -- LOAD & PLAY ANIMATION USER FOR ANIMATION TO LOAD ---------------------------------
+
+-- animation:askAnimationFolder()
+-- animation:askAnimationFile()
+-- animation:loadAnimation()
+-- animation:playAnimation()
+
 -- CREATING AN ANIMATION OBJECT ---------------------------------
 
--- Collect the animation settings from the cfg file.
-local settings = {
+local settings2 = {
 	shell = shell,
 	frameSleeping = cfg.frameSleeping,
 	frameSleep = cfg.frameSleep,
@@ -11,51 +38,95 @@ local settings = {
 	maxFramesPerGeneratedCodeFile = cfg.maxFramesPerGeneratedCodeFile,
 	progressBool = cfg.progressBool,
 	useMonitor = cfg.useMonitor,
-	loop = cfg.loop,
-	offset = cfg.offset,
+	loop = cfg.progressBool,
 	folder = cfg.folder,
+	animationSize = { width = 8, height = 8 },
 }
 
--- Create an animation object.
-local animation = an.Animation:new(settings)
+local animation2 = an.Animation:new(settings2)
 
--- LOAD & PLAY ANIMATION USER FOR ANIMATION TO LOAD ---------------------------------
+animation2.offset = { x = 50, y = 50 }
+animation2.fileName = 'char_73' -- 'H'
 
-animation:askAnimationFolder()
-animation:askAnimationFile()
-animation:loadAnimation()
-animation:playAnimation()
+animation2:loadAnimation()
+animation2:playAnimation()
 
--- -- CREATING AN ANIMATION OBJECT ---------------------------------
+animation2.offset = { x = 58, y = 50 }
+animation2.fileName = 'char_102' -- 'e'
 
--- -- Collect the animation settings from the cfg file.
--- local settings2 = {
--- 	shell = shell,
--- 	frameSleeping = cfg.frameSleeping,
--- 	frameSleep = cfg.frameSleep,
--- 	frameSleepSkipping = cfg.frameSleepSkipping,
--- 	countDown = cfg.countDown,
--- 	playAnimationBool = cfg.playAnimationBool,
--- 	maxFramesPerGeneratedCodeFile = cfg.maxFramesPerGeneratedCodeFile,
--- 	progressBool = false,
--- 	useMonitor = cfg.useMonitor,
--- 	loop = false,
--- 	offset = { x = 50, y = 50 },
--- 	folder = cfg.folder,
--- 	animationSize = { width = 128, height = 128 },
--- 	fileName = 'chars',
--- }
+animation2:loadAnimation()
+animation2:playAnimation()
 
--- -- Create an animation object.
--- local animation2 = an.Animation:new(settings2)
+animation2.offset = { x = 66, y = 50 }
+animation2.fileName = 'char_109' -- 'l'
 
--- -- LOAD & PLAY ANIMATION USER FOR ANIMATION TO LOAD ---------------------------------
+animation2:loadAnimation()
+animation2:playAnimation()
 
--- -- animation2:askAnimationFolder()
--- -- animation2:askAnimationFile()
+animation2.offset = { x = 74, y = 50 }
+animation2.fileName = 'char_109' -- 'l'
 
--- animation2:loadAnimation()
--- animation2:playAnimation()
+animation2:loadAnimation()
+animation2:playAnimation()
+
+animation2.offset = { x = 82, y = 50 }
+animation2.fileName = 'char_112' -- 'o'
+
+animation2:loadAnimation()
+animation2:playAnimation()
+
+animation2.offset = { x = 90, y = 50 }
+animation2.fileName = 'char_33' -- ' '
+
+animation2:loadAnimation()
+animation2:playAnimation()
+
+animation2.offset = { x = 98, y = 50 }
+animation2.fileName = 'char_88' -- 'W'
+
+animation2:loadAnimation()
+animation2:playAnimation()
+
+animation2.offset = { x = 106, y = 50 }
+animation2.fileName = 'char_112' -- 'o'
+
+animation2:loadAnimation()
+animation2:playAnimation()
+
+animation2.offset = { x = 114, y = 50 }
+animation2.fileName = 'char_115' -- 'r'
+
+animation2:loadAnimation()
+animation2:playAnimation()
+
+animation2.offset = { x = 122, y = 50 }
+animation2.fileName = 'char_109' -- 'l'
+
+animation2:loadAnimation()
+animation2:playAnimation()
+
+animation2.offset = { x = 130, y = 50 }
+animation2.fileName = 'char_101' -- 'd'
+
+animation2:loadAnimation()
+animation2:playAnimation()
+
+animation2.offset = { x = 138, y = 50 }
+animation2.fileName = 'char_34' -- '!'
+
+animation2:loadAnimation()
+animation2:playAnimation()
+
+animation2.offset = { x = 146, y = 50 }
+animation2.fileName = 'caramelldansen_undertale'
+
+animation2.animationSize = { width = 227, height = 85 }
+animation2.loop = true
+animation2.frameSleepSkipping = 1
+animation2.frameSleep = 0.15
+
+animation2:loadAnimation()
+animation2:playAnimation()
 
 -- DRAWING ANIMATIONS ENDED ----------------------------------------------
 
