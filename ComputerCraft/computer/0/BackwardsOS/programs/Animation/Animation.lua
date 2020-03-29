@@ -46,78 +46,21 @@ local settings2 = {
 local animation2 = an.Animation:new(settings2)
 
 animation2.offset = { x = 50, y = 50 }
-animation2.fileName = 'char_73' -- 'H'
 
-animation2:loadAnimation()
-animation2:playAnimation()
+animation2:writeCharCode(72)  -- 'H'
+animation2:writeCharCode(101) -- 'e'
+animation2:writeCharCode(108) -- 'l'
+animation2:writeCharCode(108) -- 'l'
+animation2:writeCharCode(111) -- 'o'
+animation2:writeCharCode(32)  -- ' '
+animation2:writeCharCode(87)  -- 'W'
+animation2:writeCharCode(111) -- 'o'
+animation2:writeCharCode(114) -- 'r'
+animation2:writeCharCode(108) -- 'l'
+animation2:writeCharCode(100) -- 'd'
+animation2:writeCharCode(33)  -- '!'
 
-animation2.offset = { x = 58, y = 50 }
-animation2.fileName = 'char_102' -- 'e'
-
-animation2:loadAnimation()
-animation2:playAnimation()
-
-animation2.offset = { x = 66, y = 50 }
-animation2.fileName = 'char_109' -- 'l'
-
-animation2:loadAnimation()
-animation2:playAnimation()
-
-animation2.offset = { x = 74, y = 50 }
-animation2.fileName = 'char_109' -- 'l'
-
-animation2:loadAnimation()
-animation2:playAnimation()
-
-animation2.offset = { x = 82, y = 50 }
-animation2.fileName = 'char_112' -- 'o'
-
-animation2:loadAnimation()
-animation2:playAnimation()
-
-animation2.offset = { x = 90, y = 50 }
-animation2.fileName = 'char_33' -- ' '
-
-animation2:loadAnimation()
-animation2:playAnimation()
-
-animation2.offset = { x = 98, y = 50 }
-animation2.fileName = 'char_88' -- 'W'
-
-animation2:loadAnimation()
-animation2:playAnimation()
-
-animation2.offset = { x = 106, y = 50 }
-animation2.fileName = 'char_112' -- 'o'
-
-animation2:loadAnimation()
-animation2:playAnimation()
-
-animation2.offset = { x = 114, y = 50 }
-animation2.fileName = 'char_115' -- 'r'
-
-animation2:loadAnimation()
-animation2:playAnimation()
-
-animation2.offset = { x = 122, y = 50 }
-animation2.fileName = 'char_109' -- 'l'
-
-animation2:loadAnimation()
-animation2:playAnimation()
-
-animation2.offset = { x = 130, y = 50 }
-animation2.fileName = 'char_101' -- 'd'
-
-animation2:loadAnimation()
-animation2:playAnimation()
-
-animation2.offset = { x = 138, y = 50 }
-animation2.fileName = 'char_34' -- '!'
-
-animation2:loadAnimation()
-animation2:playAnimation()
-
-animation2.offset = { x = 146, y = 50 }
+animation2.offset = { x = 154, y = 50 }
 animation2.fileName = 'caramelldansen_undertale'
 
 animation2.animationSize = { width = 227, height = 85 }
