@@ -94,11 +94,24 @@ end
 
 animation:writeCharCode(179) -- 'line vertical'
 
-animation:writeCharCode(49) -- '1'
-animation:writeCharCode(51) -- '3'
-animation:writeCharCode(58) -- ':'
-animation:writeCharCode(51) -- '3'
-animation:writeCharCode(55) -- '7'
+if http then
+	local time = wt.getTime('Europe', 'Amsterdam')
+	local timeData = time.timeData
+
+	local hours = timeData.hours
+	local hoursLeft = tonumber(hours:sub(1, 1))
+	local hoursRight = tonumber(hours:sub(2, 2))
+
+	local minutes = timeData.minutes
+	local minutesLeft = tonumber(minutes:sub(1, 1))
+	local minutesRight = tonumber(minutes:sub(2, 2))
+
+	animation:writeCharCode(48 + hoursLeft)
+	animation:writeCharCode(48 + hoursRight)
+	animation:writeCharCode(58) -- ':'
+	animation:writeCharCode(48 + minutesLeft)
+	animation:writeCharCode(48 + minutesRight)
+end
 
 animation:setCharCodeOffset(5, 3)
 
@@ -152,8 +165,6 @@ animation:loadAnimation()
 animation:playAnimation()
 
 term.setCursorPos(1, 31)
-local time = wt.getTime('Europe', 'Amsterdam')
-cf.printTable(time)
 
 -- DRAWING ANIMATIONS ENDED ----------------------------------------------
 

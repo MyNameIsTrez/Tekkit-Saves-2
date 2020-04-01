@@ -43,11 +43,14 @@ Animation = {
 
 			-- Initialized by this class' code later on.
 			sizeFolder, -- Used to calculate self.animationSize and self.fileName if self.askAnimationFolder() is called.
-			structure = https.getStructure(),
 			info,
 			screenWidth,
 			screenHeight,
 		}
+		
+		if http then
+			self.structure = https.getStructure()
+		end
 		
 		setmetatable(self, {__index = Animation})
 
@@ -228,12 +231,6 @@ Animation = {
 			local str = fs.open(path .. '/info.txt', 'r').readAll()
 			self.info = textutils.unserialize(str)
 		end
-
-		-- local file = fs.open(gitHubPath .. '.txt', 'r')
-		
-		-- if not file then
-		-- 	error('There was an attempt to load a file name that doesn\'t exist locally AND in the GitHub storage; check if the chosen file name and the file name in the input folder match.')
-		-- end
 
 		if self.progressBool then
 			self:printProgress('Opening data files...')

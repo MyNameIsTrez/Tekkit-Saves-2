@@ -5,6 +5,8 @@ useBackwardsOS = true
 -- Power this side with a redstone signal to disable starting BackwardsOS.lua.
 disableSide = 'right'
 
+redownloadAPIsOnStartup = true
+
 -- Animation ----------------------
 
 -- Whether the program sleeps between drawing each frame, by frameSleep number of seconds.
