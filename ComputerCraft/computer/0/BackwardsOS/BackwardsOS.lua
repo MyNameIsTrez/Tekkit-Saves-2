@@ -1,41 +1,58 @@
 function importAPIs()
 	local APIs = {
-		{ id = 'p9tSSWcB', name = 'cf' }, -- Common Functions.
-        { id = '4nRg9CHU', name = 'json' }, -- HTTPS needs JSON.
-        { id = 'iyBc3BWj', name = 'https' }, -- Animation needs HTTPS.
-		{ id = 'LNab4wrv', name = 'an' }, -- Animation.
-		{ id = 'nsrVpDY6', name = 'perlinNoise' }, -- Perlin noise.
-		{ id = 'cegB4RwE', name = 'dithering' }, -- Dithering (ASCII).
-		{ id = 'QKixgCbW', name = 'wt' }, -- World time.
-		{ id = '83q6p4Sp', name = 'fb' }, -- FrameBuffer.
-		{ id = 'ENwuVX0P', name = 'rc' }, -- RayCasting.
-		{ id = 'sSjBVjgc', name = 'keys' }, -- Gets names of keys.
-		{ id = 'BWpkzQYp', name = 'td' }, -- Draw 3D objects.
-		{ id = '9g8zvPpX', name = 'matrix' }, -- Matrix math.
-		{ id = 'drESpUSP', name = 'shape' },
-        { id = 'snQZyasC', name = 'mandel' }, -- Mandelbrot.
-        { id = 'VXufmAu2', name = 'lzstring' }, -- Mandelbrot.
-		{ id = '6qBVrzpK', name = 'aStar' },
-		{ id = 'BEmdjsuJ', name = 'bezier' },
-		{ id = 'NqnSq1wK', name = 'tf' }, -- Turtle Functions.
-		{ id = 'RTNpUUfH', name = 'breadthFirstSearch' }, -- Breadth First Search.
-		{ id = 'DQAkFmWQ', name = 'lo' }, -- Lists options the user can choose from.
-		{ id = 'YBhsJGxY', name = 'corona' }, -- Corona virus statistics.
-		{ id = 'DW2AERZD', name = 'tokipona' }, -- Toki Pona Dictionary.
-		{ id = 'rbLsraF4', name = 'convert' }, -- Convert data into other forms/file types.
+		{ id = 'common_functions', name = 'cf' },
+		{ id = 'json', name = 'json' },
+		{ id = 'https', name = 'https' },
+		{ id = 'animation', name = 'an' },
+		{ id = 'perlin_noise', name = 'perlinNoise' },
+		{ id = 'dithering', name = 'dithering' },
+		{ id = 'world_time', name = 'wt' },
+		{ id = 'frame_buffer', name = 'fb' },
+		{ id = 'ray_casting', name = 'rc' },
+		{ id = 'keys', name = 'keys' },
+		{ id = 'threedee', name = 'td' },
+		{ id = 'matrix', name = 'matrix' },
+		{ id = 'shape', name = 'shape' },
+		{ id = 'mandelbrot_set', name = 'mandel' },
+		{ id = 'lz_string', name = 'lzstring' },
+		{ id = 'a_star', name = 'aStar' },
+		{ id = 'bezier_curve', name = 'bezier' },
+		{ id = 'turtle_functions', name = 'tf' },
+		{ id = 'breadth_first_search', name = 'breadthFirstSearch' },
+		{ id = 'list_options', name = 'lo' },
+		{ id = 'corona_virus', name = 'corona' },
+		{ id = 'toki_pona', name = 'tokipona' },
+		{ id = 'convert', name = 'convert' },
 	}
 
-	local path = 'BackwardsOS/apis/'
+	local httpToHttpsUrl = 'http://request.mariusvanwijk.nl/'
 
-	if not fs.exists(path) then
-		fs.makeDir(path)
+	local pathAPIs = 'BackwardsOS/apis/'
+
+	if not fs.exists(pathAPIs) then
+		fs.makeDir(pathAPIs)
 	end
 
-	for _, API in pairs(APIs) do
-		local name = path .. API.name
-		fs.delete(name)
-		shell.run('pastebin', 'get', API.id, name)
-		os.loadAPI(name)
+	for _, API in ipairs(APIs) do
+		print('Loading API "' .. API.id .. '" from GitHub...')
+
+		local pathAPI = pathAPIs .. API.name
+		fs.delete(pathAPI)
+
+		local url = 'https://raw.githubusercontent.com/MyNameIsTrez/ComputerCraft-APIs/master/' .. API.id .. '.lua'
+		local handleHttps = http.post(httpToHttpsUrl, '{"url": "' .. url .. '"}' )
+		local str = handleHttps.readAll()
+
+		if not handleHttps then
+			error('Downloading file failed!')
+		end
+
+		local handleFile = io.open(pathAPI, 'w')
+		handleFile:write(str)
+		handleFile:close()
+		
+		os.loadAPI(pathAPI)
+		print('Loaded!')
 	end
 end
 
