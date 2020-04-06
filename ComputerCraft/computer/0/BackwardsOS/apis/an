@@ -26,20 +26,20 @@ Animation = {
 	new = function(self, settings)
 		local self = {
 			-- Passed settings.
-			passedShell                   = settings.shell,
-			frameSleeping                 = settings.frameSleeping,
-			frameSleep                    = settings.frameSleep,
-			frameSleepSkipping            = settings.frameSleepSkipping,
-			countDown                     = settings.countDown,
-			playAnimationBool             = settings.playAnimationBool,
-			maxFramesPerGeneratedCodeFile = settings.maxFramesPerGeneratedCodeFile,
-			progressBool                  = settings.progressBool,
-			-- useMonitor                    = settings.useMonitor,
-			loop                          = settings.loop,
-			folder                        = settings.folder,
-			offset                        = settings.offset,
-			animationSize                 = settings.animationSize, -- If not provided, set by self.askAnimationFolder().
-			fileName                      = settings.fileName, -- If not provided, set by self.askAnimationFile().
+			passedShell                    = settings.shell,
+			frameSleeping                  = settings.frameSleeping,
+			frameSleep                     = settings.frameSleep,
+			frameSleepSkipping             = settings.frameSleepSkipping,
+			countdownTime                  = settings.countdownTime,
+			playAnimationBool              = settings.playAnimationBool,
+			maxFramesPerTimedAnimationFile = settings.maxFramesPerTimedAnimationFile,
+			progressBool                   = settings.progressBool,
+			-- useMonitor                     = settings.useMonitor,
+			loop                           = settings.loop,
+			folder                         = settings.folder,
+			offset                         = settings.offset,
+			animationSize                  = settings.animationSize, -- If not provided, set by self.askAnimationFolder().
+			fileName                       = settings.fileName, -- If not provided, set by self.askAnimationFile().
 
 			-- Initialized by this class' code later on.
 			sizeFolder, -- Used to calculate self.animationSize and self.fileName if self.askAnimationFolder() is called.
@@ -124,6 +124,7 @@ Animation = {
 	askAnimationFolder = function(self)
 		-- Get the size options.
 		local localStructure = fs.list('BackwardsOS/programs/Animation/Animations')
+
 		-- Ask the size folder name.
 		self.sizeFolder = self:listOptions(self.structure, true, localStructure)
 		
@@ -142,9 +143,14 @@ Animation = {
 	-- Asks the user for an animation file to load.
 	askAnimationFile = function(self)
 		local path = 'BackwardsOS/programs/Animation/Animations/' .. self.sizeFolder
-		if not fs.exists(path) then fs.makeDir(path) end
+
+		if not fs.exists(path) then
+			fs.makeDir(path)
+		end
+
 		local localPrograms = fs.list(path)
 		local programOptions = self.structure[self.sizeFolder]
+
 		-- Ask the animation file name.
 		self.fileName = self:listOptions(programOptions, false, localPrograms)
 		
@@ -164,9 +170,15 @@ Animation = {
 		end
 	end,
 
-	downloadAnimationInfo = function(self, gitHubPath)
+	downloadAnimationInfo = function(self, gitHubPath, path)
 		local url = 'https://raw.githubusercontent.com/MyNameIsTrez/ComputerCraft-Data-Storage/master/' .. gitHubPath .. '/info.txt'
 		local str = https.get(url)
+
+		-- If the https.get() above didn't error,
+		-- make sure there's a folder to store the resulting string in.
+		if not fs.exists(path) then
+			fs.makeDir(path)
+		end
 
 		local handle = io.open(self.folder .. gitHubPath .. '/info.txt', 'w')
 		handle:write(str)
@@ -216,16 +228,23 @@ Animation = {
 		end
 	end,
 
+	getInfo = function(self)
+		-- self:downloadAnimationInfo(gitHubPath)
+		local path = self.folder .. 'Animations/size_' .. self.animationSize.width .. 'x' .. self.animationSize.height .. '/' .. self.fileName .. '/'
+		local str = fs.open(path .. 'info.txt', 'r').readAll()
+		self.info = textutils.unserialize(str)
+	end,
+
+	getFrames = function(self)
+		print(1)
+	end,
+
 	getSelectedAnimationData = function(self, gitHubPath)
 		local path = self.folder .. gitHubPath
 		local fileExists = fs.exists(path)
 
-		if not fileExists then
-			if not fs.exists(path) then
-				fs.makeDir(path)
-			end
-			
-			self:downloadAnimationInfo(gitHubPath)
+		if not fileExists then			
+			self:downloadAnimationInfo(gitHubPath, path)
 			self:downloadAnimationFile(gitHubPath)
 		else
 			local str = fs.open(path .. '/info.txt', 'r').readAll()
@@ -272,36 +291,41 @@ Animation = {
 		end
 	end,
 
-	createGeneratedCodeFolder = function(self)
-		if fs.exists(self.folder .. '.generatedCodeFiles') then
-			local names = fs.list(self.folder .. '.generatedCodeFiles')
-
-			for _, name in pairs(names) do
-				fs.delete(self.folder .. '.generatedCodeFiles/'..tostring(name))
-			end
-		else
-			fs.makeDir(self.folder .. '.generatedCodeFiles')
-		end
-	end,
-
-	dataToGeneratedCode = function(self)
-		local numberOfNeededFiles = math.ceil(self.info.frame_count / self.maxFramesPerGeneratedCodeFile)
+	dataToTimedAnimation = function(self)
+		local frame_count = self.info.frame_count
+		local numberOfNeededFiles = math.ceil(frame_count / self.maxFramesPerTimedAnimationFile)
 
 		local cursorX, cursorY = term.getCursorPos()
 		local i = 1
 
 		local framesToSleep = {}
-		for v = 1, self.info.frame_count, self.frameSleepSkipping do
+		for v = 1, frame_count, self.frameSleepSkipping do
 			table.insert(framesToSleep, math.floor(v + 0.5))
 		end
 		local frameSleepSkippingIndex = 1
 
-		for generatedCodeFileIndex = 1, numberOfNeededFiles do
-			local handle = io.open(self.folder .. '.generatedCodeFiles/' .. generatedCodeFileIndex, 'w')
+		local path1 = self.folder .. 'Timed Animations/'
+		if not fs.exists(path1) then
+			fs.makeDir(path1)
+		end
+		
+		local path2 = path1 .. 'size_' .. self.animationSize.width .. 'x' .. self.animationSize.height .. '/'
+		if not fs.exists(path2) then
+			fs.makeDir(path2)
+		end
 
-			local frameOffset = (generatedCodeFileIndex - 1) * self.maxFramesPerGeneratedCodeFile
+		local path3 = path2 .. self.fileName .. '/'
+		if not fs.exists(path3) then
+			fs.makeDir(path3)
+		end
 
-			local frameCountToFile = math.min(self.info.frame_count - frameOffset, self.maxFramesPerGeneratedCodeFile)
+		for subfile = 1, numberOfNeededFiles do
+			local path4 = path3 .. subfile
+			local handle = io.open(path4, 'w')
+
+			local frameOffset = (subfile - 1) * self.maxFramesPerTimedAnimationFile
+
+			local frameCountToFile = math.min(frame_count - frameOffset, self.maxFramesPerTimedAnimationFile)
 
 			local minFrames = frameOffset + 1
 			local maxFrames = frameOffset + frameCountToFile
@@ -321,35 +345,30 @@ Animation = {
 				k = k + 1
 				strTable[k] = self.frameStrings[f]
 				k = k + 1
-				strTable[k] = '",'
-				k = k + 1
-				strTable[k] = tostring(self.offset.x)
-				k = k + 1
-				strTable[k] = ','
-				k = k + 1
-				strTable[k] = tostring(self.offset.y)
-				k = k + 1
-				strTable[k] = ')'
+				strTable[k] = '",nil,nil'
 				k = k + 1
 
-				-- framesToSleep[frameSleepSkippingIndex] might cause errors when trying to access stuff outside of the table's scope
-				if self.frameSleeping and self.frameSleep ~= -1 and f == framesToSleep[frameSleepSkippingIndex] then
-					strTable[k] = '\nsleep('
+				-- If this isn't the last frame, when the animation doesn't loop.
+				if not (f == frame_count and self.loop == false) then
+					strTable[k] = ','
 					k = k + 1
-					strTable[k] = tostring(self.frameSleep)
-					k = k + 1
-					strTable[k] = ')'
-					k = k + 1
-					
-					frameSleepSkippingIndex = frameSleepSkippingIndex + 1
-				else
-					strTable[k] = '\nos.queueEvent("y")'
-					k = k + 1
-					strTable[k] = '\nos.pullEvent("y")'
-					k = k + 1
+
+					-- framesToSleep[frameSleepSkippingIndex] might cause errors when trying to access stuff outside of the table's scope
+					if self.frameSleeping and self.frameSleep ~= -1 and f == framesToSleep[frameSleepSkippingIndex] then
+						frameSleepSkippingIndex = frameSleepSkippingIndex + 1
+
+						strTable[k] = tostring(self.frameSleep) -- May not need tostring().
+						k = k + 1
+					else
+						strTable[k] = "'yield'"
+						k = k + 1
+					end
 				end
+
+				strTable[k] = ')'
+				k = k + 1
 				
-				if i % self.maxFramesPerGeneratedCodeFile == 0 or i == self.info.frame_count then
+				if i % self.maxFramesPerTimedAnimationFile == 0 or i == frame_count then
 					cf.tryYield()
 					
 					-- I don't remember why it's necessary to check this. Try removing this later.
@@ -374,7 +393,7 @@ Animation = {
 					k = 1
 
 					if self.progressBool then
-						local str = 'Generated '..tostring(i)..'/'..tostring(self.info.frame_count)..' frames...'
+						local str = 'Generated '..tostring(i)..'/'..tostring(frame_count)..' frames...'
 						self:printProgress(str, cursorX, cursorY)
 					end
 				end
@@ -388,31 +407,35 @@ Animation = {
 		end
 	end,
 
-	countDown = function(self)
+	countdown = function(self)
 		local cursorX, cursorY = term.getCursorPos()
 
-		for i = 1, self.countDown do
-			self:printProgress('Playing animation in ' .. tostring(self.countDown - i + 1) .. '...', cursorX, cursorY)
+		for i = 1, self.countdownTime do
+			self:printProgress('Playing animation in ' .. tostring(self.countdownTime - i + 1) .. '...', cursorX, cursorY)
 			sleep(1)
 		end
 	end,
 
-	loadAnimation = function(self)
+	createTimedAnimation = function(self)
+		local path1 = self.folder .. 'Timed Animations/size_' .. self.animationSize.width .. 'x' .. self.animationSize.height .. '/' .. self.fileName
+		if fs.exists(path1) then -- We don't need to recreate the timed animation.
+			return
+		end
+
 		local gitHubFolder = 'Animations/size_' .. self.animationSize.width .. 'x' .. self.animationSize.height
 		local gitHubPath = gitHubFolder .. '/' .. self.fileName
 
 		self:getSelectedAnimationData(gitHubPath)
 		cf.tryYield()
 		
-		self:createGeneratedCodeFolder()
-		self:dataToGeneratedCode()
+		self:dataToTimedAnimation()
 		cf.tryYield()
 	end,
 
-	_playAnimation = function(self, len)
+	_playAnimation = function(self, path, len)
 		for i = 1, len do
 			if self.playAnimationBool then
-				self.passedShell.run(self.folder .. '.generatedCodeFiles/' .. tostring(i))
+				self.passedShell.run(path .. tostring(i))
 			end
 		end
 
@@ -421,25 +444,31 @@ Animation = {
 
 	playAnimation = function(self)
 		if self.progressBool then
-			if self.countDown > 0 then
-				self:countDown(self.countDown)
+			if self.countdownTime > 0 then
+				self:countdown()
 			else
 				self:printProgress('Playing animation...')
 			end
 		end
 
-		local len = #fs.list(self.folder .. '.generatedCodeFiles')
+		local path = self.folder .. 'Timed Animations/size_' .. self.animationSize.width .. 'x' .. self.animationSize.height .. '/' .. self.fileName .. '/'
+		local len = #fs.list(path)
+
+		term.setCursorPos(self.offset.x, self.offset.y)
+
+		-- Called because it's necessary to know self.info.frame_count.
+		self:getInfo() -- Seems like this it should be able to call this method less often!!!
 
 		if self.loop and self.info.frame_count > 1 then
 			while true do
 				if self.playAnimationBool then
-					self:_playAnimation(len)
+					self:_playAnimation(path, len)
 				else
 					sleep(1)
 				end
 			end
 		else
-			self:_playAnimation(len)
+			self:_playAnimation(path, len)
 		end
 	end,
 
@@ -477,7 +506,7 @@ Animation = {
 
 			self.fileName = 'char_' .. tostring(charCode)
 
-			self:loadAnimation()
+			self:createTimedAnimation()
 			self:playAnimation()
 		end
 	end,

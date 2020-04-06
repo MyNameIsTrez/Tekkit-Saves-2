@@ -6,9 +6,9 @@
 -- 	frameSleeping = cfg.frameSleeping,
 -- 	frameSleep = cfg.frameSleep,
 -- 	frameSleepSkipping = cfg.frameSleepSkipping,
--- 	countDown = cfg.countDown,
+-- 	countdownTime = cfg.countdownTime,
 -- 	playAnimationBool = cfg.playAnimationBool,
--- 	maxFramesPerGeneratedCodeFile = cfg.maxFramesPerGeneratedCodeFile,
+-- 	maxFramesPerTimedAnimationFile = cfg.maxFramesPerTimedAnimationFile,
 -- 	progressBool = cfg.progressBool,
 -- 	useMonitor = cfg.useMonitor,
 -- 	loop = cfg.loop,
@@ -23,7 +23,7 @@
 
 -- animation:askAnimationFolder()
 -- animation:askAnimationFile()
--- animation:loadAnimation()
+-- animation:createTimedAnimation()
 -- animation:playAnimation()
 
 -- CREATING AN ANIMATION OBJECT ---------------------------------
@@ -33,12 +33,12 @@ local settings = {
 	frameSleeping = cfg.frameSleeping,
 	frameSleep = cfg.frameSleep,
 	frameSleepSkipping = cfg.frameSleepSkipping,
-	countDown = cfg.countDown,
+	countdownTime = cfg.countdownTime,
 	playAnimationBool = cfg.playAnimationBool,
-	maxFramesPerGeneratedCodeFile = cfg.maxFramesPerGeneratedCodeFile,
+	maxFramesPerTimedAnimationFile = cfg.maxFramesPerTimedAnimationFile,
 	progressBool = cfg.progressBool,
 	useMonitor = cfg.useMonitor,
-	loop = cfg.progressBool,
+	loop = cfg.loop,
 	offset = cfg.offset,
 	folder = cfg.folder,
 	animationSize = cfg.animationSize,
@@ -86,7 +86,7 @@ animation:writeCharCode(179) -- 'line vertical'
 animation:addCharCodeOffset(1, 0)
 if http then
 	animation.fileName = 'internet_icon'
-	animation:loadAnimation()
+	animation:createTimedAnimation()
 	animation:playAnimation()
 else
 	animation:writeCharCode(33, 0, 0) -- '!'
@@ -153,22 +153,27 @@ animation:writeCharCode(108) -- 'l'
 animation:writeCharCode(100) -- 'd'
 animation:writeCharCode(33)  -- '!'
 
-animation:setOffset(125, 38)
-animation.fileName = 'caramelldansen_undertale'
-
+animation.fileName = 'cyclops_cat'
 animation.animationSize = { width = 227, height = 85 }
--- animation.loop = true
-animation.frameSleepSkipping = 1
-animation.frameSleep = 0.15
 
-animation:loadAnimation()
+local xTopLeft = 1 + 8 * 5 + 5
+local yTopLeft = 1 + 8 + 5
+local xBottomRight, yBottomRight = term.getSize()
+local xMiddle = (xTopLeft + xBottomRight) / 2
+local yMiddle = (yTopLeft + yBottomRight) / 2
+
+local x = xMiddle - animation.animationSize.width / 2
+local y = yMiddle - animation.animationSize.height / 2
+animation:setOffset(x, y)
+
+animation:createTimedAnimation()
 animation:playAnimation()
 
 term.setCursorPos(1, 31)
 
 -- DRAWING ANIMATIONS ENDED ----------------------------------------------
 
--- Hide the cursor by placing it at the bottom-right.
+-- Hide the cursor by placing it in the bottom-right corner of the screen.
 -- local width, height = term.getSize()
 -- term.setCursorPos(width - 1, height)
 

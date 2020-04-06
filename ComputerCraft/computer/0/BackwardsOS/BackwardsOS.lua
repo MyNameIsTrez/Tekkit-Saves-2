@@ -52,12 +52,14 @@ function importAPIs()
 		handleFile:close()
 		
 		print(' Downloaded!')
+
+		sleep(1) -- REMOVE THIS LATER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	end
 end
 
 function loadAPIs()
 	for _, API in ipairs(APIs) do
-		write('Loading API "' .. API.id .. '" from GitHub...')
+		write('Loading API "' .. API.id .. '"...')
 		local pathAPI = pathAPIs .. API.name
 		os.loadAPI(pathAPI)
 		print(' Loaded!')
