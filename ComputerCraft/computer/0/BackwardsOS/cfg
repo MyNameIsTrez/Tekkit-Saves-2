@@ -5,7 +5,7 @@ useBackwardsOS = true
 -- Power this side with a redstone signal to disable starting BackwardsOS.lua.
 disableSide = 'right'
 
-redownloadAPIsOnStartup = false
+redownloadAPIsOnStartup = true
 
 -- Animation ----------------------
 
@@ -69,4 +69,4 @@ maxDirection = 2 * math.pi -- Radians.
 -- ThreeDee -----------------------
 
 -- The top-left corner where everything will be drawn from.
---playArea = { X = 1, Y = 1 }
+--offset = { x = 1, y = 1 }

@@ -30,7 +30,7 @@ local cubesCoords = {
 
 -- cf.printTable(cubesCoords)
 
-local framebuffer = fb.FrameBuffer.new(cfg.playArea.X, cfg.playArea.Y, width, height)
+local framebuffer = fb.FrameBuffer.new(cfg.offset.x, cfg.offset.y, width, height)
 local threedee = td.ThreeDee.new(framebuffer, 1, 1, width, height, distance, rotation, cubesCoords, connectionChar, cornerChar)
 
 local distSinArg = 0
@@ -48,7 +48,7 @@ local distSinArg = 0
 -- framebuffer:writeLine(vertices[3].x + width/2, vertices[3].y + height/2, vertices[1].x + width/2, vertices[1].y + height/2, '#')
 -- framebuffer:draw()
 
--- while true do
+while true do
 	-- local event, keyNum = os.pullEvent()
 	-- if (event == "key") then
 		-- local char = keys.getName(keyNum)
@@ -59,7 +59,7 @@ local distSinArg = 0
 
 		threedee:setProjectedCubes()
 		
-		-- threedee:drawFill()
+		threedee:drawFill()
 		-- threedee:drawConnections()
 		-- threedee:drawCorners()
 
@@ -67,9 +67,10 @@ local distSinArg = 0
 		threedee.rotation.y = rotation.y + 0.01
 		threedee.rotation.z = rotation.z + 0.01
 
-		-- framebuffer:draw()
+		framebuffer:draw()
 
-		os.queueEvent('yield')
-		os.pullEvent('yield')
+		cf.tryYield()
+		-- os.queueEvent('yield')
+		-- os.pullEvent('yield')
 	-- end
--- end
+end

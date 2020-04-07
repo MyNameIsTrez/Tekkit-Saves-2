@@ -23,13 +23,13 @@ local function printProgress(y)
 	local py = height / 2
 
 	term.setCursorPos(px, py - 1)
-	write(emptyString)
+	term.write(emptyString)
 
 	term.setCursorPos(px, py)
-	write(progressString)
+	term.write(progressString)
 
 	term.setCursorPos(px, py + 1)
-	write(emptyString)
+	term.write(emptyString)
 end
 
 local function getNoiseStr(hor, ver, z)
@@ -72,7 +72,7 @@ while true do
 	term.setCursorPos(1, 1)
 
 	local noiseStr = getNoiseStr(width-1, height, z)
-	write(noiseStr)
+	term.write(noiseStr)
 
 	cf.tryYield()
 
@@ -86,5 +86,5 @@ while true do
 
 	term.setCursorPos(1, 1)
 	print(str)
-	write(string.rep(' ', #str))
+	term.write(string.rep(' ', #str))
 end

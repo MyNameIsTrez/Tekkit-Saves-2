@@ -34,7 +34,7 @@ function importAPIs()
 	end
 
 	for _, API in ipairs(APIs) do
-		write('Downloading API "' .. API.id .. '" from GitHub...')
+		term.write('Downloading API "' .. API.id .. '" from GitHub...')
 
 		local pathAPI = pathAPIs .. API.name
 		fs.delete(pathAPI)
@@ -59,7 +59,7 @@ end
 
 function loadAPIs()
 	for _, API in ipairs(APIs) do
-		write('Loading API "' .. API.id .. '"...')
+		term.write('Loading API "' .. API.id .. '"...')
 		local pathAPI = pathAPIs .. API.name
 		os.loadAPI(pathAPI)
 		print(' Loaded!')

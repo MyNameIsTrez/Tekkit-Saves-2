@@ -14,10 +14,10 @@ function main()
 		term.setCursorPos(1,1)
 		term.clear()
 		
-		write("Enter an item to request: ")
+		term.write("Enter an item to request: ")
 		rednet.broadcast(read())
 		
-		write("Enter the amount of stacks to request: ")
+		term.write("Enter the amount of stacks to request: ")
 		stacks = read()
 		stacksCheck()
 		rednet.broadcast(stacks)
@@ -38,7 +38,7 @@ function main()
 			end
 		end
 
-		write("You didn't enter a valid item name.")
+		term.write("You didn't enter a valid item name.")
 		sleep(alertTime)
 	end
 end
@@ -48,7 +48,7 @@ function stacksCheck()
 	if type(stacks) == "number" then
 		stacks = tostring(stacks)
 	else
-		write("You didn't enter the number of stacks.")
+		term.write("You didn't enter the number of stacks.")
 		rednet.broadcast("0")
 		sleep(alertTime)
 		main()
@@ -59,7 +59,7 @@ function calculateTimeLeft()
 	stacks = tonumber(stacks)
 	timeLeft = math.ceil((stacks / 10 - step / 10) * 4.5)
 	term.setCursorPos(1,3)
-	write("Time left: "..timeLeft.." seconds	")
+	term.write("Time left: "..timeLeft.." seconds	")
 end
 
 main()
