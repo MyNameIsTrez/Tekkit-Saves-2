@@ -32,8 +32,10 @@ local function printProgress(y)
 	write(emptyString)
 end
 
-local function getPerlinMap(hor, ver, z)
-    local perlinMap = {}
+local function getNoiseStr(hor, ver, z)
+	local tab = {}
+	local i = 1
+
 	for y = 1, ver do
 		printProgress(y)
 
@@ -42,14 +44,22 @@ local function getPerlinMap(hor, ver, z)
             local yNormalized = y / ver * noiseZoom
 
             local unmappedValue = perlinNoise.perlin:noise(xNormalized, yNormalized, z) -- Return range: [-1, 1]
-            local value = cf.map(unmappedValue, -1, 1, 0, 1)
+			local value = cf.map(unmappedValue, -1, 1, 0, 1)
+			local char = dithering.getClosestChar(value)
 
-            perlinMap[#perlinMap+1] = value
+			tab[i] = char
+			i = i + 1
 
-            cf.tryYield()
-        end
-    end
-    return perlinMap
+            cf.tryYield() -- May be calling this too often.
+		end
+		
+		if y ~= ver then
+			tab[i] = '\n'
+			i = i + 1
+		end
+	end
+
+    return table.concat(tab)
 end
 
 -- CODE EXECUTION --------------------------------------------------------
@@ -57,15 +67,12 @@ end
 while true do
 	local t1 = os.clock()
 
-
 	z = z + zIncrement
 
-	local perlinMap = getPerlinMap(width-1, height, z)
-	local frame = dithering.getFrame(perlinMap, width-1)
-	local noiseString = table.concat(frame)
-
 	term.setCursorPos(1, 1)
-	write(noiseString)
+
+	local noiseStr = getNoiseStr(width-1, height, z)
+	write(noiseStr)
 
 	cf.tryYield()
 

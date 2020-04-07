@@ -5,7 +5,7 @@ width = width - 1
 local topDownWidth = width / 2
 local firstPersonWidth = width - topDownWidth - 1
 
-local framebuffer = fb.FrameBuffer.new(cfg.playArea.X, cfg.playArea.Y, width, height)
+local framebuffer = fb.FrameBuffer.new(cfg.offset.x, cfg.offset.y, width, height)
 local boundaryCount, rayCount, fov, rotationSpeed, grayscaleBool = 15, 60, math.pi/3, math.pi/45, true
 local boundaryChar, rayChar, raycasterChar = '#', '.', '~'
 local raycasting = rc.RayCasting.new(topDownWidth, height, firstPersonWidth, boundaryCount, rayCount, fov, rotationSpeed, grayscaleBool, boundaryChar, rayChar, raycasterChar, framebuffer)
