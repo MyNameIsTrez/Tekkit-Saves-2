@@ -99,7 +99,7 @@ while true do
 	end
 	
 	if turboSpeed then
-		cf.yield()
+		cf.tryYield()
 	else
 		sleep(sleepTime)
 	end

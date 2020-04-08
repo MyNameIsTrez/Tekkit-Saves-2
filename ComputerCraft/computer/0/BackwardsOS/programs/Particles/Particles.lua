@@ -190,7 +190,7 @@ while true do
 		showDebug()
 
 		sleep(cfg.sleepTime)
-		-- cf.yield()
+		-- cf.tryYield()
 	else
 		sleep(1)
 	end
