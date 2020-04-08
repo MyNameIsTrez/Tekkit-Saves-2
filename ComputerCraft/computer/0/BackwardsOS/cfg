@@ -1,13 +1,16 @@
--- BackwardsOS --------------------
+-- BackwardsOS
+
 
 useBackwardsOS = true
 
 -- Power this side with a redstone signal to disable starting BackwardsOS.lua.
 disableSide = 'right'
 
-redownloadAPIsOnStartup = true
+redownloadAPIsOnStartup = false
 
--- Animation ----------------------
+
+-- Animation
+
 
 -- Whether the program sleeps between drawing each frame, by frameSleep number of seconds.
 frameSleeping = false
@@ -46,7 +49,9 @@ folder = 'BackwardsOS/programs/Animation/'
 
 animationSize = { width = 9, height = 8 }
 
--- Particles ----------------------
+
+-- Particles
+
 
 createSpawnerTime = 5 -- Seconds.
 spawnerParticleCount = 750 -- Integer.
@@ -61,12 +66,25 @@ maxVelocity = 10 -- Float.
 minDirection = 0 -- Radians.
 maxDirection = 2 * math.pi -- Radians.
 
--- Ray Casting -----------------------
+
+-- Ray Casting
+
 
 -- The top-left corner where will be drawn from.
 --playArea = { X = 1, Y = 1 }
 
--- ThreeDee -----------------------
+
+-- ThreeDee
+
 
 -- The top-left corner where everything will be drawn from.
 --offset = { x = 1, y = 1 }
+
+
+-- Graph
+
+
+graphCols = 5
+graphOffset = { x = 10, y = 10 }
+graphSize = { width = 15, height = 10 }
+graphChar = '@'

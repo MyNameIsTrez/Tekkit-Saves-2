@@ -16,8 +16,8 @@ local settings = {
 
 	entityIcon = "e",                   -- Default is "e".
 	entityPathIcon = ".",               -- Default is ".".
-	wallIcon = "O",                     -- Default is "O".
-	closedSetIcon = "|",                -- Default is "|".
+	wallIcon = "*",                     -- Default is "O".
+	closedSetIcon = "@",                -- Default is "|".
 }
 
 local sim = aStar.Simulation:new(settings)

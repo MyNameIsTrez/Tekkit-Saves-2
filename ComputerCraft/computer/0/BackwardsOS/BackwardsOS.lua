@@ -22,6 +22,7 @@ local APIs = {
 	{ id = 'corona_virus', name = 'corona' },
 	{ id = 'toki_pona', name = 'tokipona' },
 	{ id = 'convert', name = 'convert' },
+	{ id = 'graph', name = 'graph' },
 }
 
 local pathAPIs = 'BackwardsOS/apis/'
@@ -34,7 +35,7 @@ function importAPIs()
 	end
 
 	for _, API in ipairs(APIs) do
-		term.write('Downloading API "' .. API.id .. '" from GitHub...')
+		term.write("Downloading API '" .. API.id .. "' from GitHub...")
 
 		local pathAPI = pathAPIs .. API.name
 		fs.delete(pathAPI)
@@ -55,11 +56,13 @@ function importAPIs()
 
 		sleep(1) -- REMOVE THIS LATER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	end
+
+	print()
 end
 
 function loadAPIs()
 	for _, API in ipairs(APIs) do
-		term.write('Loading API "' .. API.id .. '"...')
+		term.write("Loading API '" .. API.id .. "'...")
 		local pathAPI = pathAPIs .. API.name
 		os.loadAPI(pathAPI)
 		print(' Loaded!')
@@ -91,6 +94,6 @@ if not rs.getInput(cfg.disableSide) then
 	if fs.exists(path) then
 		shell.run(path)
 	else
-		error('Program "' .. tostring(program) .. '" not found.')
+		error("Program '" .. tostring(program) .. "' not found.")
 	end
 end
