@@ -23,6 +23,7 @@ local APIs = {
 	{ id = 'toki_pona', name = 'tokipona' },
 	{ id = 'convert', name = 'convert' },
 	{ id = 'graph', name = 'graph' },
+	{ id = 'connections', name = 'connections' },
 }
 
 local pathAPIs = 'BackwardsOS/apis/'
@@ -54,7 +55,7 @@ function importAPIs()
 		
 		print(' Downloaded!')
 
-		sleep(1) -- REMOVE THIS LATER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		sleep(1) -- TRY TO FIND A BETTER SOLUTION FOR THIS LATER !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	end
 
 	print()

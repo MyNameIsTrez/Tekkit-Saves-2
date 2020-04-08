@@ -1,8 +1,8 @@
 local settings = {
-	cols = cfg.graphCols,
+	cols   = cfg.graphCols,
 	offset = cfg.graphOffset,
-	size = cfg.graphSize,
-	char = cfg.graphChar,
+	size   = cfg.graphSize,
+	char   = cfg.graphChar,
 }
 
 local graph = graph.Graph:new(settings)

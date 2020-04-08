@@ -88,3 +88,20 @@ graphCols = 5
 graphOffset = { x = 10, y = 10 }
 graphSize = { width = 15, height = 10 }
 graphChar = '@'
+
+
+-- Connections
+
+
+connectionsOffset = { x = 10, y = 10 }
+connectionsSize   = { width = 50, height = 50 }
+
+connectionsPointCountMult            = 0.09
+connectionsMaxConnectionDistMult     = 35
+connectionsDistMult                  = 0.5
+connectionsConnectionWeightAlphaMult = 0.035 -- Not necessary?
+connectionsColorChangeMult           = 500   -- Not necessary?
+connectionsDebugInfo                 = false -- Not necessary?
+connectionsMaxFPS                    = 30    -- Not necessary?
+connectionsPointMinVel               = 15 / connectionsMaxFPS
+connectionsPointMaxVel               = 30 / connectionsMaxFPS
