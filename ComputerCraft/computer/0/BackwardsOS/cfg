@@ -93,13 +93,14 @@ graphChar = '@'
 -- Connections
 
 
-connectionsOffset = { x = 0, y = 0 }
-connectionsSize   = { width = 426, height = 160 }
+connectionsOffset = { x = 1, y = 1 }
 
-connectionsPointCountMult            = 2
-connectionsMaxConnectionDistMult     = 20
-connectionsDistMult                  = 0.5
-connectionsConnectionWeightAlphaMult = 0.01
+width, height   = term.getSize()
+connectionsSize = { width = width, height = height }
+
+connectionsPointCountMult            = 5
+connectionsMaxConnectionDistMult     = 10
+connectionsConnectionWeightAlphaMult = 0.06
 connectionsMaxFPS                    = 30 -- Not necessary?
 connectionsPointMinVel               = 30 / connectionsMaxFPS
 connectionsPointMaxVel               = 30 / connectionsMaxFPS
