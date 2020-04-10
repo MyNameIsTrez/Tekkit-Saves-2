@@ -5,7 +5,7 @@ local settings = {
 	noOccupyingTargetNode = true,       -- Default is true.
 	showPath = true,                    -- Default is true.
 	showWalls = true,                   -- Default is true.
-	wallChance = 0.35,                  -- Where 0 is 0% and 1 is 100%. Default is 0.25.
+	wallChance = 0.35,                  -- Where 0 is 0% and 1 is 100%. Default is 0.35.
 	showClosedSet = true,               -- Shows the nodes that have been explored by the pathing algorithm that aren't part of the final path. Default is true.
 
 	turboSpeed = false,                 -- If turboSpeed is true, sleepTime is ignored. Default is false.
@@ -15,9 +15,9 @@ local settings = {
 	setupSleepTime = 5,                 -- Default is 5.
 
 	entityIcon = "e",                   -- Default is "e".
-	entityPathIcon = ".",               -- Default is ".".
-	wallIcon = "*",                     -- Default is "O".
-	closedSetIcon = "@",                -- Default is "|".
+	entityPathIcon = "*",               -- Default is "*".
+	wallIcon = "#",                     -- Default is "#".
+	closedSetIcon = "@",                -- Default is "@".
 }
 
 local sim = aStar.Simulation:new(settings)
