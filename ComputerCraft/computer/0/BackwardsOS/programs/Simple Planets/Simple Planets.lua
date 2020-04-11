@@ -144,6 +144,7 @@ while true do
 		attractors[1]:show()
 
 		cf.tryYield()
+		-- os.sleep(0.05)
 	else
 		sleep(1)
 	end

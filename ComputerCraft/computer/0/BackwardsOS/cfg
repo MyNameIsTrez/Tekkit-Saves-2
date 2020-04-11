@@ -13,17 +13,17 @@ redownloadAPIsOnStartup = false
 
 
 -- Whether the program sleeps between drawing each frame, by frameSleep number of seconds.
-frameSleeping = false
+animationFrameSleeping = true
 
 -- Seconds of sleeping between frames, -1 is no sleeping. Default is 0.05.
-frameSleep = 0.05
+animationFrameSleep = 0.1
 
 -- How many frames are skipped between sleeping.
 -- Setting to 0 or 1 means every frame has a sleep.
 -- If frameSleeping is set to false, there is never any sleeping.
 
 -- 1.57 for YouTube videos, with 426x160 animationSize.
-frameSleepSkipping = 1.57
+animationFrameSleepSkipping = 2
 
 -- How many seconds are counted down before the animation starts playing. Set to 0 for no countdownTime.
 countdownTime = 0
@@ -35,7 +35,7 @@ playAnimationBool = true
 maxFramesPerTimedAnimationFile = 100
 
 -- Whether to print the progress of loading a file.
-progressBool = false
+animationProgressBool = true
 
 useMonitor = false
 
@@ -48,6 +48,15 @@ offset = { x = 1, y = 1 }
 folder = 'BackwardsOS/programs/Animation/'
 
 animationSize = { width = 9, height = 8 }
+
+
+-- UI
+
+
+UIFrameSleeping      = false
+UIFrameSleep         = 0.05
+UIFrameSleepSkipping = 1.57
+UIProgressBool       = false
 
 
 -- Particles
