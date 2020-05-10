@@ -1,3 +1,7 @@
+local APIsPath = 'BackwardsOS/apis/'
+local cfgPath = 'BackwardsOS/cfg'
+local httpToHttpsUrl = 'http://request.mariusvanwijk.nl/'
+
 local APIs = {
 	{ id = 'common_functions', name = 'cf' },
 	{ id = 'json', name = 'json' },
@@ -24,30 +28,31 @@ local APIs = {
 	{ id = 'convert', name = 'convert' },
 	{ id = 'graph', name = 'graph' },
 	{ id = 'connections', name = 'connections' },
+	{ id = 'twitter', name = 'twitter' },
+	{ id = 'voronoi_api', name = 'voronoiAPI' },
+	-- { id = '', name = '' },
 }
 
-local pathAPIs = 'BackwardsOS/apis/'
-
 function importAPIs()
-	local httpToHttpsUrl = 'http://request.mariusvanwijk.nl/'
-
-	if not fs.exists(pathAPIs) then
-		fs.makeDir(pathAPIs)
+	if not fs.exists(APIsPath) then
+		fs.makeDir(APIsPath)
 	end
 
 	for _, API in ipairs(APIs) do
 		term.write("Downloading API '" .. API.id .. "' from GitHub...")
 
-		local pathAPI = pathAPIs .. API.name
+		local pathAPI = APIsPath .. API.name
 		fs.delete(pathAPI)
 
 		local url = 'https://raw.githubusercontent.com/MyNameIsTrez/ComputerCraft-APIs/master/' .. API.id .. '.lua'
+
 		local handleHttps = http.post(httpToHttpsUrl, '{"url": "' .. url .. '"}' )
-		local str = handleHttps.readAll()
 
 		if not handleHttps then
 			error('Downloading file failed!')
 		end
+		
+		local str = handleHttps.readAll()
 
 		local handleFile = io.open(pathAPI, 'w')
 		handleFile:write(str)
@@ -64,37 +69,72 @@ end
 function loadAPIs()
 	for _, API in ipairs(APIs) do
 		term.write("Loading API '" .. API.id .. "'...")
-		local pathAPI = pathAPIs .. API.name
+		local pathAPI = APIsPath .. API.name
 		os.loadAPI(pathAPI)
 		print(' Loaded!')
 	end
 end
 
-if not rs.getInput(cfg.disableSide) then
-	if cfg.redownloadAPIsOnStartup and http then
-		importAPIs()
+function downloadCfg()
+	term.write("Downloading cfg from GitHub...")
+
+	local url = 'https://raw.githubusercontent.com/MyNameIsTrez/ComputerCraft-APIs/master/backwardsos_cfg.lua'
+
+	local handleHttps = http.post(httpToHttpsUrl, '{"url": "' .. url .. '"}' )
+
+	if not handleHttps then
+		error('Downloading file failed!')
 	end
 
-	loadAPIs()
+	local str = handleHttps.readAll()
 
-	term.clear()
-	term.setCursorPos(1, 1)
+	local handleFile = io.open(cfgPath, 'w')
+	handleFile:write(str)
+	handleFile:close()
+	
+	print(' Downloaded!')
+end
 
-	if cfg.useMonitor then
-		term.redirect(cf.getMonitor())
-	end
 
-	local options = fs.list('BackwardsOS/programs')
-	local program = lo.listOptions(options)
+if not fs.exists(cfgPath) then
+	downloadCfg()
+end
 
-	term.clear()
-	term.setCursorPos(1, 1)
+os.loadAPI(cfgPath)
 
-	local path = 'BackwardsOS/programs/' .. program .. '/' ..program .. '.lua'
+if not cfg.useBackwardsOS or rs.getInput(cfg.disableSide) then
+	return
+end
 
-	if fs.exists(path) then
-		shell.run(path)
-	else
-		error("Program '" .. tostring(program) .. "' not found.")
-	end
+if cfg.redownloadAPIsOnStartup and http then
+	importAPIs()
+end
+
+loadAPIs()
+
+term.clear()
+term.setCursorPos(1, 1)
+
+if cfg.useMonitor then
+	term.redirect(cf.getMonitor())
+end
+
+local programsPath = 'BackwardsOS/programs'
+
+if not fs.exists(programsPath) then
+	fs.makeDir(programsPath)
+end
+
+local options = fs.list(programsPath)
+local program = lo.listOptions(options)
+
+term.clear()
+term.setCursorPos(1, 1)
+
+local path = 'BackwardsOS/programs/' .. program .. '/' ..program .. '.lua'
+
+if fs.exists(path) then
+	shell.run(path)
+else
+	error("Program '" .. tostring(program) .. "' not found.")
 end

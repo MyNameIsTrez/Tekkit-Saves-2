@@ -1,0 +1,534 @@
+Movement = {
+    pos = vector.new(0, 0, 0),
+    dir = "n"
+}
+
+function Movement:new(pos, dir)
+    if type(pos) ~= "table" then
+        error("new pos expects to be a vector, currently is " .. type(pos), 2)
+    elseif type(dir) ~= "string" then
+        error("new dir expects to be a string, currently is " .. type(dir), 2)
+    elseif dir:lower() ~= "n" and dir:lower() ~= "s" and dir:lower() ~= "w" and dir:lower() ~= "e" then
+        error("dir expects to be n, s, w or e, currently is " .. dir, 2)
+    end
+    setmetatable({}, Movement)
+    self.pos = pos
+    self.dir = dir:lower()
+    return self
+end
+
+function Movement:forward(times)
+    times = times or 1
+    if (type(times) ~= "number") then
+        error("forward expects a number, currently is " .. type(times), 2)
+    end
+    for i = 1, times do
+        if turtle.forward() then
+            if self.dir == "n" then
+                self.pos.y = self.pos.y - 1
+            elseif self.dir == "s" then
+                self.pos.y = self.pos.y + 1
+            elseif self.dir == "e" then
+                self.pos.x = self.pos.x + 1
+            elseif self.dir == "w" then
+                self.pos.x = self.pos.x - 1
+            end
+        end
+    end
+end
+function Movement:attackForward(times)
+    times = times or 1
+    if (type(times) ~= "number") then
+        error("attackForward expects a number, currently is " .. type(times), 2)
+    end
+    for i = 1, times do
+        while not turtle.forward() do
+            turtle.attack()
+            sleep(1)
+        end
+        if self.dir == "n" then
+            self.pos.y = self.pos.y - 1
+        elseif self.dir == "s" then
+            self.pos.y = self.pos.y + 1
+        elseif self.dir == "e" then
+            self.pos.x = self.pos.x + 1
+        elseif self.dir == "w" then
+            self.pos.x = self.pos.x - 1
+        end
+    end
+    return true
+end
+function Movement:digForward(times)
+    times = times or 1
+    if (type(times) ~= "number") then
+        error("digForward expects a number, currently is " .. type(times), 2)
+    end
+    for i = 1, times do
+        while not turtle.forward() do
+            turtle.dig()
+            sleep(1)
+        end
+        if self.dir == "n" then
+            self.pos.y = self.pos.y - 1
+        elseif self.dir == "s" then
+            self.pos.y = self.pos.y + 1
+        elseif self.dir == "e" then
+            self.pos.x = self.pos.x + 1
+        elseif self.dir == "w" then
+            self.pos.x = self.pos.x - 1
+        end
+    end
+    return true
+end
+function Movement:digAttackForward(times)
+    times = times or 1
+    if (type(times) ~= "number") then
+        error("digAttackForward expects a number, currently is " .. type(times), 2)
+    end
+    for i = 1, times do
+        while not turtle.forward() do
+            turtle.dig()
+            turtle.attack()
+            turtle.attack()
+            sleep(1)
+        end
+        if self.dir == "n" then
+            self.pos.y = self.pos.y - 1
+        elseif self.dir == "s" then
+            self.pos.y = self.pos.y + 1
+        elseif self.dir == "e" then
+            self.pos.x = self.pos.x + 1
+        elseif self.dir == "w" then
+            self.pos.x = self.pos.x - 1
+        end
+    end
+    return true
+end
+
+function Movement:back(times)
+    times = times or 1
+    if (type(times) ~= "number") then
+        error("back expects a number, currently is " .. type(times), 2)
+    end
+    for i = 1, times do
+        if turtle.back() then
+            if self.dir == "n" then
+                self.pos.y = self.pos.y + 1
+            elseif self.dir == "s" then
+                self.pos.y = self.pos.y - 1
+            elseif self.dir == "e" then
+                self.pos.x = self.pos.x - 1
+            elseif self.dir == "w" then
+                self.pos.x = self.pos.x + 1
+            end
+        end
+    end
+end
+function Movement:attackBack(times)
+    times = times or 1
+    if (type(times) ~= "number") then
+        error("attackBack expects a number, currently is " .. type(times), 2)
+    end
+    for i = 1, times do
+        while not turtle.back() do
+            self:left(2)
+            turtle.attack()
+            turtle.attack()
+            self:left(2)
+            sleep(1)
+        end
+
+        if self.dir == "n" then
+            self.pos.y = self.pos.y - 1
+        elseif self.dir == "s" then
+            self.pos.y = self.pos.y + 1
+        elseif self.dir == "e" then
+            self.pos.x = self.pos.x + 1
+        elseif self.dir == "w" then
+            self.pos.x = self.pos.x - 1
+        end
+    end
+    return true
+end
+
+function Movement:up(times)
+    times = times or 1
+    if (type(times) ~= "number") then
+        error("up expects a number, currently is " .. type(times), 2)
+    end
+    for i = 1, times do
+        while not turtle.up() do
+            sleep(1)
+        end
+        self.pos.z = self.pos.z + 1
+    end
+    return true
+end
+function Movement:digUp(times)
+    times = times or 1
+    if (type(times) ~= "number") then
+        error("digUp expects a number, currently is " .. type(times), 2)
+    end
+    for i = 1, times do
+        while not turtle.up() do
+            turtle.digUp()
+            sleep(1)
+        end
+        self.pos.z = self.pos + 1
+    end
+    return true
+end
+function Movement:attackUp(times)
+    times = times or 1
+    if (type(times) ~= "number") then
+        error("attackUp expects a number, currently is " .. type(times), 2)
+    end
+    for i = 1, times do
+        while not turtle.up() do
+            turtle.attackUp()
+            sleep(1)
+        end
+        self.pos.z = self.pos + 1
+    end
+    return true
+end
+function Movement:digAttackUp(times)
+    times = times or 1
+    if (type(times) ~= "number") then
+        error("digAttackUp expects a number, currently is " .. type(times), 2)
+    end
+    for i = 1, times do
+        while not turtle.up() do
+            turtle.digUp()
+            turtle.attackUp()
+            turtle.attackUp()
+            sleep(1)
+        end
+        self.pos.z = self.pos + 1
+    end
+    return true
+end
+
+function Movement:down(times)
+    local times = times or 1
+    if (type(times) ~= "number") then
+        error("down expects a number, currently is " .. type(times), 2)
+    end
+    for i = 1, times do
+        while not turtle.down() do
+            sleep(1)
+        end
+        self.pos.z = self.pos.z - 1
+    end
+    return true
+end
+function Movement:digDown(times)
+    local times = times or 1
+    if (type(times) ~= "number") then
+        error("digDown expects a number, currently is " .. type(times), 2)
+    end
+    for i = 1, times do
+        while not turtle.down() do
+            turtle.digDown()
+        end
+        self.pos.z = self.pos.z - 1
+    end
+    return true
+end
+function Movement:attackDown(times)
+    local times = times or 1
+    if (type(times) ~= "number") then
+        error("attackDown expects a number, currently is " .. type(times), 2)
+    end
+    for i = 1, times do
+        while not turtle.down() do
+            turtle.attackDown()
+            sleep(1)
+        end
+        self.pos.z = self.pos - 1
+    end
+    return true
+end
+function Movement:digAttackDown(times)
+    local times = times or 1
+    if (type(times) ~= "number") then
+        error("digAttackDown expects a number, currently is " .. type(times), 2)
+    end
+    for i = 1, times do
+        while not turtle.down() do
+            turtle.digDown()
+            turtle.attackDown()
+            turtle.attackDown()
+            sleep(1)
+        end
+        self.pos.z = self.pos - 1
+    end
+    return true
+end
+
+function Movement:left(times)
+    local times = times or 1
+    if (type(times) ~= "number") then
+        error("left expects a number, currently is " .. type(times), 2)
+    end
+    for i = 1, times do
+        if turtle.turnLeft() then
+            if self.dir == "n" then
+                self.dir = "w"
+            elseif self.dir == "w" then
+                self.dir = "s"
+            elseif self.dir == "s" then
+                self.dir = "e"
+            elseif self.dir == "e" then
+                self.dir = "n"
+            end
+        end
+    end
+end
+function Movement:right(times)
+    local times = times or 1
+    if (type(times) ~= "number") then
+        error("right expects a number, currently is " .. type(times), 2)
+    end
+    for i = 1, times do
+        if turtle.turnRight() then
+            if self.dir == "n" then
+                self.dir = "e"
+            elseif self.dir == "e" then
+                self.dir = "s"
+            elseif self.dir == "s" then
+                self.dir = "w"
+            elseif self.dir == "w" then
+                self.dir = "n"
+            end
+        end
+    end
+end
+function Movement:uTurn(side)
+    local side = side:lower() or "left"
+    if type(side) ~= "string" then
+        error("uTurn expects a string, currently is " .. type(side), 2)
+    elseif side ~= "left" and side ~= "right" then
+        error("uTurn expects string to be left or right, currently is " .. side, 2)
+    end
+    if side == "right" then
+        self:right()
+        self:forward()
+        self:right()
+    else
+        self:left()
+        self:forward()
+        self:left()
+    end
+end
+function Movement:face(dir)
+    if type(dir) ~= "string" then
+        error("turn expects a string, currently is " .. type(dir), 2)
+    elseif
+    dir:lower() ~= "e" and dir:lower() ~= "s" and dir:lower() ~= "w" and dir:lower() ~= "n"
+     then
+        error("quaryChunk expects a dir (N,E,S,W), currently is " .. type(dir) .. ", " .. dir, 2)
+    end
+    local dir = dir:lower()
+    local degree = 0
+    local selfDegree = 0
+    local dif
+
+    if dir == "s" then
+        degree = 90
+    elseif dir == "w" then
+        degree = 180
+    elseif dir == "n" then
+        degree = 270
+    end
+    if self.dir == "s" then
+        selfDegree = 90
+    elseif self.dir == "w" then
+        selfDegree = 180
+    elseif self.dir == "n" then
+        selfDegree = 270
+    end
+
+    dif = degree - selfDegree
+    if dif < 0 then
+        dif = dif + 360
+    end
+    if dif > 180 then
+        while self.dir ~= dir do
+            self:left()
+        end
+    else
+        while self.dir ~= dir do
+            self:right()
+        end
+    end
+end
+
+function Movement:goToX(position, digType)
+    local position = position
+    local digType = digType or "normal"
+    local vector = vector.new(0, 0, 0)
+    if type(position) ~= "table" and type(position) ~= "number" then
+        error("goToX expects a vector or number, currently is " .. type(position),2)
+    elseif type(digType) ~= "string" then
+        error("goToX expects digType to be a string, currently is " .. type(digType),2)
+    elseif digType ~= "normal" and digType ~= "dig" and digType ~= "attack" and digType ~= "digAttack" then
+        error("goToX type expects type to be 'normal', 'dig', 'attack' or 'digAttack'",2)
+    elseif type(position) == "number" then
+        vector.x = position
+    else
+        vector = position
+    end
+    if self.pos.x ~= vector.x then
+        if self.pos.x > vector.x then
+            self:face("w")
+        elseif self.pos.x < vector.x then
+            self:face("e")
+        end
+        while self.pos.x ~= vector.x do
+            if digType == "dig" then
+                self:digForward()
+            elseif digType == "attack" then
+                self:attackForward()
+            elseif digType == "digAttack" then
+                self:digAttackForward()
+            else
+                self:forward()
+            end
+        end
+    end
+end
+function Movement:goToY(position, digType)
+    local position = position
+    local digType = digType or "normal"
+    local vector = vector.new(0, 0, 0)
+    if type(position) ~= "table" and type(position) ~= "number" then
+        error("goToY expects a vector or number, currently is " .. type(position),2)
+    elseif type(digType) ~= "string" then
+        error("goToY expects digType to be a string, currently is " .. type(digType),2)
+    elseif digType ~= "normal" and digType ~= "dig" and digType ~= "attack" and digType ~= "digAttack" then
+        error("goToY digType expects to be 'normal', 'dig', 'attack' or 'digAttack'",2)
+    elseif type(position) == "number" then
+        vector.y = position
+    else
+        vector = position
+    end
+    if self.pos.y ~= vector.y then
+        if self.pos.y < vector.y then
+            self:face("s")
+        elseif self.pos.y > vector.y then
+            self:face("n")
+        end
+        while self.pos.y ~= vector.y do
+            if digType == "dig" then
+                self:digForward()
+            elseif digType == "attack" then
+                self:attackForward()
+            elseif digType == "digAttack" then
+                self:digAttackForward()
+            else
+                self:forward()
+            end
+        end
+    end
+end
+function Movement:goToZ(position, digType)
+    local position = position
+    local digType = digType or "normal"
+    local vector = vector.new(0, 0, 0)
+    if type(position) ~= "table" and type(position) ~= "number" then
+        error("goToZ expects a vector or number, currently is " .. type(position), 2)
+    elseif type(digType) ~= "string" then
+        error("goToZ expects digType to be a string, currently is " .. type(digType) ,2)
+    elseif digType ~= "normal" and digType ~= "dig" and digType ~= "attack" and digType ~= "digAttack" then
+        error("goToZ type expects type to be 'normal', 'dig', 'attack' or 'digAttack'",2)
+    elseif type(position) == "number" then
+        vector.z = position
+    else
+        vector = position
+    end
+    if self.pos.z ~= vector.z then
+        if self.pos.z > vector.z then
+            while self.pos.z ~= vector.z do
+                if digType == "dig" then
+                    self:digDown()
+                elseif digType == "attack" then
+                    self:attackDown()
+                elseif digType == "digAttack" then
+                    self:digAttackDown()
+                else
+                    self:down()
+                end
+            end
+        elseif self.pos.z < vector.z then
+            while self.pos.z ~= vector.z do
+                if digType == "dig" then
+                    self:digUp()
+                elseif digType == "attack" then
+                    self:attackUp()
+                elseif digType == "digAttack" then
+                    self:digAttackUp()
+                else
+                    self:up()
+                end
+            end
+        end
+    end
+end
+function Movement:goTo(vector, digType)
+    local digType = digType or "normal"
+    if (type(vector) ~= "table") then
+        error("goTo expects a vector or number, currently is " .. type(vector), 2)
+    elseif type(digType) ~= "string" then
+        error("goTo expects digType to be a string, currently is " .. type(digType), 2)
+    elseif digType ~= "normal" and digType ~= "dig" and digType ~= "attack" and digType ~= "digAttack" then
+        error("goTo digType expects to be 'normal', 'dig', 'attack' or 'digAttack'", 2)
+    else
+        self:goToX(vector, digType)
+        self:goToY(vector, digType)
+        self:goToZ(vector, digType)
+    end
+end
+
+function Movement:readData()
+    if not fs.exists("data/movement/position") then
+        self:createData()
+    else
+        local file = fs.open("data/movement/position", "r")
+        self.pos.y = file.readLine()
+        self.pos.x = file.readLine()
+        self.pos.z = file.readLine()
+        self.dir = file.readLine()
+        h.close()
+        return true
+    end
+end
+function Movement:saveData()
+    if not fs.exists("data/movement/position") then
+        self:createData()
+    else
+        local file = fs.open("data/movement/position", "w")
+        file.writeLine(self.pos.x)
+        file.writeLine(self.pos.y)
+        file.writeLine(self.pos.z)
+        file.writeLine(self.dir)
+        file.close()
+        return true
+    end
+end
+function Movement:createData()
+    io.write("(Save) Couldn't find the data/movement/position file, make one? Y/N")
+    answer = io.read()
+    if answer:lower() == "y" then
+        print("creating data/movement/position file")
+        local file = fs.open("data/movement/position", "w")
+        file.writeLine(self.pos.x)
+        file.writeLine(self.pos.y)
+        file.writeLine(self.pos.z)
+        file.writeLine(self.dir)
+        file.close()
+        h.close()
+    elseif answer:lower() == "n" then
+        error("Couldn't find the data/movement/position and didn't want to make one", 2)
+    end
+end

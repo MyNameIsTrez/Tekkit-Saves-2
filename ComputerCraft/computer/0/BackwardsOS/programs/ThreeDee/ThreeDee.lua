@@ -54,7 +54,7 @@ while true do
 		-- local char = keys.getName(keyNum)
 		-- threedee:moveCamera(char)
 
-		threedee.distance = (math.sin(distSinArg) + 1)/2 * 4 + 2
+		threedee.distance = math.cos(distSinArg) * 2 + 3
 		distSinArg = distSinArg + 0.01
 
 		threedee:setProjectedCubes()
@@ -63,9 +63,9 @@ while true do
 		-- threedee:drawConnections()
 		-- threedee:drawCorners()
 
-		threedee.rotation.x = rotation.x + 0.01
-		threedee.rotation.y = rotation.y + 0.01
-		threedee.rotation.z = rotation.z + 0.01
+		threedee.rotation.x = rotation.x + 0.03
+		threedee.rotation.y = rotation.y + 0.03
+		threedee.rotation.z = rotation.z + 0.03
 
 		framebuffer:draw()
 

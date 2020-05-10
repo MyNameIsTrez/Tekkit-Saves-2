@@ -14,7 +14,7 @@ local settings = {
 	setupSleep = false,                 -- After generating the map, wait setupSleepTime seconds before starting to move the entity so you can see the path clearly. Default is false.
 	setupSleepTime = 5,                 -- Default is 5.
 
-	entityIcon = "e",                   -- Default is "e".
+	entityIcon = "|",                   -- Default is "|".
 	entityPathIcon = "*",               -- Default is "*".
 	wallIcon = "#",                     -- Default is "#".
 	closedSetIcon = "@",                -- Default is "@".
