@@ -69,10 +69,10 @@ while true do
 
 	z = z + zIncrement
 
-	term.setCursorPos(1, 1)
-
 	local noiseStr = getNoiseStr(width-1, height, z)
-	term.write(noiseStr)
+
+	term.setCursorPos(1, 1)
+	write(noiseStr)
 
 	cf.tryYield()
 

@@ -5,10 +5,12 @@ Voronoi = {}
 -- Constructor
 function Voronoi:new(pointCount)
 	setmetatable({}, Voronoi)
+
 	self.pointCount = pointCount
 	self.width, self.height = term.getSize()
 	self.width = self.width - 1 -- Compensates for adding the invisible '\n' char at the end of every row.
 	self.chars = { ".", "'", ":", "-", "!", "/", "(", "=", "%", "1", "C", "3", "$", "2", "5", "A", "0", "#", "@" }
+	
 	return self
 end
 

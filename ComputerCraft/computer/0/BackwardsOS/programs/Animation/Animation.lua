@@ -11,6 +11,8 @@ local settings = {
 	loop                           = cfg.loop,
 	folder                         = cfg.folder,
 	offset                         = cfg.offset,
+	useHardcodedStorageStructure   = cfg.useHardcodedStorageStructure,
+	hardcodedStorageStructure	   = cfg.hardcodedStorageStructure,
 }
 
 local animation = an.Animation:new(settings)
