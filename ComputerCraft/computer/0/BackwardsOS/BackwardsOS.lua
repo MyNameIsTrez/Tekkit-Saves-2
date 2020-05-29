@@ -70,8 +70,11 @@ function loadAPIs()
 	for _, API in ipairs(APIs) do
 		term.write("Loading API '" .. API.id .. "'...")
 		local pathAPI = APIsPath .. API.name
-		os.loadAPI(pathAPI)
-		print(' Loaded!')
+		if os.loadAPI(pathAPI) then
+			print(" Loaded!")
+		else
+			error("An API crashed!")
+		end
 	end
 end
 

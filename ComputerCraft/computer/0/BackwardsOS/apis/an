@@ -36,126 +36,178 @@ function Animation:new(settings)
 	self.loop                           = settings.loop
 	self.folder                         = settings.folder
 	self.offset                         = settings.offset
-	self.animationSize                  = settings.animationSize -- If not provided, set by self.askAnimationFolder().
-	self.fileName                       = settings.fileName -- If not provided, set by self.askAnimationFile().
+	self.animationSize                  = settings.animationSize -- If not provided, set by self.askFolder().
+	self.fileName                       = settings.fileName -- If not provided, set by self.askFile().
+	self.useCloud						= settings.useCloud
 
-	if http and not settings.useHardcodedStorageStructure then
-		self.structure = https.getStorageStructure()
-	elseif settings.useHardcodedStorageStructure then
-		self.structure = settings.hardcodedStorageStructure
-	else
-		error("The settings/lack of HTTP connection didn't allow loading of the structure locally/from HTTP.")
-	end
-	
+	self:initStructure()
 	self:getScreenWidthHeight()
 	
 	return self
 end
 
 -- Methods
-function Animation:setShell(shl)
-	self.passedShell = shl
+function Animation:initStructure()
+	self.structure = {}
+
+	-- Add local structure.
+	local pathLocalAnimations = "BackwardsOS/programs/Animation/Animations/"
+	if fs.exists(pathLocalAnimations) then
+		for _, charType in ipairs(fs.list(pathLocalAnimations)) do
+			local pathLocalCharType = pathLocalAnimations .. charType .. "/"
+			if not self.structure[charType] then self.structure[charType] = {} end
+			if fs.exists(pathLocalCharType) then
+				for _, size in ipairs(fs.list(pathLocalCharType)) do
+					local pathLocalFiles = pathLocalCharType .. size
+					if not self.structure[charType][size] then self.structure[charType][size] = {} end
+					local localFiles = fs.list(pathLocalFiles)
+					for _, file in ipairs(localFiles) do table.insert(self.structure[charType][size], file) end
+				end
+			end
+		end
+	end
+
+	-- Add cloud structure.
+	if self.useCloud and http then
+		local cloudStructure = https.getStorageStructure()
+		if cloudStructure then
+			for charType, _ in pairs(cloudStructure) do
+				if not self.structure[charType] then self.structure[charType] = {} end
+				for size, _ in pairs(cloudStructure[charType]) do
+					if not self.structure[charType][size] then self.structure[charType][size] = {} end
+					for _, file in ipairs(cloudStructure[size]) do table.insert(self.structure[charType][size], file) end
+				end
+			end
+		end
+	end
+
+	if #cf.getKeys(self.structure) == 0 then error("No local or online structure could was found!") end
 end
 
 function Animation:getScreenWidthHeight()
 	self.screenWidth, self.screenHeight = term.getSize()
 end
 
--- Lists options the user can choose from.
--- If keysStrings is set to 'true', the table is looped with 'pairs()'.
-function Animation:listOptions(cloudOptions, keysStrings, localOptions)
-	cloudOptionsShort = {}
-	if keysStrings then
-		-- Folders.
-		for name, _ in pairs(cloudOptions) do
-			-- a is necessary, because gsub() also returns a second value being the number of substitutions made.
-			local a = name:gsub('size_', '')
-			table.insert(cloudOptionsShort, a)
-		end
-	else
-		-- Files.
-		for _, name in ipairs(cloudOptions) do
-			local a = name:gsub('size_', '')
-			table.insert(cloudOptionsShort, a)
-		end
-	end
+function Animation:setShell(shl)
+	self.passedShell = shl
+end
 
-	localOptionsShort = {}
-	for _, name in ipairs(localOptions) do
-		local a = name:gsub('size_', '')
-		table.insert(localOptionsShort, a)
-	end
-
-	for _, name in ipairs(cloudOptionsShort) do
-		if cf.valueInTable(localOptionsShort, name) then
-			term.write('  ')
-		else
-			term.write('! ')
-		end
-		print(name)
-	end
-	
-	print()
-	print('Enter one of the above names:')
-	
-	while true do
-		local answer = read()
-		local answerLowerCase = answer:lower()
-
-		for _, option in ipairs(cloudOptionsShort) do
-			if option:lower() == answerLowerCase then
-				if keysStrings then
-					return 'size_' .. answer
-				else
-					return answer
+function Animation:getLocalStructure()
+	if not self.localStructure then
+		self.localStructure = {}
+		local pathLocalAnimations = "BackwardsOS/programs/Animation/Animations/"
+		if fs.exists(pathLocalAnimations) then
+			for _, charType in ipairs(fs.list(pathLocalAnimations)) do
+				local pathLocalCharType = pathLocalAnimations .. charType .. "/"
+				if not self.localStructure[charType] then self.localStructure[charType] = {} end
+				if fs.exists(pathLocalCharType) then
+					for _, size in ipairs(fs.list(pathLocalCharType)) do
+						local pathLocalFiles = pathLocalCharType .. size
+						if not self.localStructure[charType][size] then self.localStructure[charType][size] = {} end
+						local localFiles = fs.list(pathLocalFiles)
+						for _, file in ipairs(localFiles) do table.insert(self.localStructure[charType][size], file) end
+					end
 				end
 			end
 		end
+	end
+	return self.localStructure
+end
+
+-- Lists options the user can choose from.
+-- If keysStrings is set to 'true', the table is looped with 'pairs()'.
+function Animation:listOptions(askType)
+	local localStructure = self:getLocalStructure()
+	print()
+
+	if askType == "charType" then
+		for charType, _ in pairs(self.structure) do
+			if localStructure[charType] ~= nil then
+				term.write('  ')
+			else
+				term.write('! ')
+			end
+			print(charType)
+		end
 		
-		print('Invalid program name.') -- Only reached if we haven't returned.
+		print('\nEnter one of the above char types:')
+		
+		while true do
+			local answerLowerCase = read():lower()
+			for charType, _ in pairs(self.structure) do
+				if charType:lower() == answerLowerCase then
+					return charType
+				end
+			end
+			print('Invalid program name.') -- Only reached when we haven't returned.
+		end
+	elseif askType == "size" then
+		for size, _ in pairs(self.structure[self.charType]) do
+			if localStructure[self.charType][size] ~= nil then
+				term.write('  ')
+			else
+				term.write('! ')
+			end
+			local short = size:gsub('size_', '')
+			print(short)
+		end
+		
+		print('\nEnter one of the above folder names:')
+		
+		while true do
+			local answerLowerCase = read():lower()
+			for size, _ in pairs(self.structure[self.charType]) do
+				if size:gsub('size_', ''):lower() == answerLowerCase then
+					return size
+				end
+			end
+			print('Invalid program name.') -- Only reached when we haven't returned.
+		end
+	elseif askType == "file" then
+		for _, name in pairs(self.structure[self.charType][self.sizeFolder]) do
+			if localStructure[self.charType][self.sizeFolder] ~= nil and cf.valueInTable(localStructure[self.charType][self.sizeFolder], name) then
+				term.write('  ')
+			else
+				term.write('! ')
+			end
+			print(name)
+		end
+		
+		print('\nEnter one of the above file names:')
+		
+		while true do
+			local answerLowerCase = read():lower()
+			for _, name in pairs(self.structure[self.charType][self.sizeFolder]) do
+				if name:lower() == answerLowerCase then
+					return name
+				end
+			end
+			print('Invalid program name.') -- Only reached when we haven't returned.
+		end
 	end
 end
 
--- Asks the user for an animation folder to load.
-function Animation:askAnimationFolder()
-	-- Get the size options.
-	local path = 'BackwardsOS/programs/Animation/Animations'
-	if not fs.exists(path) then
-		fs.makeDir(path)
-	end
-	local localStructure = fs.list(path)
+function Animation:askCharType()
+	local pathCharType = 'BackwardsOS/programs/Animation/Animations'
+	if not fs.exists(pathCharType) then fs.makeDir(pathCharType) end
+	self.charType = self:listOptions("charType")
+	cf.clearTerm()
+end
 
-	-- Ask the size folder name.
-	self.sizeFolder = self:listOptions(self.structure, true, localStructure)
-	
-	-- Skips the beginning 'size_' part.
-	local sizeStr = cf.split(self.sizeFolder, '_')[2]
-	
-	-- Splits the width and height.
-	local _animationSize = cf.split(sizeStr, 'x')
-	
+function Animation:askFolder()
+	local pathAnimations = 'BackwardsOS/programs/Animation/Animations/' .. self.charType
+	if not fs.exists(pathAnimations) then fs.makeDir(pathAnimations) end
+	self.sizeFolder = self:listOptions("size")
+	local _animationSize = cf.split(self.sizeFolder:gsub('size_', ''), 'x')
 	self.animationSize = { width = _animationSize[1], height = _animationSize[2] }
-	
-	term.clear()
-	term.setCursorPos(1, 1)
+	cf.clearTerm()
 end
 
--- Asks the user for an animation file to load.
-function Animation:askAnimationFile()
-	local path = 'BackwardsOS/programs/Animation/Animations/' .. self.sizeFolder
-
-	if not fs.exists(path) then
-		fs.makeDir(path)
-	end
-
-	local localPrograms = fs.list(path)
-	local programOptions = self.structure[self.sizeFolder]
-
-	-- Ask the animation file name.
-	self.fileName = self:listOptions(programOptions, false, localPrograms)
-	
-	term.clear()
-	term.setCursorPos(1, 1)
+function Animation:askFile()
+	local pathSize = 'BackwardsOS/programs/Animation/Animations/' .. self.charType .. '/' .. self.sizeFolder
+	if not fs.exists(pathSize) then fs.makeDir(pathSize) end
+	self.fileName = self:listOptions("file")
+	cf.clearTerm()
 end
 
 function Animation:printProgress(str, x, y)
@@ -170,13 +222,11 @@ function Animation:printProgress(str, x, y)
 	end
 end
 
-function Animation:downloadAnimationInfo(path)
+function Animation:downloadAnimationInfo(pathFile)
 	local url = 'size_' .. self.animationSize.width .. 'x' .. self.animationSize.height .. '/' .. self.fileName .. '/info.txt'
 	local str = https.getStorageData(url)
 
-	if not fs.exists(path) then
-		fs.makeDir(path)
-	end
+	if not fs.exists(pathFile) then fs.makeDir(pathFile) end
 
 	local handle = io.open(self.folder .. 'Animations/' .. url, 'w')
 	handle:write(str)
@@ -185,7 +235,7 @@ function Animation:downloadAnimationInfo(path)
 	self.info = textutils.unserialize(str)
 end
 
-function Animation:downloadAnimationFile(path)
+function Animation:downloadAnimationFile(pathFile)
 	local cursorX, cursorY = term.getCursorPos()
 
 	if self.progressBool then
@@ -197,7 +247,7 @@ function Animation:downloadAnimationFile(path)
 		local timeStart = os.clock()
 
 		local url    = 'size_' .. self.animationSize.width .. 'x' .. self.animationSize.height .. '/' .. self.fileName .. '/data/' .. tostring(i) .. '.txt'
-		local folder = path .. '/data'
+		local folder = pathFile .. '/data'
 		local name   = i
 		https.downloadStorageFile(url, folder, name)
 
@@ -227,23 +277,48 @@ function Animation:downloadAnimationFile(path)
 	end
 end
 
-function Animation:getInfo(path)
-	local path = self.folder .. 'Animations/size_' .. self.animationSize.width .. 'x' .. self.animationSize.height .. '/' .. self.fileName .. '/'
-	local str = fs.open(path .. 'info.txt', 'r').readAll()
+function Animation:getInfo()
+	local pathFile = self.folder .. 'Animations/' .. self.charType .. '/size_' .. self.animationSize.width .. 'x' .. self.animationSize.height .. '/' .. self.fileName .. '/'
+	local str = fs.open(pathFile .. 'info.txt', 'r').readAll()
 	self.info = textutils.unserialize(str)
 end
 
 function Animation:getSelectedAnimationData()
-	local path = self.folder .. 'Animations/size_' .. self.animationSize.width .. 'x' .. self.animationSize.height .. '/' .. self.fileName
-	local fileExists = fs.exists(path)
+	-- Create Timed Animations folder.
+	local pathTimedAnimations = self.folder .. 'Timed Animations/'
+	if not fs.exists(pathTimedAnimations) then fs.makeDir(pathTimedAnimations) end
 
-	if not fileExists then			
-		self:downloadAnimationInfo(path)
-		self:downloadAnimationFile(path)
+	-- Create charType folder.
+	local pathTimedAnimationsCharType = pathTimedAnimations .. self.charType .. '/'
+	if not fs.exists(pathTimedAnimationsCharType) then fs.makeDir(pathTimedAnimationsCharType) end
+	
+	-- Create size folder.
+	local pathTimedAnimationsSize = pathTimedAnimationsCharType .. 'size_' .. self.animationSize.width .. 'x' .. self.animationSize.height .. '/'
+	if not fs.exists(pathTimedAnimationsSize) then fs.makeDir(pathTimedAnimationsSize) end
+
+	-- Create fileName folder.
+	local pathTimedAnimationsFile = pathTimedAnimationsSize .. self.fileName .. '/'
+	if not fs.exists(pathTimedAnimationsFile) then fs.makeDir(pathTimedAnimationsFile) end
+
+	local pathAnimationsFile = self.folder .. 'Animations/' .. self.charType .. '/size_' .. self.animationSize.width .. 'x' .. self.animationSize.height .. '/' .. self.fileName
+	local pathAnimationsInfo = pathAnimationsFile .. '/info.txt'
+
+	if not fs.exists(pathAnimationsFile) then			
+		self:downloadAnimationInfo(pathAnimationsFile)
+		self:downloadAnimationFile(pathAnimationsFile)
 	else
-		local str = fs.open(path .. '/info.txt', 'r').readAll()
+		local str = fs.open(pathAnimationsInfo, 'r').readAll()
 		self.info = textutils.unserialize(str)
 	end
+
+	local frameCount = self.info.frame_count
+	
+	-- Create table of frame indices to sleep at.
+	local framesToSleep = {}
+	for v = 1, frameCount, self.frameSleepSkipping do
+		table.insert(framesToSleep, math.floor(v + 0.5))
+	end
+	local frameSleepSkippingIndex = 1
 
 	if self.progressBool then
 		self:printProgress('Opening data files...')
@@ -254,82 +329,30 @@ function Animation:getSelectedAnimationData()
 	local cursorX, cursorY = term.getCursorPos()
 	local i = 1
 
-	self.frameStrings = {}
+	-- self.frameStrings = {}
 
-	for j = 1, self.info.data_files do
-		local path2 = path .. '/data/' .. tostring(j) .. '.txt'
-		local file = fs.open(path2, 'r')
+	for dataFileIndex = 1, self.info.data_files do
+		local pathData = pathTimedAnimationsFile .. dataFileIndex
+		local dataWriteHandle = io.open(pathData, 'w')
 
-		-- self.frameStrings = {}
-
-		for lineStr in file.readLine do
-			self.frameStrings[i] = lineStr
-
-			if i % 1000 == 0 then
-				cf.yield()
-				if self.progressBool then
-					self:printProgress('Gotten ' .. tostring(i) .. '/' .. tostring(self.info.frame_count) .. ' data frames...', cursorX, cursorY)
-				end
-			end
-
-			i = i + 1
-		end
-		
-		file:close()
-		cf.tryYield()
-	end
-	
-	if self.progressBool then
-		-- For the final frame.
-		self:printProgress('Gotten ' .. tostring(self.info.frame_count) .. '/' .. tostring(self.info.frame_count) .. ' data frames...', cursorX, cursorY)
-	end
-end
-
-function Animation:dataToTimedAnimation()
-	local frameCount = self.info.frame_count
-	local neededFilesCount = math.ceil(frameCount / self.maxFramesPerTimedAnimationFile)
-
-	local cursorX, cursorY = term.getCursorPos()
-	local i = 1
-
-	local framesToSleep = {}
-	for v = 1, frameCount, self.frameSleepSkipping do
-		table.insert(framesToSleep, math.floor(v + 0.5))
-	end
-	local frameSleepSkippingIndex = 1
-
-	local path1 = self.folder .. 'Timed Animations/'
-	if not fs.exists(path1) then
-		fs.makeDir(path1)
-	end
-	
-	local path2 = path1 .. 'size_' .. self.animationSize.width .. 'x' .. self.animationSize.height .. '/'
-	if not fs.exists(path2) then
-		fs.makeDir(path2)
-	end
-
-	local path3 = path2 .. self.fileName .. '/'
-	if not fs.exists(path3) then
-		fs.makeDir(path3)
-	end
-
-	for subfile = 1, neededFilesCount do
-		local path4 = path3 .. subfile
-		local handle = io.open(path4, 'w')
-
-		local frameOffset = (subfile - 1) * self.maxFramesPerTimedAnimationFile
+		local frameOffset = (dataFileIndex - 1) * self.maxFramesPerTimedAnimationFile
 
 		local frameCountToFile = math.min(frameCount - frameOffset, self.maxFramesPerTimedAnimationFile)
 
 		local minFrames = frameOffset + 1
 		local maxFrames = frameOffset + frameCountToFile
 
-		-- I expect handle:write() to be an expensive operation, so that's why I chose to only write to it every 1000 frames.
+		-- I expect dataWriteHandle:write() to be an expensive operation, so that's why I chose to only write to it every 1000 frames.
 		local strTable = {}
 		local k = 1
 
-		for f = minFrames, maxFrames do
-			-- Prevents the first line of each generated code file being empty.
+		local pathDataFile = pathAnimationsFile .. '/data/' .. tostring(dataFileIndex) .. '.txt'
+		local dataReadHandle = fs.open(pathDataFile, 'r')
+
+		local f = minFrames
+		-- for f = minFrames, maxFrames do
+		for lineStr in dataReadHandle.readLine do
+			-- 'k > 1' Prevents the first line of each generated code file being empty.
 			if k > 1 then
 				strTable[k] = '\n'
 				k = k + 1
@@ -337,7 +360,8 @@ function Animation:dataToTimedAnimation()
 			
 			strTable[k] = 'cf.frameWrite("'
 			k = k + 1
-			strTable[k] = self.frameStrings[f]
+			-- strTable[k] = self.frameStrings[f]
+			strTable[k] = lineStr
 			k = k + 1
 			strTable[k] = '",nil,nil'
 			k = k + 1
@@ -379,7 +403,7 @@ function Animation:dataToTimedAnimation()
 				os.queueEvent('yield')
 				os.pullEvent('yield')
 				
-				handle:write(str)
+				dataWriteHandle:write(str)
 				os.queueEvent('yield')
 				os.pullEvent('yield')
 
@@ -393,11 +417,60 @@ function Animation:dataToTimedAnimation()
 			end
 
 			i = i + 1
+			f = f + 1
 		end
 		
-		handle:close()
-		
+		dataWriteHandle:close()
+		dataReadHandle:close()
+
 		cf.tryYield()
+		
+
+
+
+
+
+
+
+
+
+		-- local pathDataFile = pathAnimationsFile .. '/data/' .. tostring(dataFileIndex) .. '.txt'
+		-- local dataReadHandle = fs.open(pathDataFile, 'r')
+
+		-- for lineStr in dataReadHandle.readLine do
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			-- self.frameStrings[i] = lineStr
+
+			-- if i % 1000 == 0 then
+			-- 	cf.yield()
+			-- 	if self.progressBool then
+			-- 		self:printProgress('Gotten ' .. tostring(i) .. '/' .. tostring(self.info.frame_count) .. ' data frames...', cursorX, cursorY)
+			-- 	end
+			-- end
+
+			-- i = i + 1
+		-- end
+		
+		-- dataReadHandle:close()
+		-- cf.tryYield()
+	end
+	
+	if self.progressBool then
+		-- For the final frame.
+		self:printProgress('Gotten ' .. tostring(self.info.frame_count) .. '/' .. tostring(self.info.frame_count) .. ' data frames...', cursorX, cursorY)
 	end
 end
 
@@ -411,16 +484,14 @@ function Animation:countdown()
 end
 
 function Animation:createTimedAnimation()
-	local path1 = self.folder .. 'Timed Animations/size_' .. self.animationSize.width .. 'x' .. self.animationSize.height .. '/' .. self.fileName
-	if fs.exists(path1) then -- We don't need to recreate the timed animation.
-		return
+	local pathFile = self.folder .. 'Timed Animations/size_' .. self.animationSize.width .. 'x' .. self.animationSize.height .. '/' .. self.fileName
+	if not fs.exists(pathFile) then -- Don't want to recreate a timed animation.
+		self:getSelectedAnimationData()
+		cf.tryYield()
+		
+		-- self:dataToTimedAnimation()
+		-- cf.tryYield()
 	end
-
-	self:getSelectedAnimationData()
-	cf.tryYield()
-	
-	self:dataToTimedAnimation()
-	cf.tryYield()
 end
 
 function Animation:_playAnimation(path, len)
@@ -441,24 +512,24 @@ function Animation:playAnimation()
 		end
 	end
 
-	local path = self.folder .. 'Timed Animations/size_' .. self.animationSize.width .. 'x' .. self.animationSize.height .. '/' .. self.fileName .. '/'
-	local len = #fs.list(path)
+	local pathFile = self.folder .. 'Timed Animations/' .. self.charType .. '/size_' .. self.animationSize.width .. 'x' .. self.animationSize.height .. '/' .. self.fileName .. '/'
+	local len = #fs.list(pathFile)
 
 	term.setCursorPos(self.offset.x, self.offset.y)
 
 	-- Called because it's necessary to know self.info.frame_count.
-	self:getInfo() -- Seems like it should be possible to call this method less often !!!
+	self:getInfo() -- TODO: Should be possible to call this method less often.
 
 	if self.loop and self.info.frame_count > 1 then
 		while true do
 			if self.playAnimationBool then
-				self:_playAnimation(path, len)
+				self:_playAnimation(pathFile, len)
 			else
 				sleep(1)
 			end
 		end
 	else
-		self:_playAnimation(path, len)
+		self:_playAnimation(pathFile, len)
 	end
 end
 

@@ -11,13 +11,13 @@ local settings = {
 	loop                           = cfg.loop,
 	folder                         = cfg.folder,
 	offset                         = cfg.offset,
-	useHardcodedStorageStructure   = cfg.useHardcodedStorageStructure,
-	hardcodedStorageStructure	   = cfg.hardcodedStorageStructure,
+	useCloud					   = cfg.useCloud,
 }
 
 local animation = an.Animation:new(settings)
 
-animation:askAnimationFolder()
-animation:askAnimationFile()
+animation:askCharType()
+animation:askFolder()
+animation:askFile()
 animation:createTimedAnimation()
 animation:playAnimation()

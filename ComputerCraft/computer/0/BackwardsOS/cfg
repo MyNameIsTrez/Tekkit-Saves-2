@@ -49,22 +49,7 @@ folder = 'BackwardsOS/programs/Animation/'
 
 animationSize = { width = 9, height = 8 }
 
-useHardcodedStorageStructure = true
-
-hardcodedStorageStructure = {
-	size_10x10 = {
-		"spanish_class",
-	},
-	size_30x30 = {
-		"spanish_class",
-		"takeout",
-		"ten_years_later",
-	},
-	size_426x160 = {
-		"eiffel_color",
-		"coincidence_color",
-	},
-}
+useCloud = false
 
 
 -- UI
