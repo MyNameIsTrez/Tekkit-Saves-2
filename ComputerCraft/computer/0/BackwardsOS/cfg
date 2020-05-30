@@ -45,11 +45,11 @@ loop = true
 -- The top-left corner where the animation will be drawn from.
 offset = { x = 1, y = 1 }
 
-folder = 'BackwardsOS/programs/Animation/'
+folder = 'BackwardsOS/programs/Animation'
 
 animationSize = { width = 9, height = 8 }
 
-useCloud = false
+useCloud = true
 
 
 -- UI

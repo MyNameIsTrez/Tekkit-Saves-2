@@ -5,16 +5,60 @@ local tab = {
 		-- 	url = '',
 		-- 	name = '',
 		-- 	extension = '',
-		-- 	width = '',
-		-- 	height = ''
+		-- 	options = {
+		-- 		{
+		-- 			char_type = "",
+		-- 			width = ,
+		-- 			height = 
+		-- 		},
+		-- 	}
 		-- },
-		{
-			url = 'https://r4---sn-5hne6nsz.googlevideo.com/videoplayback?expire=1587429092&ei=hOqdXpb0EdSi-gb865bgDw&ip=89.98.103.144&id=o-ABvQEKaBs4MTrWUHsN1-j5ZWLhzX5ihQRPQECE0CiKm6&itag=18&source=youtube&requiressl=yes&mh=7c&mm=31%2C26&mn=sn-5hne6nsz%2Csn-4g5ednek&ms=au%2Conr&mv=m&mvi=3&pl=16&gcr=nl&initcwndbps=1507500&vprv=1&xtags=tx%3D23791946&mime=video%2Fmp4&gir=yes&clen=14418018&ratebypass=yes&dur=212.091&lmt=1578978755383282&mt=1587407375&fvip=4&c=WEB&txp=1111222&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cgcr%2Cvprv%2Cxtags%2Cmime%2Cgir%2Cclen%2Cratebypass%2Cdur%2Clmt&lsparams=mh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Cinitcwndbps&lsig=ALrAebAwRQIgFpiizesq7llWxFbntdm3zVW2fIzA9US9XkGVbmtgPS8CIQCz2BZ41ZUy-7C8LivYWpNoAlp7rBVhZuQshT2OBlKEOA%3D%3D&sig=AJpPlLswRgIhAPYQcmo025jKBm2rR0btl3EqHznt1mf3448SQVE8mhQ-AiEAockg1B_BVhjLp9PohPJek5DXV3Sk4U1_rqfRV9K4eiA%3D',
-			name = 'never gonna give you up',
-			extension = 'mp4',
-			width = '77',
-			height = '38'
-		},
+		-- {
+		-- 	url = 'https://r4---sn-5hne6nsz.googlevideo.com/videoplayback?expire=1587429092&ei=hOqdXpb0EdSi-gb865bgDw&ip=89.98.103.144&id=o-ABvQEKaBs4MTrWUHsN1-j5ZWLhzX5ihQRPQECE0CiKm6&itag=18&source=youtube&requiressl=yes&mh=7c&mm=31%2C26&mn=sn-5hne6nsz%2Csn-4g5ednek&ms=au%2Conr&mv=m&mvi=3&pl=16&gcr=nl&initcwndbps=1507500&vprv=1&xtags=tx%3D23791946&mime=video%2Fmp4&gir=yes&clen=14418018&ratebypass=yes&dur=212.091&lmt=1578978755383282&mt=1587407375&fvip=4&c=WEB&txp=1111222&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cgcr%2Cvprv%2Cxtags%2Cmime%2Cgir%2Cclen%2Cratebypass%2Cdur%2Clmt&lsparams=mh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Cinitcwndbps&lsig=ALrAebAwRQIgFpiizesq7llWxFbntdm3zVW2fIzA9US9XkGVbmtgPS8CIQCz2BZ41ZUy-7C8LivYWpNoAlp7rBVhZuQshT2OBlKEOA%3D%3D&sig=AJpPlLswRgIhAPYQcmo025jKBm2rR0btl3EqHznt1mf3448SQVE8mhQ-AiEAockg1B_BVhjLp9PohPJek5DXV3Sk4U1_rqfRV9K4eiA%3D',
+		-- 	name = 'never gonna give you up',
+		-- 	extension = 'mp4',
+		-- 	options = {
+		-- 		-- {
+		-- 		-- 	"char_type": "vanilla",
+		-- 		-- 	"width": 426,
+		-- 		-- 	"height": 160
+		-- 		-- },
+		-- 		{
+		-- 			char_type = "grayscale",
+		-- 			width = 426,
+		-- 			height = 160
+		-- 		},
+		-- 		-- {
+		-- 		-- 	"char_type": "color",
+		-- 		-- 	"width": 426,
+		-- 		-- 	"height": 160
+		-- 		-- }
+		-- 	}
+		-- 	-- width = '77',
+		-- 	-- height = '38'
+		-- },
+		-- {
+		-- 	url = "https://media.giphy.com/media/7GcdjWkek7Apq/giphy.gif",
+		-- 	name = "coincidence",
+		-- 	extension = "gif",
+		-- 	options = {
+		-- 		{
+		-- 			char_type = "vanilla",
+		-- 			width = 426,
+		-- 			height = 160
+		-- 		},
+		-- 		-- {
+		-- 		-- 	char_type = "grayscale",
+		-- 		-- 	width = 426,
+		-- 		-- 	height = 160
+		-- 		-- },
+		-- 		-- {
+		-- 		-- 	char_type = "color",
+		-- 		-- 	width = 426,
+		-- 		-- 	height = 160
+		-- 		-- }
+		-- 	}
+		-- },
 
 		-- NEWGROUNDS
 		-- {
@@ -54,13 +98,18 @@ local tab = {
 		-- 	height = 30
 		-- },
 		
-		-- {
-		-- 	url = 'https://uploads.ungrounded.net/alternate/1429000/1429660_alternate_93609.720p.mp4?f1582824641',
-		-- 	name = 'spanish class',
-		-- 	extension = 'mp4',
-		-- 	width = 10,
-		-- 	height = 10
-		-- },
+		{
+			url = 'https://uploads.ungrounded.net/alternate/1429000/1429660_alternate_93609.720p.mp4?f1582824641',
+			name = 'spanish class',
+			extension = 'mp4',
+			options = {
+				{
+					char_type = "color",
+					width = 426,
+					height = 160
+				},
+			}
+		},
 
 		-- {
 		-- 	url = 'https://r4---sn-5hne6nsr.googlevideo.com/videoplayback?expire=1586820206&ei=DqCUXtqzJoeL7gO9iaawBQ&ip=89.98.103.144&id=o-AFJYSkVu2OW_alCLigLEX30itY2s-93QovO6CmmEopcv&itag=22&source=youtube&requiressl=yes&mh=Df&mm=31%2C26&mn=sn-5hne6nsr%2Csn-4g5edns6&ms=au%2Conr&mv=m&mvi=3&pl=16&initcwndbps=1531250&vprv=1&mime=video%2Fmp4&ratebypass=yes&dur=1242.522&lmt=1570208245435130&mt=1586798501&fvip=4&beids=9466585&c=WEB&txp=5535432&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cvprv%2Cmime%2Cratebypass%2Cdur%2Clmt&sig=AJpPlLswRAIgNP1LG60kjR3iYMUOMUguJBDaFvzWiqVN_AD27WWHqh0CIHfJ_ecn5n_fD7AIF83pw6t0qfLdP-CUOTijvPh6W5j2&lsparams=mh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Cinitcwndbps&lsig=ALrAebAwRAIgP_wn_BMmisyx-1OHpJvEl9v2TddLBUyTy_k-LuePBN4CIBHWfeDXjRnKV5vwQAM-Q-ZWKpj8W8k3ssjSP5flrWu9',
@@ -79,10 +128,23 @@ local tab = {
 	}
 }
 
+-- tab = {hello = "world"}
+
 local url = 'http://joppekoers.nl:1337/'
 local objectStr = json.encode(tab)
 
 print(url)
 print(objectStr)
+print(type(objectStr))
+
 
 http.post(url, objectStr)
+-- http.post(url, "123456789foobar")
+-- http.post(url, '{"hello": "world", "foo": "bar"}')
+-- http.post(url, "123456789={foobar='123'}, {}")
+
+-- objectStr = "123456789={foobar='123'}"
+-- http.post(url, objectStr, { ["Content-Type"] = "application/json" })
+
+
+-- local tab = { password: 'MyNameIsTrez', data = [ { url: "https://media.giphy.com/media/7GcdjWkek7Apq/giphy.gif", name: "coincidence", extension: "gif", options: [ { "char_type": "vanilla", "width": 426, "height": 160 } ] } ] }
