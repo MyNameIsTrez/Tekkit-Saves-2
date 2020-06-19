@@ -104,9 +104,14 @@ local tab = {
 			extension = 'mp4',
 			options = {
 				{
+					char_type = "vanilla",
+					width = 50,
+					height = 18
+				},
+				{
 					char_type = "color",
-					width = 426,
-					height = 160
+					width = 50,
+					height = 18
 				},
 			}
 		},

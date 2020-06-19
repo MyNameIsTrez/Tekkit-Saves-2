@@ -1,0 +1,1 @@
+{frame_count=68,width=426,height=160,data_files=1}

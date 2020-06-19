@@ -16,7 +16,7 @@ redownloadAPIsOnStartup = false
 animationFrameSleeping = true
 
 -- Seconds of sleeping between frames, -1 is no sleeping. Default is 0.05.
-animationFrameSleep = 0.1
+animationFrameSleep = 0.05
 
 -- How many frames are skipped between sleeping.
 -- Setting to 0 or 1 means every frame has a sleep.
