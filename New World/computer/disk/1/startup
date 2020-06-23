@@ -1,0 +1,1 @@
+shell.run("label", "set", ("a"):rep(os.getComputerID()))

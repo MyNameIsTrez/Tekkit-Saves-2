@@ -1,33 +1,43 @@
 -- Set up a list which contains the sides as keys, and the current redstone state of each side as a boolean value.
-local statelist = {
-	["top"] = rs.getBundledInput("top"),
-	["front"] = rs.getBundledInput("front"),
-	["left"] = rs.getBundledInput("left"),
-	["right"] = rs.getBundledInput("right"),
+local state_list = {
 	["back"] = rs.getBundledInput("back"),
+	["right"] = rs.getBundledInput("right"),
+	["top"] = rs.getBundledInput("top"),
+	["left"] = rs.getBundledInput("left"),
 	["bottom"] = rs.getBundledInput("bottom"),
+	["front"] = rs.getBundledInput("front"),
 }
 
--- Ready the terminal for printing to.
+local side_additions = {
+	["back"] = 0,
+	["right"] = 16,
+	["top"] = 32,
+	["left"] = 48,
+	["bottom"] = 64,
+	["front"] = 80,
+}
+
 term.clear()
 term.setCursorPos(1,1)
 
 print("LISTENING")
 
-while true do -- Start an endless loop
-	os.pullEvent("redstone") -- Yield the computer until some redstone changes.
-	-- We don't care what the event returns, since the first variable will be "redstone" and the rest will be nil. 
+while true do
+	os.pullEvent("redstone")
 
-	-- Now we check each side to see if it's changed.
-	for side, state in pairs(statelist) do -- Run the lines of code in this loop for each key/value pair in statelist
-		-- print("CHECKING STATELIST")
-		-- print(os.clock())
-		-- print("side: " .. tostring(side))
-		-- print("rs.getBundledInput(side): " .. tostring(rs.getBundledInput(side)))
-		-- print("state: " .. tostring(state))
-		if rs.getBundledInput(side) ~= state then -- If the side we're checking doesn't match what it was last time we checked then.
-			print(side.." is now "..tostring(rs.getBundledInput(side))) -- Print the new state of the side.
-			statelist[side] = rs.getBundledInput(side) -- Update the statelist with the new change.
+	for side, state in pairs(state_list) do
+		local input = rs.getBundledInput(side)
+		if input ~= state then
+			print(side .. " is now " .. tostring(input))
+
+			if input ~= 0 then -- Cable off.
+				local index = math.log(input) / math.log(2) + 1
+				local true_index = side_additions[side]+index
+				local char = string.char(true_index + 31) -- First 31 chars are bugged.
+				print("char: " .. char)
+			end
+
+			state_list[side] = input
 		end
 	end
 end

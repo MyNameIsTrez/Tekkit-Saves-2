@@ -2,3 +2,5 @@
 2 builder
 6 builder
 8 msg-receiver-1
+9 screwdriverWearing
+12 gamblingServer
