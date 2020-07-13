@@ -12,12 +12,24 @@ local info = {
 					height = 160
 				}
 			}
+		},
+		{
+			url = "https://media.giphy.com/media/7GcdjWkek7Apq/giphy.gif",
+			extension = "gif",
+			variations = {
+				{
+					name = "coincidence",
+					palette = "vanilla",
+					width = 200,
+					height = 300
+				}
+			}
 		}
 	}
 }
 
 local url = "http://localhost:3000/add"
-local objectStr = json.encode(info)
+local objectStr = 'foo=' .. json.encode(info)
 
 print(url)
 print(objectStr)
