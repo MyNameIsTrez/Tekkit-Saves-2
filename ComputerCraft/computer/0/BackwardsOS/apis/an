@@ -28,6 +28,9 @@ function Animation:new(settings)
 	self.maxFramesPerTimedAnimationFile = settings.maxFramesPerTimedAnimationFile
 	self.progressBool                   = settings.progressBool
 	self.loop                           = settings.loop
+	self.countdownTime                  = settings.countdownTime
+	self.offset                         = settings.offset
+	self.playAnimationBool = settings.playAnimationBool
 	-- self. = settings.
 
 	self:_init_paths()
@@ -70,14 +73,10 @@ function Animation:_get_metadata()
 	end
 end
 
-function Animation:print_ascii_names()
+function Animation:choose_document()
 	for _, document in ipairs(self.metadata) do
-		-- cf.printTable(document)
 		print(string.format("%s | %s", document.downloaded and " " or "!", document.displayed_name))
 	end
-end
-
-function Animation:choose_document()
 	print("\nEnter a 'displayed_name':")
 	while true do
 		local answer_lowercase = read():lower()
@@ -86,6 +85,10 @@ function Animation:choose_document()
 				self.document = document
 				self.document_path = cf.pathJoin(self.ascii_path, self.document._id)
 				self.timed_document_path = cf.pathJoin(self.timed_ascii_path, self.document._id)
+
+				if not fs.exists(self.document_path) then self:_download_subfiles() end
+				self:_create_timed_subfiles()
+
 				return
 			end
 		end
@@ -93,13 +96,11 @@ function Animation:choose_document()
 	end
 end
 
-function Animation:download_subfiles()
-	if fs.exists(self.document_path) then return end
-
+function Animation:_download_subfiles()
 	local cursorX, cursorY = term.getCursorPos()
 	if self.progressBool then
 		local str = "Fetching animation file 1/" .. tostring(self.document.frame_files_count) .. " from server. Calculating ETA..."
-		self:print_status(str, cursorX, cursorY)
+		self:_print_status(str, cursorX, cursorY)
 	end
 
 	fs.makeDir(self.document_path)
@@ -124,14 +125,14 @@ function Animation:download_subfiles()
 
 		if self.progressBool then
 			local str = "Fetching animation file " .. tostring(subfile_id < self.document.frame_files_count and subfile_id + 1 or subfile_id) .. "/" .. tostring(self.document.frame_files_count) .. " from server." .. eta .. "           "
-			self:print_status(str, cursorX, cursorY)
+			self:_print_status(str, cursorX, cursorY)
 		end
 	end
 
 	self.database:insert(self.document)
 end
 
-function Animation:create_timed_subfiles()
+function Animation:_create_timed_subfiles()
 	fs.makeDir(self.timed_document_path)
 
 	-- Create table of frame indices to sleep at.
@@ -142,7 +143,7 @@ function Animation:create_timed_subfiles()
 	local frameSleepSkippingIndex = 1
 
 	if self.progressBool then
-		self:print_status("Opening data files...")
+		self:_print_status("Opening data files...")
 	end
 
 	cf.tryYield() -- TODO: Try to remove.
@@ -150,31 +151,32 @@ function Animation:create_timed_subfiles()
 	local cursorX, cursorY = term.getCursorPos()
 	local i = 1
 
-	for frame_file_index = 1, self.document.frame_files_count do
-		local dataWriteHandle = fs.open(cf.pathJoin(self.timed_document_path, frame_file_index), "w")
+	for subfile_id = 1, self.document.frame_files_count do
+		local dataWriteHandle = fs.open(cf.pathJoin(self.timed_document_path, subfile_id), "w")
 
-		local frameOffset = (frame_file_index - 1) * self.maxFramesPerTimedAnimationFile
+		local frameOffset = (subfile_id - 1) * self.maxFramesPerTimedAnimationFile
 
 		local frameCountToFile = math.min(self.document.frame_count - frameOffset, self.maxFramesPerTimedAnimationFile)
 
 		local strTable = {}
 		local k = 1
 
-		local dataReadHandle = fs.open(cf.pathJoin(self.document_path, frame_file_index), "r")
+		local dataReadHandle = fs.open(cf.pathJoin(self.document_path, subfile_id), "r")
 
 		local f = frameOffset + 1
-		for lineStr in dataReadHandle.readLine do
+		for line_str in dataReadHandle.readLine do
 			-- "k > 1" prevents the first line of each generated code file being empty.
 			if k > 1 then
 				strTable[k] = "\n"
 				k = k + 1
 			end
 			
-			strTable[k] = "cf.frameWrite('"
+			-- line_str can contain a ' character
+			strTable[k] = 'cf.frameWrite("'
 			k = k + 1
-			strTable[k] = lineStr
+			strTable[k] = line_str
 			k = k + 1
-			strTable[k] = "',nil,nil"
+			strTable[k] = '",nil,nil'
 			k = k + 1
 
 			if f ~= self.document.frame_count and self.loop then
@@ -224,7 +226,7 @@ function Animation:create_timed_subfiles()
 
 				if self.progressBool then
 					local str = "Generated "..tostring(i).."/"..tostring(self.document.frame_count).." frames..."
-					self:print_status(str, cursorX, cursorY)
+					self:_print_status(str, cursorX, cursorY)
 				end
 			end
 			i = i + 1
@@ -237,70 +239,55 @@ function Animation:create_timed_subfiles()
 	
 	-- TODO: For the final frame. Refactor this away.
 	if self.progressBool then
-		self:print_status("Generated " .. tostring(self.document.frame_count) .. "/" .. tostring(self.document.frame_count) .. " frames...", cursorX, cursorY)
+		self:_print_status("Generated " .. tostring(self.document.frame_count) .. "/" .. tostring(self.document.frame_count) .. " frames...", cursorX, cursorY)
 	end
 end
 
-function Animation:print_status(str, x, y)
+function Animation:_print_status(str, x, y)
 	if x and y then term.setCursorPos(x, y) end
 	print(str)
 end
 
--- function Animation:getInfo()
--- 	local size = "size_" .. self.animationSize.width .. "x" .. self.animationSize.height
--- 	local pathInfo = cf.pathJoin(self.ascii_path, self.charType, size, self.fileName, "metadata.txt")
--- 	local str = fs.open(pathInfo, "r").readAll()
--- 	self.metadata = textutils.unserialize(str)
--- end
+function Animation:play_animation()
+	if self.progressBool then
+		if self.countdownTime > 0 then
+			self:_countdown()
+		else
+			self:_print_status("Playing animation...")
+		end
+	end
 
--- function Animation:countdown()
--- 	local cursorX, cursorY = term.getCursorPos()
+	term.setCursorPos(self.offset.x, self.offset.y)
+	local len = #fs.list(self.timed_document_path)
+	if self.loop and self.document.frame_count > 1 then
+		while true do
+			if self.playAnimationBool then
+				self:_playAnimation(len)
+			else
+				sleep(1)
+			end
+		end
+	else
+		self:_playAnimation(len)
+	end
+end
 
--- 	for i = 1, self.countdownTime do
--- 		self:print_status("Playing animation in " .. tostring(self.countdownTime - i + 1) .. "...", cursorX, cursorY)
--- 		sleep(1)
--- 	end
--- end
+function Animation:_countdown()
+	local cursorX, cursorY = term.getCursorPos()
+	for i = 1, self.countdownTime do
+		self:_print_status("Playing animation in " .. tostring(self.countdownTime - i + 1) .. "...", cursorX, cursorY)
+		sleep(1)
+	end
+end
 
--- function Animation:_playAnimation(pathFile, len)
--- 	for i = 1, len do
--- 		if self.playAnimationBool then
--- 			self.shell.run(cf.pathJoin(pathFile, i))
--- 		end
--- 	end
--- 	cf.tryYield() -- TODO: Try to remove.
--- end
-
--- function Animation:playAnimation()
--- 	if self.progressBool then
--- 		if self.countdownTime > 0 then
--- 			self:countdown()
--- 		else
--- 			self:print_status("Playing animation...")
--- 		end
--- 	end
-
--- 	local size = "size_" .. self.animationSize.width .. "x" .. self.animationSize.height
--- 	local pathFile = cf.pathJoin(self.timed_ascii_path, self.charType, size, self.fileName)
--- 	local len = #fs.list(pathFile)
-
--- 	term.setCursorPos(self.offset.x, self.offset.y)
-
--- 	-- Inits self.document.frame_count.
--- 	self:getInfo() -- TODO: Should be possible to call this method less often.
-
--- 	if self.loop and self.document.frame_count > 1 then
--- 		while true do
--- 			if self.playAnimationBool then
--- 				self:_playAnimation(pathFile, len)
--- 			else
--- 				sleep(1)
--- 			end
--- 		end
--- 	else
--- 		self:_playAnimation(pathFile, len)
--- 	end
--- end
+function Animation:_playAnimation(len)
+	for subfile_id = 1, len do
+		if self.playAnimationBool then
+			self.shell.run(cf.pathJoin(self.timed_document_path, subfile_id))
+		end
+	end
+	cf.tryYield() -- TODO: Try to remove.
+end
 
 -- function Animation:setOffset(x, y)
 -- 	self.offset = { x = x, y = y }
@@ -337,7 +324,7 @@ end
 
 -- 		self.fileName = "char_" .. tostring(charCode)
 
--- 		self:create_timed_subfiles()
--- 		self:playAnimation()
+-- 		self:_create_timed_subfiles()
+-- 		self:play_animation()
 -- 	end
 -- end

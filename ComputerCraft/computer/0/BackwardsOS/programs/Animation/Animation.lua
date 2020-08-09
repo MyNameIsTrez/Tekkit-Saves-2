@@ -4,25 +4,17 @@ local settings = {
 	frameSleeping                  = cfg.animationFrameSleeping,
 	frameSleep                     = cfg.animationFrameSleep,
 	frameSleepSkipping             = cfg.animationFrameSleepSkipping,
-	-- countdownTime                  = cfg.countdownTime,
-	-- playAnimationBool              = cfg.playAnimationBool,
 	maxFramesPerTimedAnimationFile = cfg.maxFramesPerTimedAnimationFile,
 	progressBool                   = cfg.animationProgressBool,
-	-- useMonitor                     = cfg.useMonitor,
 	loop                           = cfg.loop,
-	-- offset                         = cfg.offset,
+	countdownTime                  = cfg.countdownTime,
+	offset                         = cfg.offset,
+	playAnimationBool              = cfg.playAnimationBool,
+	-- useMonitor                     = cfg.useMonitor,
 	-- useCloud					   = cfg.useCloud,
 }
 
 local animation = an.Animation:new(settings)
 
-animation:print_ascii_names()
 animation:choose_document()
-animation:download_subfiles()
-animation:create_timed_subfiles()
--- animation:askCharType()
--- animation:askFolder()
--- animation:askFile()
--- animation:chooseFile()
--- animation:createTimedAnimation()
--- animation:playAnimation()
+animation:play_animation()

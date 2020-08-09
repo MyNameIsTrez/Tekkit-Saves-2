@@ -19,13 +19,12 @@ animationFrameSleeping = true
 animationFrameSleep = 0.05
 
 -- How many frames are skipped between sleeping.
--- Setting to 0 or 1 means every frame has a sleep.
 -- If animationFrameSleeping is set to false, there is never any sleeping.
 
--- 1.57 for YouTube videos, with 426x160 animationSize.
-animationFrameSleepSkipping = 1.57
+-- 1.57 for YouTube videos, with 426x160 animationSize. 1 means no frames are skipped.
+animationFrameSleepSkipping = 1
 
--- How many seconds are counted down before the animation starts playing. Set to 0 for no countdownTime.
+-- How many seconds are counted down before the animation starts playing. Set to 0 for no countdown.
 countdownTime = 0
 
 -- Whether to start playing the animation. Can be used to exit the while loop of a timed animation being run.
