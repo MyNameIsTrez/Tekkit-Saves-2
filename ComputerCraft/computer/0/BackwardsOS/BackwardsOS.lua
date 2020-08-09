@@ -30,6 +30,8 @@ local APIs = {
 	{ id = 'connections', name = 'connections' },
 	{ id = 'twitter', name = 'twitter' },
 	{ id = 'voronoi_api', name = 'voronoiAPI' },
+	{ id = 'database', name = 'database' },
+	{ id = 'online_storage', name = 'online_storage' },
 	-- { id = '', name = '' },
 }
 
@@ -54,9 +56,9 @@ function importAPIs()
 		
 		local str = handleHttps.readAll()
 
-		local handleFile = io.open(pathAPI, 'w')
-		handleFile:write(str)
-		handleFile:close()
+		local handleFile = fs.open(pathAPI, 'w')
+		handleFile.write(str)
+		handleFile.close()
 		
 		print(' Downloaded!')
 
@@ -91,9 +93,9 @@ function downloadCfg()
 
 	local str = handleHttps.readAll()
 
-	local handleFile = io.open(cfgPath, 'w')
-	handleFile:write(str)
-	handleFile:close()
+	local handleFile = fs.open(cfgPath, 'w')
+	handleFile.write(str)
+	handleFile.close()
 	
 	print(' Downloaded!')
 end

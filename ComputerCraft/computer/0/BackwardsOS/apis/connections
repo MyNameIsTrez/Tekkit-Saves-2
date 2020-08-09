@@ -2,10 +2,10 @@
 -- https://editor.p5js.org/MyNameIsTrez/sketches/MqnvoTzC
 
 
--- Class table.
+-- Class table
 Connections = {}
 
--- Constructor.
+-- Constructor
 function Connections:new(s) -- 's' stands for 'settings'
 	setmetatable({}, Connections)
 
@@ -44,67 +44,17 @@ function Connections:new(s) -- 's' stands for 'settings'
 	return self
 end
 
-function Connections:copy(obj)
-    if type(obj) ~= "table" then
-        return obj
-    end
-    local res = {}
-    for k, v in pairs(obj) do
-        res[self:copy(k)] = self:copy(v)
-    end
-    return res
-end
-
 function Connections:generatePoints()
 	for index = 1, self.pointCount do
 		local x = math.random(self.size.width)
 		local y = math.random(self.size.height)
-
-		print("loop: " .. index)
-		sleep(1)
-
-		-- local point = self:copy(Point:new({
-		-- 	index = index,
-		-- 	x = x,
-		-- 	y = y,
-		-- 	pointMinVel = self.pointMinVel,
-		-- 	pointMaxVel = self.pointMaxVel
-		-- }))
-
-		local point = Point:new({
+		table.insert(self.points, Point:new({
 			index = index,
 			x = x,
 			y = y,
 			pointMinVel = self.pointMinVel,
 			pointMaxVel = self.pointMaxVel
-		})
-
-		self.points[#self.points + 1] = point
-
-		-- self.points[#self.points + 1] = Point:new({
-		-- 	index = index,
-		-- 	x = x,
-		-- 	y = y,
-		-- 	pointMinVel = self.pointMinVel,
-		-- 	pointMaxVel = self.pointMaxVel
-		-- })
-
-		-- table.insert(self.points, Point:new({
-		-- 	index = index,
-		-- 	x = x,
-		-- 	y = y,
-		-- 	pointMinVel = self.pointMinVel,
-		-- 	pointMaxVel = self.pointMaxVel
-		-- }))
-
-		-- cf.printTable(self.points)
-		-- print(textutils.serialize(self.points))
-		print("#self.points: " .. #self.points)
-		for i = 1, #self.points do 
-			print(self.points[i].pos.x)
-		end
-		print("---------------")
-		sleep(3)
+		}))
 	end
 end
 
@@ -113,7 +63,7 @@ function Connections:show()
 		point:move(self.maxConnectionDist, self.size.width, self.size.height)
 		point.connections = {}
 	end
-	
+
 	for _, point in ipairs(self.points) do
 		point:generateConnections(self.pointCount, self.points, self.maxConnectionDist)
 		point:showConnections(self.points, self.maxConnectionDist, self.connectionWeightAlphaMult, self.framebuffer)
@@ -123,18 +73,17 @@ function Connections:show()
 end
 
 
--- Class table.
+-- Class table
 Point = {}
 
--- Constructor.
+-- Constructor
 function Point:new(settings)
 	setmetatable({}, Point)
 
 	-- Passed settings.
-	self.index = settings.index
-	self.pos   = vector.new(settings.x, settings.y)
-	self.vel   = cf.vectorRandom2D():mul(math.random(settings.pointMinVel, settings.pointMaxVel))
-
+	self.index       = settings.index
+	self.pos         = vector.new(settings.x, settings.y)
+	self.vel         = cf.vectorRandom2D():mul(math.random(settings.pointMinVel, settings.pointMaxVel))
 	self.connections = {}
 	
 	return self
@@ -161,30 +110,17 @@ function Point:generateConnections(pointCount, points, maxConnectionDist)
 	for otherIndex = 1, pointCount do
 		local other = points[otherIndex]
 
-		-- term.setCursorPos(1, 1)
-		-- term.write(2 .. ": " .. otherIndex .. ", " .. tostring(other == self))
-		-- cf.printTable(points)
-		-- cf.printTable(other)
-		-- cf.printTable(self)
-		-- sleep(10)
-
 		-- Don't connect to itself.
-		if other ~= self then
+		if other ~= self then				
 			local dist = cf.pythagoras(self.pos.x, self.pos.y, other.pos.x, other.pos.y)
 			
 			-- Don't connect if the line wouldn't be visible.
 			if dist < maxConnectionDist then
-				term.setCursorPos(1, 1)
-				term.write(4)
-				sleep(2)
 				-- Prevents 2 lines being drawn, one from each point of the line.
 				-- O(n) time complexity, instead of O(1), I think.
 				-- Still better in performance tests than checking if the x is higher
 				-- than the other's x in my (bad) implementation, though.
 				if not cf.valueInTable(other.connections, self.index) then
-					term.setCursorPos(1, 1)
-					term.write(5)
-					sleep(2)
 					table.insert(self.connections, otherIndex)
 				end
 			end
@@ -193,13 +129,7 @@ function Point:generateConnections(pointCount, points, maxConnectionDist)
 end
 
 function Point:showConnections(points, maxConnectionDist, connectionWeightAlphaMult, framebuffer)
-	-- term.setCursorPos(1, 1)
-	-- term.write(1)
-	-- sleep(5)
 	for _, otherIndex in ipairs(self.connections) do
-		-- term.setCursorPos(1, 1)
-		-- term.write(2)
-		-- sleep(5)
 		local other = points[otherIndex]
 
 		local dist = cf.pythagoras(self.pos.x, self.pos.y, other.pos.x, other.pos.y)
@@ -210,6 +140,7 @@ function Point:showConnections(points, maxConnectionDist, connectionWeightAlphaM
 
 			local char = dithering.getClosestChar(cf.clamp(alpha * connectionWeightAlphaMult, 0, 1))
 
+			cf.printTable(self.pos.x, self.pos.y)
 			framebuffer:writeLine(self.pos.x, self.pos.y, other.pos.x, other.pos.y, char)
 		end
 	end

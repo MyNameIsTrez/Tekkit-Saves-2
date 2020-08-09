@@ -25,12 +25,12 @@ local info = {
 					width = 426,
 					height = 160
 				},
-				{
-					displayed_name = "wavetro logo small",
-					palette = "vanilla",
-					width = 50,
-					height = 18
-				}
+				-- {
+				-- 	displayed_name = "wavetro logo small",
+				-- 	palette = "vanilla",
+				-- 	width = 50,
+				-- 	height = 18
+				-- }
 			}
 		},
 		-- {
@@ -62,7 +62,7 @@ local info = {
 	}
 }
 
-local url = "http://localhost:3000/add"
+local url = "http://localhost:3000/ascii-add"
 local objectStr = 'foo=' .. json.encode(info)
 
 print(url)
