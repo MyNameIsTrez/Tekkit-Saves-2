@@ -1,4 +1,4 @@
-local url = "http://h2896147.stratoserver.net:3000/test-res-send"
+local url = "http://h2896147.stratoserver.net:3000/test-res-send-random"
 
 local time_start, time_end
 local total = 0
@@ -11,7 +11,7 @@ while true do
 	total = total + math.floor((time_end - time_start) * 10 + 0.5) / 10
 	calls = calls + 1
 	term.setCursorPos(1, 1)
-	write(total / calls .. " secs avg   ")
+	write(total * 1000 / calls .. " ms avg   ")
 	term.setCursorPos(1, 2)
 	write(calls .. " calls   ")
 end

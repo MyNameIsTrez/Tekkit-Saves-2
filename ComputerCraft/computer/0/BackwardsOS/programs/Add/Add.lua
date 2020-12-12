@@ -103,31 +103,45 @@ local info = {
 		-- },
 
 		-- Works, but it has weird colors.
+		-- {
+		-- 	url = "https://ia801602.us.archive.org/11/items/Rick_Astley_Never_Gonna_Give_You_Up/Rick_Astley_Never_Gonna_Give_You_Up.mp4",
+		-- 	url_name = "never gonna give you up",
+		-- 	extension = "mp4",
+		-- 	variations = {
+		-- 		-- {
+		-- 		-- 	displayed_name = "never gonna give you up vanilla small",
+		-- 		-- 	palette = "vanilla",
+		-- 		-- 	width = 50,
+		-- 		-- 	height = 18
+		-- 		-- },
+		-- 		-- {
+		-- 		-- 	displayed_name = "never gonna give you up vanilla large",
+		-- 		-- 	palette = "vanilla",
+		-- 		-- 	width = 426,
+		-- 		-- 	height = 160
+		-- 		-- },
+		-- 		-- {
+		-- 		-- 	displayed_name = "never gonna give you up color small",
+		-- 		-- 	palette = "color",
+		-- 		-- 	width = 50,
+		-- 		-- 	height = 18
+		-- 		-- },
+		-- 		{
+		-- 			displayed_name = "never gonna give you up color large",
+		-- 			palette = "color",
+		-- 			width = 426,
+		-- 			height = 160
+		-- 		},
+		-- 	}
+		-- },
+
 		{
-			url = "https://ia801602.us.archive.org/11/items/Rick_Astley_Never_Gonna_Give_You_Up/Rick_Astley_Never_Gonna_Give_You_Up.mp4",
-			url_name = "never gonna give you up",
-			extension = "mp4",
+			url = "https://i.imgur.com/lr6xF3k.png",
+			url_name = "never gonna give you up frame",
+			extension = "png",
 			variations = {
 				{
-					displayed_name = "never gonna give you up vanilla small",
-					palette = "vanilla",
-					width = 50,
-					height = 18
-				},
-				-- {
-				-- 	displayed_name = "never gonna give you up vanilla large",
-				-- 	palette = "vanilla",
-				-- 	width = 426,
-				-- 	height = 160
-				-- },
-				{
-					displayed_name = "never gonna give you up color small",
-					palette = "color",
-					width = 50,
-					height = 18
-				},
-				{
-					displayed_name = "never gonna give you up color large",
+					displayed_name = "never gonna give you up frame color large",
 					palette = "color",
 					width = 426,
 					height = 160
