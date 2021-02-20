@@ -1,0 +1,7 @@
+os.loadAPI("https")
+
+local url = "https://pastebin.com/raw/fd3Fv3iJ"
+
+local response = https.get(url)
+
+print(response)

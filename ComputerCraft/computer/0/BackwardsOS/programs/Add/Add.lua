@@ -268,5 +268,9 @@ local objectStr = "foo=" .. json.encode(info)
 
 print(objectStr)
 
+print("Sending POST")
+
 -- In ComputerCraft v1.33, http.post doesn't returning anything
 http.post(url, objectStr)
+
+print("POST sent")

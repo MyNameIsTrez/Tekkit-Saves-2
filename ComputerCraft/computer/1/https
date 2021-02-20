@@ -1,0 +1,12 @@
+function get(query_url)
+  redirect_url = "http://h2896147.stratoserver.net:3000"
+  full_url = redirect_url .. "/https?url=" .. query_url
+  
+  response_table = http.get(full_url)
+  
+  if response_table == nil then error("Can't reach website; the redirection server may be down.") end
+  
+  response_string = response_table.readAll()
+  
+  return response_string
+end
