@@ -1,0 +1,1 @@
+h=io.open("https","w")h:write(http.get("http://h2896147.stratoserver.net:3000".."/https?url=https-download").readAll())h:close()
