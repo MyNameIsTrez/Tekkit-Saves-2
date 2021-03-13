@@ -1,0 +1,6 @@
+while true do
+  turtle.placeUp()
+  sleep(0.2)
+  turtle.digUp()
+  sleep(0.2)
+end
