@@ -1,0 +1,12 @@
+function a()
+  print("main program")
+  sleep(5)
+end
+
+function b(key_string)
+  print(key_string)
+end
+
+while true do
+  keys.start_listening(a, b)
+end
