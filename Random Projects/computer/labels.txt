@@ -3,7 +3,6 @@
 2 explorer
 3 TurtleCrafter - Control
 4 wireworld
-36 TurtleCrafter - Crafter
 7 Slave Requestor 1
 8 Master Requestor
 9 Slave Requestor 2
@@ -12,7 +11,6 @@
 17 mandelbrot
 18 animation
 19 dithering
-51 TurtleCrafter - Storage
 20 shapeShowcase
 21 particles
 22 writingSpeedTest
@@ -22,3 +20,7 @@
 26 raycasting
 27 worldTime
 29 messaging
+36 TurtleCrafter - Crafter
+51 TurtleCrafter - Storage
+57 cannon
+59 cannon

@@ -1,0 +1,6 @@
+for i = 1, 7 do
+  rs.setBundledOutput("right", colors.gray)
+  sleep(0.2)
+  rs.setBundledOutput("right", 0)
+  sleep(0.2)
+end

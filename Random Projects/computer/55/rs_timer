@@ -1,0 +1,6 @@
+local side = "right"
+
+while true do
+  local _, key = os.pullEvent()
+  print(key)
+end

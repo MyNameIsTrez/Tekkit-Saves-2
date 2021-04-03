@@ -1,0 +1,3 @@
+rs.setBundledOutput("right", 1)
+sleep(0.15)
+rs.setBundledOutput("right", 0)
