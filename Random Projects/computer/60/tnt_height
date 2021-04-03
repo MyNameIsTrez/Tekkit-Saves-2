@@ -1,0 +1,51 @@
+local side_place = "back"
+local side_ignite = "top"
+local side_piston = "right"
+
+local args = {...}
+local payload_delay_seconds = args[1]
+
+
+function on(side)
+  rs.setOutput(side, true)
+end
+
+
+function off(side)
+  rs.setOutput(side, false)
+end
+
+
+function fire()
+  on(side_place)
+  sleep(0.05)
+  on(side_ignite)
+  sleep(0.05)
+  
+  off(side_place)
+  off(side_ignite)
+end
+
+
+function main()
+  term.clear()
+  term.setCursorPos(1, 1)
+  print("Don't quit; running test!")
+  
+  while true do
+    on(side_piston)
+    sleep(0.35)
+    fire()
+    sleep(payload_delay_seconds)
+    fire()
+    sleep(0.15)
+    off(side_piston)
+    
+    print("You can quit!")
+    sleep(4)
+    print("Don't quit; running test!")
+  end
+end
+
+
+main()
