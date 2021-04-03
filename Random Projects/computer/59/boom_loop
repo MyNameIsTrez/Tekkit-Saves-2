@@ -1,0 +1,11 @@
+print("Don't quit; cannon running!")
+
+while true do
+  shell.run("boom")
+  
+  term.clear()
+  term.setCursorPos(1, 1)
+  print("You can quit!")
+  sleep(4)
+  print("Don't quit; cannon running!")
+end
