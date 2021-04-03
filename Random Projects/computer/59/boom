@@ -1,2 +1,2 @@
 shell.run("reload")
-shell.run("fire")
+shell.run("fire", 7, 2.6)

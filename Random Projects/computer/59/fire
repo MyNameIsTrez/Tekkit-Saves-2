@@ -1,5 +1,7 @@
-local propellant_tnt_count = 7
-local payload_ignite_delay_seconds = 2.7
+local args = {...}
+
+local propellant_tnt_count = args[1]
+local payload_ignite_delay_seconds = args[2]
 
 local side = "top"
 
