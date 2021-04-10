@@ -3,7 +3,7 @@ local propellant_tnt_count = 8
 local side = "top"
 
 local color_place_propellant = colors.purple
-local color_place_payload = colors.brown
+local color_place_payload = colors.blue
 
 
 function out(color)
