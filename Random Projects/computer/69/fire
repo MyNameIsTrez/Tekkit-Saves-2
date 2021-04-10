@@ -1,0 +1,32 @@
+local args = {...}
+local propellant_tnt_count = args[1]
+local payload_ignite_delay_seconds = args[2]
+
+
+local side = "top"
+
+local color_align_propellant = colors.lightGray
+local color_align_ignite_payload = colors.cyan
+
+
+local colors_ignite_propellant = 2^(propellant_tnt_count)-1
+
+
+function out(color)
+  rs.setBundledOutput(side, color)
+end
+
+
+function main()
+  out(colors_ignite_propellant + color_align_propellant)
+  sleep(0.15)
+  out(0)
+  
+  sleep(payload_ignite_delay_seconds)
+  out(color_align_ignite_payload)
+  sleep(0.15)
+  out(0)
+end
+
+
+main()

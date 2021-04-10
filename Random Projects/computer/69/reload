@@ -1,0 +1,31 @@
+local propellant_tnt_count = 8
+
+local side = "top"
+
+local color_place_propellant = colors.purple
+local color_place_payload = colors.brown
+
+
+function out(color)
+  rs.setBundledOutput(side, color)
+end
+
+
+function main()
+  for i = 1, propellant_tnt_count do
+    out(color_place_propellant)
+    sleep(0.1)
+    
+    if i ~= propellant_tnt_count then
+      out(0)
+      sleep(0.25)
+    end
+  end
+  
+  out(color_place_payload)
+  sleep(0.5)
+  out(0)
+end
+
+
+main()

@@ -1,0 +1,16 @@
+local dont_quit_text = "Don't quit; cannon running!"
+local can_quit_text = "You can quit!"
+
+
+print(dont_quit_text)
+
+while true do
+  shell.run("boom")
+  
+  term.clear()
+  term.setCursorPos(1, 1)
+
+  print(can_quit_text)
+  sleep(4)
+  print(dont_quit_text)
+end

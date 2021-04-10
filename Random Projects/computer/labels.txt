@@ -3,6 +3,7 @@
 2 explorer
 3 TurtleCrafter - Control
 4 wireworld
+69 8cannon
 7 Slave Requestor 1
 8 Master Requestor
 9 Slave Requestor 2
