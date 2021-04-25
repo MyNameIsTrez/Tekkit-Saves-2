@@ -5,6 +5,7 @@
 4 wireworld
 69 8cannon
 7 Slave Requestor 1
+71 dropping_test
 8 Master Requestor
 9 Slave Requestor 2
 12 simplePlanets

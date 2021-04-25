@@ -1,0 +1,4 @@
+sleep(3)
+while true do
+    turtle.forward()
+end

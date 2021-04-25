@@ -1,0 +1,9 @@
+sleep(3)
+while true do
+    parallel.waitForAny(
+    turtle.forward,
+    function()
+        --os.queueEvent("turtle_response", true)
+    end
+    )
+end
