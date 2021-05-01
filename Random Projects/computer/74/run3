@@ -1,18 +1,15 @@
 local queue = {}
-local callback_fns = {}
 local callbacks = {}
 
 
 function listen(event, callback_fn)
-  -- TODO: Combine into a single if-statement?
   if callbacks[event] == nil then
     callbacks[event] = {}
   end
-  if callback_fns[event] == nil then
-    callback_fns[event] = {}
-  end
   
-  table.insert(callback_fns[event], callback_fn)
+  local callback_coro = coroutine.create(callback_fn)
+  
+  table.insert(callbacks[event], callback_coro)
 end
 
 local function runner()
@@ -22,21 +19,12 @@ local function runner()
     if queue[1] then
       local eventData = table.remove(queue, 1)
       local event = eventData[1]
-      --print("event: ", event)
-      
+      print("event: ", event)
       if callbacks[event] then
-        --print("#callbacks[event]: ", #callbacks[event])
-        
+        print("#callbacks[event]: ", #callbacks[event])
         for i = 1, #callbacks[event] do
           -- TODO: USE TABLE.UNPACK()!!
-          -- If one of the params is nil, it won't
-          -- return the params after it.
-          
-          local status = coroutine.status(callbacks[event][i])
-          if status == "dead" then
-            callbacks[event][i] = coroutine.create(callback_fns[event][i])
-          end
-          
+          --print("coroutine.resume()")
           coroutine.resume(callbacks[event][i], unpack(eventData))
         end
       end
