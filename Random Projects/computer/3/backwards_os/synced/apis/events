@@ -1,11 +1,6 @@
 local events = {}
 
 
-local function add_event(event)
-	events[event] = {}
-end
-
-
 --[[
 function remove_event(event)
 	events[event] = nil
@@ -13,16 +8,40 @@ end
 ]]--
 
 
--- TODO: Allow "event" to be a table.
-function listen(event, callback)
+function listen(event_arg, callback_arg)
+	if type(event_arg) == "table" then
+		--server.print("Loop through table of callbacks.")
+		-- Loop through table of callbacks.
+		for event_result, callback in pairs(event_arg) do
+			if type(event_result) == "table" then
+				--server.print("Loop through table of keys that call the callback.")
+				-- Loop through table of keys that call the callback.
+				for _, event in ipairs(event_result) do
+					--server.print("event: " .. event .. ", callback: " .. tostring(callback))
+					add_event(event, callback)
+				end
+			else
+				--server.print("single event: " .. event_result .. ", callback: " .. tostring(callback))
+				add_event(event_result, callback)
+			end
+		end
+	else
+		--server.print("single event: " .. event_arg .. ", single callback: " .. tostring(callback_arg))
+		add_event(event_arg, callback_arg)
+	end
+end
+
+
+function add_event(event, callback)
 	if events[event] == nil then
-		add_event(event)
+		events[event] = {}
 	end
 	table.insert(events[event], callback)
 end
 
 
 -- TODO: Allow "event" to be a table.
+--[[
 function remove_listener(event, callback)
 	for i, found_callback in pairs(events[event]) do
 		if callback == found_callback then
@@ -31,22 +50,29 @@ function remove_listener(event, callback)
 		end
 	end
 end
+]]--
 
 
 -- TODO: Allow "event" to be a table.
-function fire(event)
+function fire(event, ...)
 	if not events[event] then
 		return
 	end
 	
+	--server.print(#events[event])
+	--for _, callback in ipairs(events[event]) do
+	--	server.print(tostring(callback))
+	--end
+	
 	for _, callback in ipairs(events[event]) do
-		callback()
+		--server.print(_)
+		callback(...)
 	end
 end
 
 
-function print_event_callbacks(event)
-	for _, callback in ipairs(events[event]) do
-		print(callback)
-	end
-end
+--function print_event_callbacks(event)
+--	for _, callback in ipairs(events[event]) do
+--		print(callback)
+--	end
+--end

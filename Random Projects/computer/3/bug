@@ -1,0 +1,14 @@
+parallel.waitForAll(function()
+while true do
+  local event = os.pullEvent()
+  --sleep(0.05)
+  if event == "key" or event == "char" then
+    print(event)
+  end
+end
+end, function()
+while true do
+os.queueEvent("xd")
+os.pullEvent("xd")
+end
+end)

@@ -1,0 +1,31 @@
+local shared_event
+
+while true do
+
+parallel.waitForAll(
+
+function()
+  print("function 1")
+  local event, value = os.pullEvent()
+  
+  if event == "timer" then
+    shared_event = nil
+  else
+    shared_event = event
+  end
+end,
+
+function()
+  print("function 2")
+  -- Always nil before the first event is fired.
+  if shared_event == nil then
+    return
+  end
+  
+  print(shared_event)
+  sleep(3)
+end
+
+)
+
+end
