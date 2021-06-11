@@ -1,6 +1,8 @@
+typed = "" -- Global storage.
+
+
 -- Find these keys by copying this into a CC terminal that has the "lua" program open:
 -- while true do type, num = os.pullEvent("key") print(num) end
-
 local keys_index_name = {
 	"backslash", -- 0
 	"escape","one","two","three","four", -- 1
@@ -108,8 +110,9 @@ keys_string_number["return"] = keys_string_number.enter
 
 function listen()
 	while true do
+		--utils.debug_write_random()
+		
 		local event, value = os.pullEvent()
-		--print(event)
 		
 		if event == "key" then
 			local key_num = value
@@ -139,6 +142,3 @@ end
 function is_typed(key_num)
 	return typed_index_bool[key_num + 1] == true
 end
-
-
-typed = ""

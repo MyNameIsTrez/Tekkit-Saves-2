@@ -5,7 +5,7 @@ local cfg_path = fs.combine(apis, "backwards_os_cfg")
 local fake_width, height = term.getSize()
 local width = fake_width - 1
 
-local typing_start_x = 3
+local typing_start_x -- Initialized in main()
 --local typing_start_y = 1
 local typed_history = {}
 local typed_history_index = 0
@@ -14,16 +14,18 @@ local running_program = false
 
 function premain()
 	parallel.waitForAny(
-		listen_file_update,
 		keyboard.listen,
+		listen_file_update,
 		main
 	)
 end
 
 
+-- TODO: Replace with events.listen call.
 function listen_file_update()
 	while true do
-		if long_poll.listen("file_change") == "true" then
+		-- The server responds every N seconds.
+		if long_poll.listen() == "true" then
 			os.reboot()
 		end
 	end
@@ -32,6 +34,9 @@ end
 
 function main()
 	term.write("> ")
+	-- This line below is in case the string above gets changed.
+	typing_start_x = term.getCursorPos()
+	
 	term.setCursorBlink(true)
 	
 	shell.run("backwards_os/synced/programs/crafting_gui")
@@ -55,12 +60,10 @@ end
 -- Function of synced/apis/subterm.lua
 events_tab["pageUp"] = function()
 	subterm.scroll_up(1)
-	--server.print("typed pageUp")
 end
 
 events_tab["pageDown"] = function()
 	subterm.scroll_down(1)
-	--server.print("typed pageDown")
 end
 
 events_tab["enter"] = function()
@@ -88,7 +91,7 @@ events_tab["enter"] = function()
 end
 
 -- TODO: Move into function.
-events_tab[ { "backspace", "delete" } ] = function()
+events_tab[ { "backspace", "delete" } ] = function(key)
 	if #keyboard.typed > 0 then
 		local cursor_x, cursor_y = term.getCursorPos()
 		local typed_cursor_index = cursor_x - typing_start_x
@@ -131,23 +134,18 @@ events_tab[ { "up", "down", "left", "right" } ] = function(key)
 	end
 end
 
-events_tab["char"] = function(char)
-	--server.print("bar")
-	--server.print("")
+events_tab["char"] = function(_, char)
 	local cursor_x, cursor_y = term.getCursorPos()
-	--server.print("cursor_x: " .. cursor_x .. ", cursor_y: " .. cursor_y)
 	local typed_cursor_index = cursor_x - typing_start_x
-	--server.print("typed_cursor_index: " .. typed_cursor_index)
 	
-	--keyboard.typed = keyboard.typed .. char
-	keyboard.typed = keyboard.typed:sub(1, typed_cursor_index) .. char .. keyboard.typed:sub(typed_cursor_index + 1, -1)
-	--server.print("keyboard.typed: " .. keyboard.typed)
+	local back = keyboard.typed:sub(1, typed_cursor_index)
+	local front = keyboard.typed:sub(typed_cursor_index + 1, -1)
+	keyboard.typed = back .. char .. front
 	
 	if not running_program then
 		write(keyboard.typed:sub(typed_cursor_index + 1, -1))
 		term.setCursorPos(cursor_x + 1, cursor_y)
 	end
-	--server.print(keyboard.typed)
 end
 
 
@@ -162,10 +160,6 @@ function move_cursor(key)
 			
 			keyboard.typed = typed_history[typed_history_index - 1]
 			typed_history_index = typed_history_index - 1
-			
-			--server.print(prev_typed)
-			--server.print(keyboard.typed)
-			--server.print(#prev_typed - #keyboard.typed)
 			
 			term.setCursorPos(typing_start_x, y)
 			term.write(keyboard.typed)
@@ -192,10 +186,6 @@ function move_cursor(key)
 			
 			keyboard.typed = typed_history[typed_history_index + 1]
 			typed_history_index = typed_history_index + 1
-			
-			--server.print(prev_typed)
-			--server.print(keyboard.typed)
-			--server.print(#prev_typed - #keyboard.typed)
 			
 			term.setCursorPos(typing_start_x, y)
 			term.write(keyboard.typed)
@@ -237,7 +227,7 @@ function downloadCfg()
 
 	local url = 'https://raw.githubusercontent.com/MyNameIsTrez/ComputerCraft-APIs/master/backwardsos_cfg.lua'
 
-	local handleHttps = http.post(httpToHttpsUrl, '{"url": "' .. url .. '"}' )
+	local handleHttps = http.post_lossless(httpToHttpsUrl, '{"url": "' .. url .. '"}' )
 
 	if not handleHttps then
 		handleHttps.close()

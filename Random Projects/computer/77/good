@@ -1,0 +1,22 @@
+function foo()
+  while true do
+    print("foo: pre queue")
+    os.queueEvent("unused")
+    print("foo: post queue, pre pull")
+    os.pullEvent()
+    print("foo: post pull")
+  end
+end
+
+function bar()
+  while true do
+    print("bar: pre pull")
+    os.pullEvent()
+    print("bar: post pull")
+  end
+end
+
+parallel.waitForAny(
+  foo,
+  bar
+)
