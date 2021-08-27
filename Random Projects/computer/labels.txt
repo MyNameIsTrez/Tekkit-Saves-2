@@ -15,15 +15,22 @@
 17 mandelbrot
 18 animation
 19 dithering
+83 itemSender
 20 shapeShowcase
+84 gold
 21 particles
+85 diamond
 22 writingSpeedTest
+86 teleport
 23 perlinNoise
 24 performanceTesting
 25 threedee
 26 raycasting
 27 worldTime
+92 slave_single_sender_1
 29 messaging
+93 slave_stack_sender_1
+95 master_requester
 36 TurtleCrafter - Crafter
 51 TurtleCrafter - Storage
 57 cannon

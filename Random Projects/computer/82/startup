@@ -1,0 +1,17 @@
+local ids = {
+  lapis = colors.white,
+  gold = colors.orange,
+  diamond = colors.magenta,
+}
+
+rednet.open("top")
+
+function f(id) rednet.send(83, tostring(id)) end
+
+f(ids.lapis)
+sleep(1)
+f(ids.gold)
+sleep(1)
+f(ids.diamond)
+sleep(1)
+f(0)

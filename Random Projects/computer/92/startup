@@ -1,0 +1,8 @@
+rednet.open("front")
+
+while true do
+  local _, n = rednet.receive()
+  n = tonumber(n)
+  
+  rs.setBundledOutput("left", n)
+end

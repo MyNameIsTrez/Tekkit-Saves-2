@@ -1,0 +1,9 @@
+rednet.open("top")
+
+while true do
+  rednet.receive()
+  
+  rs.setOutput("back", true)
+  sleep(1)
+  rs.setOutput("back", false)
+end

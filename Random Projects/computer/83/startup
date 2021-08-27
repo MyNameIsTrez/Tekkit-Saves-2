@@ -1,0 +1,9 @@
+rednet.open("top")
+
+function f(n) rs.setBundledOutput("bottom", n) end
+
+while true do
+  local _, n = rednet.receive()
+  
+  f(n)
+end

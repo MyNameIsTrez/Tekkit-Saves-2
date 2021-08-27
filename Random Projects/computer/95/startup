@@ -1,0 +1,24 @@
+rednet.open("back")
+
+function send(color_number) rednet.send(92, tostring(color_number)) end
+
+function f() for i = 1, 25000000 do local a = 0 end end
+
+send(colors.white)
+f()
+print("first f() finished")
+send(colors.white + colors.orange)
+f()
+print("second f() finished")
+send(colors.white + colors.orange + colors.magenta)
+--[[
+send(colors.white)
+sleep(1)
+
+send(colors.orange)
+sleep(1)
+
+send(colors.magenta)
+]]--
+sleep(1)
+send(0)
